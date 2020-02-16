@@ -243,20 +243,121 @@ type MilitaryActionConstants =
     | ACTION_HEAL
     | ACTION_RANGED_HEAL;
 
-type MilitaryTargetConstants = 
-    | DirectionConstant
-    | string; // ID
+type MilitaryTargetConstants_Move =
+    | DirectionConstant;
 
-type MilitaryTargetTypeConstant =
-    | "creep"
-    | "powerCreep"
-    | "structure"
+type MilitaryTargetConstants_Heal =
+    | Id<Creep>
+    | string // Creep name
+    | Id<PowerCreep>;
+
+type MilitaryTargetConstants_RangedHeal =
+    | Id<Creep>
+    | string // Creep name
+    | Id<PowerCreep>;
+
+type MilitaryTargetConstants_Attack =
+    | Id<Creep>
+    | string // Creep name
+    | Id<PowerCreep>
+    | Id<Structure>;
+
+type MilitaryTargetConstants_RangedAttack =
+    | Id<Creep>
+    | string // Creep name
+    | Id<PowerCreep>
+    | Id<Structure>;
+
+type MilitaryTargetConstants_MassRanged =
+    | null;
+
+type MilitaryTargetConstants = 
+    | MilitaryTargetConstants_Move
+    | MilitaryTargetConstants_Heal
+    | MilitaryTargetConstants_RangedHeal
+    | MilitaryTargetConstants_Attack
+    | MilitaryTargetConstants_RangedAttack
+    | MilitaryTargetConstants_MassRanged;
+
+type MilitaryTargetTypeConstants_Move =
     | "direction";
 
-interface MiliIntent {
+type MilitaryTargetTypeConstants_Heal =
+    | "creepID"
+    | "creepName"
+    | "powerCreep";
+
+type MilitaryTargetTypeConstants_RangedHeal =
+    | "creepID"
+    | "creepName"
+    | "powerCreep";
+
+type MilitaryTargetTypeConstants_Attack =
+    | "creepID"
+    | "creepName"
+    | "powerCreep"
+    | "structure";
+
+type MilitaryTargetTypeConstants_RangedAttack =
+    | "creepID"
+    | "creepName"  
+    | "powerCreep"
+    | "structure";
+
+type MilitaryTargetTypeConstants_MassRanged =
+    | "creepID"
+    | "creepName"
+    | "powerCreep"
+    | "structure";
+
+type MilitaryTargetTypeConstants =
+    | MilitaryTargetTypeConstants_Move
+    | MilitaryTargetTypeConstants_Heal
+    | MilitaryTargetTypeConstants_RangedHeal
+    | MilitaryTargetTypeConstants_Attack
+    | MilitaryTargetTypeConstants_RangedAttack
+    | MilitaryTargetTypeConstants_MassRanged
+
+interface Base_MiliIntent {
     action: MilitaryActionConstants;
     target: MilitaryTargetConstants;
-    targetType: MilitaryTargetTypeConstant;
+    targetType: MilitaryTargetTypeConstants;
+}
+
+interface Move_MiliIntent extends Base_MiliIntent {
+    action: ACTION_MOVE;
+    target: MilitaryTargetConstants_Move;
+    targetType: MilitaryTargetTypeConstants_Move;
+}
+
+interface Heal_MiliIntent extends Base_MiliIntent {
+    action: ACTION_HEAL;
+    target: MilitaryTargetConstants_Heal;
+    targetType: MilitaryTargetTypeConstants_Heal;
+}
+
+interface RangedHeal_MiliIntent extends Base_MiliIntent {
+    action: ACTION_RANGED_HEAL;
+    target: MilitaryTargetConstants_RangedHeal;
+    targetType: MilitaryTargetTypeConstants_RangedHeal;
+}
+
+interface Attack_MiliIntent extends Base_MiliIntent {
+    action: ACTION_ATTACK;
+    target: MilitaryTargetConstants_Attack;
+    targetType: MilitaryTargetTypeConstants_Attack;
+}
+
+interface RangedAttack_MiliIntent extends Base_MiliIntent {
+    action: ACTION_RANGED_ATTACK;
+    target: MilitaryTargetConstants_RangedAttack;
+    targetType: MilitaryTargetTypeConstants_RangedAttack;
+}
+
+interface MassRanged_MiliIntent extends Base_MiliIntent {
+    action: ACTION_MASS_RANGED;
+    target: MilitaryTargetConstants_MassRanged;
+    targetType: MilitaryTargetTypeConstants_MassRanged;
 }
 
 interface MilitaryDataAll {
@@ -302,7 +403,7 @@ interface ISquadManager {
 
 interface SquadStack {
     name: string;
-    intents: MiliIntent[];
+    intents: Base_MiliIntent[];
 }
 
 type SquadStrategyImplementation = {

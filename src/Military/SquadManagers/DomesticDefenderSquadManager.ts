@@ -221,7 +221,7 @@ export class DomesticDefenderSquadManager implements ISquadManager {
                 const pathOpts: FindPathOpts = MilitaryMovment_Api.getDomesticDefenderCostMatrix(instance.targetRoom, false, roomData);
                 const directionToTarget = creep.pos.findPathTo(targetRampart.pos, pathOpts)[0].direction;
 
-                const intent: MiliIntent = {
+                const intent: Move_MiliIntent = {
                     action: ACTION_MOVE,
                     target: directionToTarget,
                     targetType: "direction"
@@ -254,10 +254,10 @@ export class DomesticDefenderSquadManager implements ISquadManager {
 
                 if (creep.pos.inRangeTo(bestTargetHostile.pos, 3)) {
 
-                    const intent: MiliIntent = {
+                    const intent: RangedAttack_MiliIntent = {
                         action: ACTION_RANGED_ATTACK,
                         target: bestTargetHostile.id,
-                        targetType: "creep"
+                        targetType: "creepID"
                     };
 
                     MemoryApi_Military.pushIntentToCreepStack(instance, creep.name, intent);
@@ -268,10 +268,10 @@ export class DomesticDefenderSquadManager implements ISquadManager {
                 const closestHostileCreep: Creep | undefined = _.find(roomData[instance.targetRoom].hostiles!.allHostiles, (hostile: Creep) => hostile.pos.getRangeTo(creep.pos) <= 3);
 
                 if (closestHostileCreep !== undefined) {
-                    const intent: MiliIntent = {
+                    const intent: RangedAttack_MiliIntent = {
                         action: ACTION_RANGED_ATTACK,
                         target: closestHostileCreep.id,
-                        targetType: "creep"
+                        targetType: "creepID"
                     };
 
                     MemoryApi_Military.pushIntentToCreepStack(instance, creep.name, intent);
@@ -294,10 +294,10 @@ export class DomesticDefenderSquadManager implements ISquadManager {
                 const creepIsOnRampart: boolean = _.filter(creep.pos.lookFor(LOOK_STRUCTURES), (struct: Structure) => struct.structureType === STRUCTURE_RAMPART).length > 0;
                 if ((roomData[instance.targetRoom].hostiles!.allHostiles.length > 0 && !creepIsOnRampart) || creep.hits < creep.hitsMax) {
 
-                    const intent: MiliIntent = {
+                    const intent: Heal_MiliIntent = {
                         action: ACTION_HEAL,
                         target: creep.name,
-                        targetType: "creep"
+                        targetType: "creepName"
                     };
 
                     MemoryApi_Military.pushIntentToCreepStack(instance, creep.name, intent);

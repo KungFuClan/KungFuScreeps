@@ -33,7 +33,7 @@ export class MilitaryIntents_Api {
             return false;
         }
 
-        const intent: MiliIntent = {
+        const intent: Move_MiliIntent = {
             action: ACTION_MOVE,
             target: directionOffExitTile,
             targetType: "direction"
@@ -58,7 +58,7 @@ export class MilitaryIntents_Api {
     public static queueIntentMoveToTargetRoom(creep: Creep, instance: ISquadManager): boolean {
         const path = creep.pos.findPathTo(new RoomPosition(25, 25, instance.targetRoom), { range: 25 });
         const directionToTarget = path[0].direction;
-        const intent: MiliIntent = {
+        const intent: Move_MiliIntent = {
             action: ACTION_MOVE,
             target: directionToTarget,
             targetType: "direction"
@@ -87,7 +87,7 @@ export class MilitaryIntents_Api {
                     return false;
                 }
 
-                const intent: MiliIntent = {
+                const intent: Move_MiliIntent = {
                     action: ACTION_MOVE,
                     target: directionToTarget,
                     targetType: "direction"
@@ -102,7 +102,7 @@ export class MilitaryIntents_Api {
             else {
                 const path = creep.pos.findPathTo(targetHostile.pos, { range: 3 });
                 const directionToTarget = path[0].direction;
-                const intent: MiliIntent = {
+                const intent: Move_MiliIntent = {
                     action: ACTION_MOVE,
                     target: directionToTarget,
                     targetType: "direction"
@@ -131,7 +131,7 @@ export class MilitaryIntents_Api {
             if (!directionToTarget) {
                 return false;
             }
-            const intent: MiliIntent = {
+            const intent: Move_MiliIntent = {
                 action: ACTION_MOVE,
                 target: directionToTarget,
                 targetType: "direction"
@@ -163,10 +163,10 @@ export class MilitaryIntents_Api {
 
         if (creep.pos.inRangeTo(bestTargetHostile.pos, 3)) {
 
-            const intent: MiliIntent = {
+            const intent: RangedAttack_MiliIntent = {
                 action: ACTION_RANGED_ATTACK,
                 target: bestTargetHostile.id,
-                targetType: "creep"
+                targetType: "creepID"
             };
 
             MemoryApi_Military.pushIntentToCreepStack(instance, creep.name, intent);
@@ -187,10 +187,10 @@ export class MilitaryIntents_Api {
         const closestHostileCreep: Creep | undefined = _.find(roomData[instance.targetRoom].hostiles!.allHostiles, (hostile: Creep) => hostile.pos.getRangeTo(creep.pos) <= 3);
 
         if (closestHostileCreep !== undefined) {
-            const intent: MiliIntent = {
+            const intent: RangedAttack_MiliIntent = {
                 action: ACTION_RANGED_ATTACK,
                 target: closestHostileCreep.id,
-                targetType: "creep"
+                targetType: "creepID"
             };
 
             MemoryApi_Military.pushIntentToCreepStack(instance, creep.name, intent);
@@ -211,10 +211,10 @@ export class MilitaryIntents_Api {
         const creepIsOnRampart: boolean = _.filter(creep.pos.lookFor(LOOK_STRUCTURES), (struct: Structure) => struct.structureType === STRUCTURE_RAMPART).length > 0;
         if ((roomData[instance.targetRoom].hostiles!.allHostiles.length > 0 && !creepIsOnRampart) || creep.hits < creep.hitsMax) {
 
-            const intent: MiliIntent = {
+            const intent: Heal_MiliIntent = {
                 action: ACTION_HEAL,
                 target: creep.name,
-                targetType: "creep"
+                targetType: "creepName"
             };
 
             MemoryApi_Military.pushIntentToCreepStack(instance, creep.name, intent);
