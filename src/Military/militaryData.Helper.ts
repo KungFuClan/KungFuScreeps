@@ -11,7 +11,6 @@ export class militaryDataHelper {
      */
     public static getRoomData(creeps: Creep[], roomData: MilitaryDataAll, dataNeeded: MilitaryDataParams, instance: ISquadManager): MilitaryDataAll {
         
-
         _.forEach(creeps, (creep: Creep) => {
             const roomName = creep.room.name;
 
