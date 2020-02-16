@@ -247,26 +247,20 @@ type MilitaryTargetConstants_Move =
     | DirectionConstant;
 
 type MilitaryTargetConstants_Heal =
-    | Id<Creep>
-    | string // Creep name
-    | Id<PowerCreep>;
+    | Id<Creep | PowerCreep>
+    | string; // Creep name
 
 type MilitaryTargetConstants_RangedHeal =
-    | Id<Creep>
-    | string // Creep name
-    | Id<PowerCreep>;
+    | Id<Creep | PowerCreep>
+    | string; // Creep name
 
 type MilitaryTargetConstants_Attack =
-    | Id<Creep>
-    | string // Creep name
-    | Id<PowerCreep>
-    | Id<Structure>;
+    | Id<Creep | PowerCreep | Structure>    
+    | string; // Creep name
 
 type MilitaryTargetConstants_RangedAttack =
-    | Id<Creep>
-    | string // Creep name
-    | Id<PowerCreep>
-    | Id<Structure>;
+    | Id<Creep | PowerCreep | Structure>
+    | string; // Creep name
 
 type MilitaryTargetConstants_MassRanged =
     | null;
