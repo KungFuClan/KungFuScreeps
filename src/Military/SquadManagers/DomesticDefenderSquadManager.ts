@@ -246,6 +246,10 @@ export class DomesticDefenderSquadManager implements ISquadManager {
 
             roomData = militaryDataHelper.getRoomData(creeps, roomData, {hostiles:true, openRamparts:true}, instance);
 
+            if (!roomData[instance.targetRoom]?.hostiles || !roomData[instance.targetRoom]?.openRamparts) {
+                return;
+            }
+
             const bestTargetHostile = militaryDataHelper.getHostileClosestToBunkerCenter(roomData[instance.targetRoom].hostiles!.allHostiles, instance.targetRoom);
 
             if (bestTargetHostile === null) {
@@ -288,6 +292,10 @@ export class DomesticDefenderSquadManager implements ISquadManager {
             const creeps = MemoryApi_Military.getLivingCreepsInSquadByInstance(instance)
 
             roomData = militaryDataHelper.getRoomData(creeps, roomData, {hostiles:true}, instance);
+
+            if (!roomData[instance.targetRoom]?.hostiles) {
+                return;
+            }
 
             // Heal yourself every tick, as long as there are hostiles in the room
 
