@@ -4,14 +4,13 @@ import { close } from "inspector";
 export class militaryDataHelper {
 
     /**
-     * Get the data for the room
+     * Get the data for the room. If the data requested is already present, it will be skipped since this object
+     * is invalidated each tick. 
      * @param creeps the creeps we're getting data for
      * @param dataNeeded the booleans representing the data we need
      */
-    public static getRoomData(creeps: Creep[], dataNeeded: MilitaryDataParams, instance: ISquadManager): MilitaryDataAll {
-        const roomData: MilitaryDataAll = {};
-        roomData[instance.targetRoom] = this.getDefaultRoomDataForRoom(instance.targetRoom);
-
+    public static getRoomData(creeps: Creep[], roomData: MilitaryDataAll, dataNeeded: MilitaryDataParams, instance: ISquadManager): MilitaryDataAll {
+        
 
         _.forEach(creeps, (creep: Creep) => {
             const roomName = creep.room.name;
@@ -20,10 +19,10 @@ export class militaryDataHelper {
                 roomData[roomName] = {};
             }
 
-            if (dataNeeded.hostiles) {
+            if (dataNeeded.hostiles && roomData[roomName].hostiles === undefined) {
                 roomData[roomName].hostiles = this.getHostileCreeps(roomName);
             }
-            if (dataNeeded.openRamparts) {
+            if (dataNeeded.openRamparts && roomData[roomName].openRamparts === undefined) {
                 roomData[roomName].openRamparts = this.getOpenRamparts(roomName);
             }
         });
@@ -41,18 +40,6 @@ export class militaryDataHelper {
         const closestHostile = bunkerCenter.findClosestByRange(enemies);
 
         return closestHostile;
-    }
-
-    /**
-     * Fill room data with default empty values so it will be defined in the squad mannagers
-     * @param roomName the room we're trying to put default info in for
-     * @returns military room data all object
-     */
-    public static getDefaultRoomDataForRoom(roomName: string): MilitaryDataRoom {
-        return {
-            hostiles: { allHostiles: [], heal: [], attack: [], rangedAttack: [] },
-            openRamparts: [],
-        }
     }
 
     /**
