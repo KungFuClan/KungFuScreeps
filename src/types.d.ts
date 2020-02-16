@@ -243,10 +243,20 @@ type MilitaryActionConstants =
     | ACTION_HEAL
     | ACTION_RANGED_HEAL;
 
+type MilitaryTargetConstants = 
+    | DirectionConstant
+    | string; // ID
+
+type MilitaryTargetTypeConstant =
+    | "creep"
+    | "powerCreep"
+    | "structure"
+    | "direction";
+
 interface MiliIntent {
     action: MilitaryActionConstants;
-    target: string | MockRoomPos | DirectionConstant;
-    targetType: string;
+    target: MilitaryTargetConstants;
+    targetType: MilitaryTargetTypeConstant;
 }
 
 interface MilitaryDataAll {
