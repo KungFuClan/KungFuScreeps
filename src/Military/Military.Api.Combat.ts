@@ -101,7 +101,11 @@ export class MilitaryCombat_Api {
      */
     public static runIntent_MOVE(intent: Move_MiliIntent, creep: Creep, roomData: StringMap): void {
 
-        if (intent.targetType === "direction" && creep.fatigue === 0) {
+        if(creep.fatigue > 0) {
+            return;
+        }
+        
+        if (intent.targetType === "direction") {
             const target = this.validateTarget<number>(intent.target, intent, "runIntent_MOVE");
             creep.move(intent.target);
             return;
