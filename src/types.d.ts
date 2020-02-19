@@ -368,6 +368,26 @@ interface MilitaryDataParams {
     hostiles?: boolean;
 }
 
+// Cost matrix storage interface - used by CostMatrix.Api
+interface CostMatrixIndex {
+    /**
+     * Room Name to access cost matrices of
+     */
+    [index: string]: RoomCostMatrices;
+}
+interface RoomCostMatrices {
+    creepMatrix?: StoredCostMatrix;
+    towerDamageMatrix?: StoredCostMatrix;
+    structureMatrix?: StoredCostMatrix;
+    terrainMatrix?: StoredCostMatrix;
+}
+interface StoredCostMatrix {
+    serializedCostMatrix: string;
+    expires: boolean;
+    expirationTick?: number;
+    roomName: string;
+}
+
 // Role Interfaces to be implemented  -------------
 interface ICivCreepRoleManager {
     name: RoleConstant;
