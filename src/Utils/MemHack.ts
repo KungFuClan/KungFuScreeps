@@ -8,7 +8,7 @@ export class Mem {
             RawMemory._parsed = lastMemory;
         }
         else {
-            // tslint-disable-next-line no-unused-expressions
+            // tslint:disable-next-line
             Memory.rooms; // forces parsing
             lastMemory = RawMemory._parsed;
         }
