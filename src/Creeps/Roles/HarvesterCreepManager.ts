@@ -19,7 +19,7 @@ export class HarvesterCreepManager implements ICivCreepRoleManager {
      */
     public getNewJob(creep: Creep, room: Room): BaseJob | undefined {
         // if creep is empty, get a GetEnergyJob
-        if (creep.carry.energy === 0) {
+        if (creep.store.energy === 0) {
             return CreepCivApi.newGetEnergyJob(creep, room);
         } else {
             let job: BaseJob | undefined = this.newCarryPartJob(creep, room);

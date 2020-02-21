@@ -68,7 +68,7 @@ export class CreepCivHelper {
      * @param creep the creep we are deciding for
      */
     public static getContainerJobFilterFunction(room: Room, creep: Creep): (job: GetEnergyJob) => boolean {
-        const normalCaseContainerQualifier: (job: GetEnergyJob) => boolean = (cJob: GetEnergyJob) => !cJob.isTaken && cJob.resources!.energy >= creep.carryCapacity;
+        const normalCaseContainerQualifier: (job: GetEnergyJob) => boolean = (cJob: GetEnergyJob) => !cJob.isTaken && cJob.resources!.energy >= creep.store.getCapacity();
         const harvesterNeedsEnergyNowQualifier: (job: GetEnergyJob) => boolean = (cJob: GetEnergyJob) => !cJob.isTaken;
         // Only applies in the case of a harvester, so break early if we can
         if (creep.memory.role !== ROLE_HARVESTER) {

@@ -222,15 +222,11 @@ export class RoomApi_Structure {
      * checks if a structure or creep store is full
      * @param target the structure or creep we are checking
      */
-    public static isFull(target: any): boolean {
-        if (target instanceof Creep) {
-            return _.sum(target.carry) === target.carryCapacity;
-        } else if (target.hasOwnProperty("store")) {
-            return _.sum(target.store) === target.storeCapacity;
+    public static isFull(target: StoreStructure | Creep, resource?: ResourceConstant): boolean {
+        if (!resource) {
+            return target.store.getFreeCapacity() === 0;
         }
-
-        // if not one of these two, there was an error
-        throw new UserException("Invalid Target", "isFull called on target with no capacity for storage.", ERROR_ERROR);
+        return target.store.getFreeCapacity(resource) === 0;
     }
 
     /**
