@@ -178,4 +178,83 @@ export class CostMatrixApi {
         const parsedMatrix: number[] = JSON.parse(storedMatrix.serializedCostMatrix);
         return PathFinder.CostMatrix.deserialize(parsedMatrix);
     }
+
+    /**
+     * Reduces an array to make the minimum value in the range 1 (e.g. 4-20 will reduce to 1-17)
+     * @param costMatrix Cost matrix to reduce to 1 based
+     */
+    public static reduceCostMatrix(costMatrix: CostMatrix): CostMatrix {
+
+        const reducedMatrix = new PathFinder.CostMatrix();
+
+        const offset = 1 - _.min(costMatrix.serialize());
+
+        // Return early if matrix is already 1-based
+        if(offset === 0) {
+            return costMatrix;
+        }
+
+        for(let x = 0; x < 50; x++) {
+            for(let y = 0; y < 50; y++) {
+
+                const currValue: number = costMatrix.get(x, y);
+                reducedMatrix.set(x, y, currValue - offset);
+
+            }
+        }
+
+        return reducedMatrix;
+    }
+
+    /**
+     * Converts a cost matrix of any range of values to 1-scale. Any 255 values will remain 255
+     * @param costMatrix Cost matrix to scale
+     * @param scaleMax Max value of the scale
+     */
+    public static scaleCostMatrix(costMatrix: CostMatrix, scaleMax: number): CostMatrix {
+
+        const scaledMatrix = new PathFinder.CostMatrix();
+
+        // +1 to make scale 1 based instead of zero based
+        const range = 1 + _.max(costMatrix.serialize()) - _.min(costMatrix.serialize())
+        
+        const valueScale = scaleMax / range;
+
+        for(let x = 0; x < 50; x++) {
+            for(let y = 0; y < 50; y++) {
+
+                const scaledValue = costMatrix.get(x, y) * valueScale;
+                scaledMatrix.set(x, y, scaledValue);
+
+            }
+        }
+
+        return scaledMatrix;
+    }
+
+    /**
+     * Sums any number of costMatrices
+     * @param costMatrices An array of costmatrices to sum
+     */
+    public static sumCostMatrices(costMatrices: CostMatrix[]): CostMatrix {
+
+        const resultMatrix = new PathFinder.CostMatrix();
+
+        for(let x = 0; x < 50; x++) {
+            for(let y = 0; y < 50; y++) {
+
+                let summedValue = 0;
+
+                for(let i = 0; i < costMatrices.length; i++) {
+
+                    summedValue += costMatrices[i].get(x, y);
+
+                }
+
+                resultMatrix.set(x, y, summedValue);
+            }
+        }
+
+        return resultMatrix;
+    }
 }
