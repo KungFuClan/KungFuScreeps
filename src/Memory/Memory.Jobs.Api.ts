@@ -923,7 +923,7 @@ export class MemoryApi_Jobs {
             job.targetType === "terminal"
         ) {
             // Subtract creep carry from resources
-            job.resources.energy -= creep.store.getCapacity();
+            job.resources.energy -= creep.store.getFreeCapacity();
 
             if (job.resources.energy <= 0) {
                 job.isTaken = true;
