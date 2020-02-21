@@ -255,7 +255,7 @@ type MilitaryTargetConstants_RangedHeal =
     | string; // Creep name
 
 type MilitaryTargetConstants_Attack =
-    | Id<Creep | PowerCreep | Structure>    
+    | Id<Creep | PowerCreep | Structure>
     | string; // Creep name
 
 type MilitaryTargetConstants_RangedAttack =
@@ -265,7 +265,7 @@ type MilitaryTargetConstants_RangedAttack =
 type MilitaryTargetConstants_MassRanged =
     | null;
 
-type MilitaryTargetConstants = 
+type MilitaryTargetConstants =
     | MilitaryTargetConstants_Move
     | MilitaryTargetConstants_Heal
     | MilitaryTargetConstants_RangedHeal
@@ -294,7 +294,7 @@ type MilitaryTargetTypeConstants_Attack =
 
 type MilitaryTargetTypeConstants_RangedAttack =
     | "creepID"
-    | "creepName"  
+    | "creepName"
     | "powerCreep"
     | "structure";
 
@@ -465,6 +465,8 @@ interface IFlagProcesser {
  */
 declare namespace NodeJS {
     interface Global {
+        Memory: Memory;
+        age?: number;
         removeConstructionSites(roomName: string, structureType?: string): void;
         removeFlags(substr: string): void;
         displayRoomStatus(roomName: string): void;
