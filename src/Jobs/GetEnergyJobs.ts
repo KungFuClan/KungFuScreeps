@@ -239,7 +239,7 @@ export class GetEnergyJobs implements IJobTypeHelper {
 
             // Subtract the empty carry of creeps targeting this container to withdraw
             _.forEach(creepsUsingContainer, (creep: Creep) => {
-                adjustedContainerStore.energy -= creep.store.getFreeCapacity() - creep.store.energy;
+                adjustedContainerStore.energy -= creep.store.getFreeCapacity();
             });
 
             // Create the containerJob
@@ -316,7 +316,7 @@ export class GetEnergyJobs implements IJobTypeHelper {
 
             // Subtract the empty carry of creeps targeting this tombstone to withdraw
             _.forEach(creepsUsingTombstone, (creep: Creep) => {
-                adjustedTombstoneStore.energy -= creep.store.getFreeCapacity() - creep.store.energy;
+                adjustedTombstoneStore.energy -= creep.store.getFreeCapacity();
             });
 
             // Create the tombstoneJob
@@ -350,7 +350,7 @@ export class GetEnergyJobs implements IJobTypeHelper {
 
             // Subtract the empty carry of creeps targeting this container to withdraw
             _.forEach(creepsUsingRuin, (creep: Creep) => {
-                adjustedRuinStore.energy -= creep.store.getFreeCapacity() - creep.store.energy;
+                adjustedRuinStore.energy -= creep.store.getFreeCapacity();
             });
 
             // Create the containerJob
