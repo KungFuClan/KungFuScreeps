@@ -84,7 +84,10 @@ export class RemoteHarvesterBodyOptsHelper implements ICreepBodyOptsHelper {
                     wallRepair: true, //
                     fillTower: true, //
                     getFromContainer: true, //
+                    getLootJobs: true,
                     getDroppedEnergy: true, //
+                    getFromStorage: true,
+                    getFromTerminal: true,
                     fillStorage: true,
                     fillTerminal: true,
                     fillLink: true
