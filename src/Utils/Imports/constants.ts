@@ -101,7 +101,9 @@ export const ALL_STRUCTURE_TYPES: StructureConstant[] = [
     STRUCTURE_KEEPER_LAIR,
     STRUCTURE_CONTROLLER,
     STRUCTURE_POWER_BANK,
-    STRUCTURE_PORTAL
+    STRUCTURE_PORTAL,
+    STRUCTURE_FACTORY,
+    STRUCTURE_INVADER_CORE
 ];
 
 // The Wall/Rampart HP Limit for each Controller level
