@@ -7,7 +7,9 @@ import {
     MemoryApi_Military,
     OP_STRATEGY_NONE,
     DOMESTIC_DEFENDER_MAN,
-    SpawnApi
+    SpawnApi,
+    REMOTE_DEFENDER_MAN,
+    SOLO_ZEALOT_MAN
 } from "Utils/Imports/internals";
 
 export class Military_Spawn_Api {
@@ -122,6 +124,29 @@ export class Military_Spawn_Api {
             Military_Spawn_Api.createSquadInstance(DOMESTIC_DEFENDER_MAN, roomName, operationUUID);
         }
 
+    }
+
+    /**
+     * Create a military instance to defend our remote rooms
+     * @param roomName the room we are checking
+     */
+    public static requestRemoteDefenders(roomName: string): void {
+        const room: Room = Game.rooms[roomName];
+        const remoteRooms: RemoteRoomMemory[] = MemoryApi_Room.getRemoteRooms(room, (rr: RemoteRoomMemory) => Memory.rooms[rr.roomName].defcon >= 2);
+        if (remoteRooms.length > 0) {
+            return;
+        }
+
+        remoteRooms.forEach((remoteRoom: RemoteRoomMemory) => {
+            const operationUUID: string = SpawnApi.generateSquadUUID(remoteRoom.roomName);
+            const currentMemory: RoomMemory = Memory.rooms[remoteRoom.roomName];
+            if (currentMemory.hostileStructures.data[STRUCTURE_INVADER_CORE].length > 0) {
+                Military_Spawn_Api.createSquadInstance(SOLO_ZEALOT_MAN, remoteRoom.roomName, operationUUID);
+                return;
+            }
+
+            Military_Spawn_Api.createSquadInstance(REMOTE_DEFENDER_MAN, remoteRoom.roomName, operationUUID);
+        });
     }
 
     /**
