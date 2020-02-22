@@ -10,6 +10,7 @@
 // Define prototypes
 import { ErrorMapper, ManagerManager } from "Utils/Imports/internals";
 import { Mem } from "Utils/MemHack";
+import { CostMatrixApi } from "Pathfinding/CostMatrix.Api";
 export const loop = ErrorMapper.wrapLoop(() => {
     Mem.loadCachedMemory();
     ManagerManager.runManagerManager();

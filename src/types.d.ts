@@ -1333,7 +1333,7 @@ interface FlagMemory {
 /**
  * parent memory for depedent rooms
  */
-interface DepedentRoomParentMemory {
+interface DependentRoomParentMemory {
     /**
      * the name of the room for lookup purposes
      */
@@ -1347,7 +1347,7 @@ interface DepedentRoomParentMemory {
 /**
  * Remote room memory structure
  */
-interface RemoteRoomMemory extends DepedentRoomParentMemory {
+interface RemoteRoomMemory extends DependentRoomParentMemory {
     /**
      * sources in the room
      */
@@ -1370,7 +1370,7 @@ interface RemoteRoomMemory extends DepedentRoomParentMemory {
  * Claim room memory structure
  */
 // tslint:disable-next-line:no-empty-interface
-interface ClaimRoomMemory extends DepedentRoomParentMemory {
+interface ClaimRoomMemory extends DependentRoomParentMemory {
     // Parent memory covers everything currently needed in here
 }
 

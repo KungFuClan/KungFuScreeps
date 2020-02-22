@@ -680,11 +680,11 @@ export class MemoryApi_Room {
         if (targetRoom) {
             remoteRooms = _.filter(
                 Memory.rooms[room.name].remoteRooms!,
-                (roomMemory: RemoteRoomMemory) => roomMemory.roomName === targetRoom && filterFunction
-            );
+                (roomMemory: RemoteRoomMemory) => roomMemory.roomName === targetRoom);
+            remoteRooms = _.filter(remoteRooms, filterFunction);
         } else {
             // No target room provided, just return them all
-            remoteRooms = _.filter(Memory.rooms[room.name].remoteRooms!, () => filterFunction);
+            remoteRooms = _.filter(Memory.rooms[room.name].remoteRooms!, filterFunction);
         }
 
         if (remoteRooms.length === 0) {
