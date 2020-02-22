@@ -129,9 +129,8 @@ export class RoomApi_State {
      */
     public static setDefconLevel(room: Room): void {
         const hostileCreeps = MemoryApi_Creep.getHostileCreeps(room.name);
-        const hostileStructures = room.find(FIND_HOSTILE_STRUCTURES, {
-            filter: s => s.structureType === STRUCTURE_INVADER_CORE
-        });
+        const hostileStructures = MemoryApi_Room.getHostileStuctures(room.name, s => s.structureType === STRUCTURE_INVADER_CORE)
+        
         // check level 0 first to reduce cpu drain as it will be the most common scenario
         // level 0 -- no danger
         if (hostileCreeps.length === 0 && hostileStructures.length === 0) {

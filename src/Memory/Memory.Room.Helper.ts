@@ -6,6 +6,7 @@ import {
     CarryPartJobs,
     RoomHelper_Structure,
     RoomApi_State,
+    ALLY_LIST,
 } from "Utils/Imports/internals";
 
 /**
@@ -24,6 +25,7 @@ export class MemoryHelper_Room {
         // Update structures/construction sites
         this.updateConstructionSites(room.name);
         this.updateStructures(room.name);
+        this.updateHostileStructures(room.name);
         // Update sources, minerals, dropped resources, tombstones
         this.updateSources(room.name);
         this.updateMinerals(room.name);
@@ -50,8 +52,9 @@ export class MemoryHelper_Room {
             return;
         }
 
-        // TODO filter our ally creeps out
-        const enemies = Game.rooms[roomName].find(FIND_HOSTILE_CREEPS);
+        const enemies = Game.rooms[roomName].find(FIND_HOSTILE_CREEPS).filter((creep: Creep) => {
+            return _.contains(ALLY_LIST, creep.owner.username)
+        });
 
         // Sort creeps into categories
         Memory.rooms[roomName].hostiles = {
