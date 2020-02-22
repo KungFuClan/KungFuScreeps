@@ -243,10 +243,115 @@ type MilitaryActionConstants =
     | ACTION_HEAL
     | ACTION_RANGED_HEAL;
 
-interface MiliIntent {
+type MilitaryTargetConstants_Move =
+    | DirectionConstant;
+
+type MilitaryTargetConstants_Heal =
+    | Id<Creep | PowerCreep>
+    | string; // Creep name
+
+type MilitaryTargetConstants_RangedHeal =
+    | Id<Creep | PowerCreep>
+    | string; // Creep name
+
+type MilitaryTargetConstants_Attack =
+    | Id<Creep | PowerCreep | Structure>
+    | string; // Creep name
+
+type MilitaryTargetConstants_RangedAttack =
+    | Id<Creep | PowerCreep | Structure>
+    | string; // Creep name
+
+type MilitaryTargetConstants_MassRanged =
+    | null;
+
+type MilitaryTargetConstants =
+    | MilitaryTargetConstants_Move
+    | MilitaryTargetConstants_Heal
+    | MilitaryTargetConstants_RangedHeal
+    | MilitaryTargetConstants_Attack
+    | MilitaryTargetConstants_RangedAttack
+    | MilitaryTargetConstants_MassRanged;
+
+type MilitaryTargetTypeConstants_Move =
+    | "direction";
+
+type MilitaryTargetTypeConstants_Heal =
+    | "creepID"
+    | "creepName"
+    | "powerCreep";
+
+type MilitaryTargetTypeConstants_RangedHeal =
+    | "creepID"
+    | "creepName"
+    | "powerCreep";
+
+type MilitaryTargetTypeConstants_Attack =
+    | "creepID"
+    | "creepName"
+    | "powerCreep"
+    | "structure";
+
+type MilitaryTargetTypeConstants_RangedAttack =
+    | "creepID"
+    | "creepName"
+    | "powerCreep"
+    | "structure";
+
+type MilitaryTargetTypeConstants_MassRanged =
+    | "creepID"
+    | "creepName"
+    | "powerCreep"
+    | "structure";
+
+type MilitaryTargetTypeConstants =
+    | MilitaryTargetTypeConstants_Move
+    | MilitaryTargetTypeConstants_Heal
+    | MilitaryTargetTypeConstants_RangedHeal
+    | MilitaryTargetTypeConstants_Attack
+    | MilitaryTargetTypeConstants_RangedAttack
+    | MilitaryTargetTypeConstants_MassRanged
+
+interface Base_MiliIntent {
     action: MilitaryActionConstants;
-    target: string | MockRoomPos | DirectionConstant;
-    targetType: string;
+    target: MilitaryTargetConstants;
+    targetType: MilitaryTargetTypeConstants;
+}
+
+interface Move_MiliIntent extends Base_MiliIntent {
+    action: ACTION_MOVE;
+    target: MilitaryTargetConstants_Move;
+    targetType: MilitaryTargetTypeConstants_Move;
+}
+
+interface Heal_MiliIntent extends Base_MiliIntent {
+    action: ACTION_HEAL;
+    target: MilitaryTargetConstants_Heal;
+    targetType: MilitaryTargetTypeConstants_Heal;
+}
+
+interface RangedHeal_MiliIntent extends Base_MiliIntent {
+    action: ACTION_RANGED_HEAL;
+    target: MilitaryTargetConstants_RangedHeal;
+    targetType: MilitaryTargetTypeConstants_RangedHeal;
+}
+
+interface Attack_MiliIntent extends Base_MiliIntent {
+    action: ACTION_ATTACK;
+    target: MilitaryTargetConstants_Attack;
+    targetType: MilitaryTargetTypeConstants_Attack;
+}
+
+interface RangedAttack_MiliIntent extends Base_MiliIntent {
+    action: ACTION_RANGED_ATTACK;
+    target: MilitaryTargetConstants_RangedAttack;
+    targetType: MilitaryTargetTypeConstants_RangedAttack;
+}
+
+interface MassRanged_MiliIntent extends Base_MiliIntent {
+    action: ACTION_MASS_RANGED;
+    target: MilitaryTargetConstants_MassRanged;
+    targetType: MilitaryTargetTypeConstants_MassRanged;
 }
 
 interface MilitaryDataAll {
@@ -261,6 +366,26 @@ interface MilitaryDataRoom {
 interface MilitaryDataParams {
     openRamparts?: boolean;
     hostiles?: boolean;
+}
+
+// Cost matrix storage interface - used by CostMatrix.Api
+interface CostMatrixIndex {
+    /**
+     * Room Name to access cost matrices of
+     */
+    [index: string]: RoomCostMatrices;
+}
+interface RoomCostMatrices {
+    creepMatrix?: StoredCostMatrix;
+    towerDamageMatrix?: StoredCostMatrix;
+    structureMatrix?: StoredCostMatrix;
+    terrainMatrix?: StoredCostMatrix;
+}
+interface StoredCostMatrix {
+    serializedCostMatrix: string;
+    expires: boolean;
+    expirationTick?: number;
+    roomName: string;
 }
 
 // Role Interfaces to be implemented  -------------
@@ -292,7 +417,7 @@ interface ISquadManager {
 
 interface SquadStack {
     name: string;
-    intents: MiliIntent[];
+    intents: Base_MiliIntent[];
 }
 
 type SquadStrategyImplementation = {
@@ -340,6 +465,8 @@ interface IFlagProcesser {
  */
 declare namespace NodeJS {
     interface Global {
+        Memory: Memory;
+        age?: number;
         removeConstructionSites(roomName: string, structureType?: string): void;
         removeFlags(substr: string): void;
         displayRoomStatus(roomName: string): void;
@@ -1360,3 +1487,6 @@ interface ETAMemory {
 type AllCreepCount = {
     [key in RoleConstant]: number;
 };
+
+type StoreStructure = StructureStorage | StructureContainer | StructureExtension | StructureFactory | StructureLab
+    | StructureLink | StructureNuker | StructurePowerSpawn | StructureSpawn | StructureTerminal | StructureTower;

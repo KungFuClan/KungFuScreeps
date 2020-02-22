@@ -71,7 +71,7 @@ export class StalkerBodyOptsHelper implements ICreepBodyOptsHelper {
 
         // ! Important DONT FORGET TO CHANGE
         // Temp override
-        // body = { ranged_attack: 1, move: 1, heal: 1 };
+        body = { ranged_attack: 1, move: 2, heal: 1 };
         // Generate creep body based on body array and options
         return SpawnApi.createCreepBody(body, opts);
     }

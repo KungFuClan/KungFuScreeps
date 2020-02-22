@@ -117,7 +117,6 @@ export class MilitaryMovment_Api {
             return BOTTOM;
         }
         if (x === 49) {
-            creep.move(LEFT);
             return LEFT;
         }
         if (y === 49) {

@@ -4,13 +4,13 @@ import { close } from "inspector";
 export class militaryDataHelper {
 
     /**
-     * Get the data for the room
+     * Get the data for the room. If the data requested is already present, it will be skipped since this object
+     * is invalidated each tick. 
      * @param creeps the creeps we're getting data for
      * @param dataNeeded the booleans representing the data we need
      */
-    public static getRoomData(creeps: Creep[], dataNeeded: MilitaryDataParams): MilitaryDataAll {
-        const roomData: MilitaryDataAll = {};
-
+    public static getRoomData(creeps: Creep[], roomData: MilitaryDataAll, dataNeeded: MilitaryDataParams, instance: ISquadManager): MilitaryDataAll {
+        
         _.forEach(creeps, (creep: Creep) => {
             const roomName = creep.room.name;
 
@@ -18,10 +18,10 @@ export class militaryDataHelper {
                 roomData[roomName] = {};
             }
 
-            if (dataNeeded.hostiles) {
+            if (dataNeeded.hostiles && roomData[roomName].hostiles === undefined) {
                 roomData[roomName].hostiles = this.getHostileCreeps(roomName);
             }
-            if (dataNeeded.openRamparts) {
+            if (dataNeeded.openRamparts && roomData[roomName].openRamparts === undefined) {
                 roomData[roomName].openRamparts = this.getOpenRamparts(roomName);
             }
         });
@@ -86,7 +86,10 @@ export class militaryDataHelper {
     public static getHostileCreeps(
         roomName: string
     ): { allHostiles: Creep[]; attack: Creep[]; rangedAttack: Creep[]; heal: Creep[] } {
-        const allHostiles: Creep[] = MemoryApi_Creep.getHostileCreeps(roomName);
+        if (!Game.rooms[roomName]) {
+            return { allHostiles: [], attack: [], rangedAttack: [], heal: [] };
+        }
+        const allHostiles: Creep[] = Game.rooms[roomName].find(FIND_HOSTILE_CREEPS);
         const attackCreeps: Creep[] = [];
         const rangedAttackCreeps: Creep[] = [];
         const healCreeps: Creep[] = [];

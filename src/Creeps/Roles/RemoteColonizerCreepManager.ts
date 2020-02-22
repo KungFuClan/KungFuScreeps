@@ -20,7 +20,7 @@ export class RemoteColonizerCreepManager implements ICivCreepRoleManager {
         if (creep.room.name === creep.memory.targetRoom) {
 
             const targetRoom = Game.rooms[creep.memory.targetRoom];
-            if (creep.carry.energy === 0) {
+            if (creep.store.energy === 0) {
                 return this.newGetEnergyJob(creep, targetRoom);
             } else {
                 creep.memory.working = false;
@@ -44,7 +44,7 @@ export class RemoteColonizerCreepManager implements ICivCreepRoleManager {
             // All dropped resources with enough energy to fill creep.carry, and not taken
             const dropJobs = MemoryApi_Jobs.getPickupJobs(
                 room,
-                (dJob: GetEnergyJob) => !dJob.isTaken && dJob.resources.energy >= creep.carryCapacity
+                (dJob: GetEnergyJob) => !dJob.isTaken && dJob.resources.energy >= creep.store.getCapacity()
             );
 
             if (dropJobs.length > 0) {

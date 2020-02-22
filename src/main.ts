@@ -9,7 +9,11 @@
 
 // Define prototypes
 import { ErrorMapper, ManagerManager } from "Utils/Imports/internals";
-import { MilitaryMovement_Helper } from "Military/Military.Movement.Helper";
+import { Mem } from "Utils/MemHack";
 export const loop = ErrorMapper.wrapLoop(() => {
-  ManagerManager.runManagerManager();
+    ManagerManager.runManagerManager();
+    // const terrain = CostMatrixApi.getTerrainMatrix("W9N7");
+    // const twrDmg = CostMatrixApi.getTowerDamageMatrix("W9N7");
+    // const summed = CostMatrixApi.sumCostMatrices([terrain, twrDmg]);
+    // CostMatrixApi.visualizeCostMatrix(summed, "W9N7");
 });

@@ -18,7 +18,7 @@ export class ManagerCreepManager implements ICivCreepRoleManager {
      */
     public getNewJob(creep: Creep, room: Room): BaseJob | undefined {
 
-        if (creep.carry.energy === 0) {
+        if (creep.store.energy === 0) {
             return this.getEnergyJob(creep, room);
         }
         else {
@@ -50,7 +50,7 @@ export class ManagerCreepManager implements ICivCreepRoleManager {
             const backupStructures = MemoryApi_Jobs.getBackupStructuresJobs(
                 room,
                 (job: GetEnergyJob) =>
-                    !job.isTaken && job.resources.energy >= creep.carryCapacity &&
+                    !job.isTaken && job.resources.energy >= creep.store.getCapacity() &&
                     job.targetType === STRUCTURE_TERMINAL
             );
 
@@ -69,7 +69,7 @@ export class ManagerCreepManager implements ICivCreepRoleManager {
             const backupStructures = MemoryApi_Jobs.getBackupStructuresJobs(
                 room,
                 (job: GetEnergyJob) =>
-                    !job.isTaken && job.resources.energy >= creep.carryCapacity &&
+                    !job.isTaken && job.resources.energy >= creep.store.getCapacity() &&
                     job.targetType === STRUCTURE_STORAGE
             );
 

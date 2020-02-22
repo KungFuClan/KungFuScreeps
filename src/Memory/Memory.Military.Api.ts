@@ -111,7 +111,7 @@ export class MemoryApi_Military {
         // Remove the creeps name from the squad
         for (const i in squad.creeps) {
             const creepName: string = squad.creeps[i].name;
-            const intentStack: MiliIntent[] = squad.creeps[i].intents;
+            const intentStack: Base_MiliIntent[] = squad.creeps[i].intents;
             if (Game.creeps[creepName]) {
                 livingCreeps.push({
                     name: creepName,
@@ -123,7 +123,7 @@ export class MemoryApi_Military {
         squad.creeps = livingCreeps;
     }
 
-    public static pushIntentToCreepStack(instance: ISquadManager, creepName: string, intent: MiliIntent) {
+    public static pushIntentToCreepStack(instance: ISquadManager, creepName: string, intent: Base_MiliIntent) {
         const creepStack = this.findCreepInSquadByInstance(instance, creepName);
 
         if (creepStack === undefined) {

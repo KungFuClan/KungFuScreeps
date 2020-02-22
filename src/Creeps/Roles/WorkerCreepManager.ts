@@ -15,7 +15,7 @@ export class WorkerCreepManager implements ICivCreepRoleManager {
      * Gets a new job for the worker creep
      */
     public getNewJob(creep: Creep, room: Room): BaseJob | undefined {
-        if (creep.carry.energy === 0) {
+        if (creep.store.energy === 0) {
             return this.newGetEnergyJob(creep, room);
         } else {
             let job: BaseJob | undefined = CreepCivApi.newWorkPartJob(creep, room);
@@ -36,7 +36,7 @@ export class WorkerCreepManager implements ICivCreepRoleManager {
             // All container jobs with enough energy to fill creep.carry, and not taken
             const containerJobs = MemoryApi_Jobs.getContainerJobs(
                 room,
-                (cJob: GetEnergyJob) => !cJob.isTaken && cJob.resources.energy >= creep.carryCapacity
+                (cJob: GetEnergyJob) => !cJob.isTaken && cJob.resources.energy >= creep.store.getCapacity()
             );
 
             if (containerJobs.length > 0) {
@@ -48,7 +48,7 @@ export class WorkerCreepManager implements ICivCreepRoleManager {
             // All dropped resources with enough energy to fill creep.carry, and not taken
             const dropJobs = MemoryApi_Jobs.getPickupJobs(
                 room,
-                (dJob: GetEnergyJob) => !dJob.isTaken && dJob.resources.energy >= creep.carryCapacity
+                (dJob: GetEnergyJob) => !dJob.isTaken && dJob.resources.energy >= creep.store.getCapacity()
             );
 
             if (dropJobs.length > 0) {
@@ -60,7 +60,7 @@ export class WorkerCreepManager implements ICivCreepRoleManager {
             // All backupStructures with enough energy to fill creep.carry, and not taken
             const backupStructures = MemoryApi_Jobs.getBackupStructuresJobs(
                 room,
-                (job: GetEnergyJob) => !job.isTaken && job.resources.energy >= creep.carryCapacity
+                (job: GetEnergyJob) => !job.isTaken && job.resources.energy >= creep.store.getCapacity()
             );
 
             if (backupStructures.length > 0) {

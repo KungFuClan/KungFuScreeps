@@ -1,4 +1,4 @@
-import { ROLE_POWER_UPGRADER,   CreepAllApi, MemoryApi_Jobs } from "Utils/Imports/internals";
+import { ROLE_POWER_UPGRADER, CreepAllApi, MemoryApi_Jobs } from "Utils/Imports/internals";
 
 // Manager for the miner creep role
 export class PowerUpgraderCreepManager implements ICivCreepRoleManager {
@@ -15,7 +15,7 @@ export class PowerUpgraderCreepManager implements ICivCreepRoleManager {
      */
     public getNewJob(creep: Creep, room: Room): BaseJob | undefined {
         // if creep is empty, get a GetEnergyJob
-        if (creep.carry.energy === 0) {
+        if (creep.store.energy === 0) {
             return this.newGetEnergyJob(creep, room);
         } else {
             // Creep energy > 0

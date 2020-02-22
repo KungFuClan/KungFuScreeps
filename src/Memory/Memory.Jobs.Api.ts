@@ -872,7 +872,7 @@ export class MemoryApi_Jobs {
      */
     public static updateCarryPartJob(job: CarryPartJob, creep: Creep): void {
         if (job.actionType === "transfer") {
-            job.remaining -= creep.carry.energy;
+            job.remaining -= creep.store.energy;
 
             if (job.remaining <= 0) {
                 job.isTaken = true;
@@ -923,7 +923,7 @@ export class MemoryApi_Jobs {
             job.targetType === "terminal"
         ) {
             // Subtract creep carry from resources
-            job.resources.energy -= creep.carryCapacity;
+            job.resources.energy -= creep.store.getFreeCapacity();
 
             if (job.resources.energy <= 0) {
                 job.isTaken = true;
@@ -940,7 +940,7 @@ export class MemoryApi_Jobs {
     public static updateWorkPartJob(job: WorkPartJob, creep: Creep): void {
         if (job.targetType === "constructionSite") {
             // Creep builds 5 points/part/tick at 1 energy/point
-            job.remaining -= creep.carry.energy; // 1 to 1 ratio of energy to points built
+            job.remaining -= creep.store.energy; // 1 to 1 ratio of energy to points built
 
             if (job.remaining <= 0) {
                 job.isTaken = true;
@@ -951,7 +951,7 @@ export class MemoryApi_Jobs {
 
         if (job.targetType === STRUCTURE_CONTROLLER) {
             // Upgrade at a 1 to 1 ratio
-            job.remaining -= creep.carry.energy;
+            job.remaining -= creep.store.energy;
             // * Do nothing really - Job will never be taken
             // Could optionally mark something on the job to show that we have 1 worker upgrading already
             return;
@@ -959,7 +959,7 @@ export class MemoryApi_Jobs {
 
         if (job.targetType in ALL_STRUCTURE_TYPES) {
             // Repair 20 hits/part/tick at .1 energy/hit rounded up to nearest whole number
-            job.remaining -= Math.ceil(creep.carry.energy * 0.1);
+            job.remaining -= Math.ceil(creep.store.energy * 0.1);
 
             if (job.remaining <= 0) {
                 job.isTaken = true;
