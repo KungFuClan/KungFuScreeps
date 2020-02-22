@@ -100,7 +100,7 @@ export class CarryPartJobs implements IJobTypeHelper {
         if(room.controller?.owner && room.controller?.my) {
             upgraderLink = MemoryApi_Room.getUpgraderLink(room) as StructureLink;
         }
-        if (lowSpawnsAndExtensions.length === 0 && lowTowers.length === 0 && upgraderLink !== null) {
+        if (lowSpawnsAndExtensions.length === 0 && lowTowers.length === 0 && upgraderLink === null) {
             return [];
         }
 
