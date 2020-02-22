@@ -48,6 +48,7 @@ export const REMOTE_DEFENDER_MAN = "remoteDefenderSquad";
 export const OP_STRATEGY_NONE = "none";
 export const OP_STRATEGY_FFA = "ffa";
 export const OP_STRATEGY_COMBINED = "combined";
+export const OP_STRATEGY_INVADER = "invader";
 
 // Attack Flag Constants
 export const CLAIM_FLAG = 4;

@@ -7,9 +7,12 @@ import {
     MemoryApi_Military,
     SQUAD_STATUS_OK,
     OP_STRATEGY_COMBINED,
-    OP_STRATEGY_FFA,,
-    militaryDataHelper
-    MilitaryCombat_Api
+    OP_STRATEGY_FFA,
+    militaryDataHelper,
+    MilitaryCombat_Api,
+    ACTION_MOVE,
+    ACTION_ATTACK,
+    OP_STRATEGY_INVADER
 } from "Utils/Imports/internals";
 import { MilitaryStatus_Helper } from "Military/Military.Status.Helper";
 import { MilitaryIntents_Api } from "Military/Military.Api.Intents";
@@ -54,6 +57,7 @@ export class SoloZealotSquadManager implements ISquadManager {
         switch (operation.operationStrategy) {
             case OP_STRATEGY_COMBINED: return this[OP_STRATEGY_COMBINED];
             case OP_STRATEGY_FFA: return this[OP_STRATEGY_FFA];
+            case OP_STRATEGY_INVADER: return this[OP_STRATEGY_INVADER];
             default: return this[OP_STRATEGY_FFA];
         }
     }
@@ -127,7 +131,7 @@ export class SoloZealotSquadManager implements ISquadManager {
      */
     public invader = {
 
-        runSquad(instance: ISquadManager): void { 
+        runSquad(instance: ISquadManager): void {
 
             const singleton: ISquadManager = MemoryApi_Military.getSingletonSquadManager(instance.name);
             const status: SquadStatusConstant = singleton.checkStatus(instance);
@@ -139,7 +143,8 @@ export class SoloZealotSquadManager implements ISquadManager {
             MilitaryStatus_Helper.handleNotOKStatus(status);
 
             const dataNeeded: MilitaryDataParams = {
-                hostiles: true
+                hostiles: true,
+                hostileStructures: true
             };
             const creeps: Creep[] = MemoryApi_Military.getLivingCreepsInSquadByInstance(instance);
             const roomData: MilitaryDataAll = militaryDataHelper.getRoomData(creeps, {}, dataNeeded, instance);
@@ -166,11 +171,35 @@ export class SoloZealotSquadManager implements ISquadManager {
                 }
             });
 
-            
+
         },
 
         decideMoveIntents_TARGET_ROOM(instance: ISquadManager, status: SquadStatusConstant, roomData: MilitaryDataAll, creep: Creep): void {
 
+            const invaderCore = _.find(roomData[creep.room.name]!.hostileStructures!, (struct: AnyOwnedStructure) => struct.structureType === STRUCTURE_INVADER_CORE);
+
+            if(invaderCore === undefined) { 
+                return;
+            }
+
+            let directionToTarget: DirectionConstant | undefined;
+
+            if (!MilitaryCombat_Api.isInAttackRange(creep, invaderCore.pos, true)) {
+                const path = creep.pos.findPathTo(invaderCore.pos, { range: 1 });
+                directionToTarget = path[0].direction;
+            }
+
+            if(directionToTarget === undefined) {
+                return;
+            }
+
+            const intent: Move_MiliIntent = {
+                action: ACTION_MOVE,
+                target: directionToTarget,
+                targetType: "direction"
+            };
+
+            MemoryApi_Military.pushIntentToCreepStack(instance, creep.name, intent);
         },
 
         decideMoveIntents_NON_TARGET_ROOM(instance: ISquadManager, status: SquadStatusConstant, roomData: MilitaryDataAll, creep: Creep): void {
@@ -193,7 +222,35 @@ export class SoloZealotSquadManager implements ISquadManager {
 
         decideAttackIntents(instance: ISquadManager, status: SquadStatusConstant, roomData: MilitaryDataAll) {
 
-        },
+            const creeps = MemoryApi_Military.getLivingCreepsInSquadByInstance(instance);
+            
+            // Return early if we do not have a creep in the target room yet
+            if(roomData[instance.targetRoom] === undefined) { 
+                return;
+            }
+            
+            const invaderCore = _.find(roomData[instance.targetRoom]!.hostileStructures!, (struct: AnyOwnedStructure) => struct.structureType === STRUCTURE_INVADER_CORE);
+
+            if(invaderCore === undefined) { 
+                return;
+            }
+
+
+            _.forEach(creeps, (creep: Creep) => {
+
+                if(MilitaryCombat_Api.isInAttackRange(creep, invaderCore.pos, true)) {
+
+                    const intent: Attack_MiliIntent = {
+                        action: ACTION_ATTACK,
+                        target: invaderCore.id,
+                        targetType: "structure"
+                    }
+
+                    MemoryApi_Military.pushIntentToCreepStack(instance, creep.name, intent);
+                    return;
+                }
+            });
+        }
     }
     /**
      * Implementation of OP_STRATEGY_COMBINED

@@ -1,4 +1,4 @@
-import { UserException, MemoryApi_Creep, MemoryApi_Room, ALLY_LIST, Normalize } from "Utils/Imports/internals";
+import { UserException, MemoryApi_Creep, MemoryApi_Room, ALLY_LIST, Normalize, RoomManager } from "Utils/Imports/internals";
 import { close } from "inspector";
 
 export class militaryDataHelper {
@@ -23,6 +23,9 @@ export class militaryDataHelper {
             }
             if (dataNeeded.openRamparts && roomData[roomName].openRamparts === undefined) {
                 roomData[roomName].openRamparts = this.getOpenRamparts(roomName);
+            }
+            if (dataNeeded.hostileStructures && roomData[roomName].hostileStructures === undefined) {
+                roomData[roomName].hostileStructures = this.getHostileStructures(roomName);
             }
         });
 
@@ -129,6 +132,14 @@ export class militaryDataHelper {
         return { allHostiles, attack: attackCreeps, rangedAttack: rangedAttackCreeps, heal: healCreeps };
     }
 
+    /**
+     * Gets the hostile structures of a room, excluding ally structures
+     * TODO Make this more complex, sort the structures into an object to make lookup easier
+     * @param roomName The room to check
+     */
+    public static getHostileStructures(roomName: string): AnyOwnedStructure[] {
+        return Game.rooms[roomName].find(FIND_HOSTILE_STRUCTURES).filter((structure: AnyOwnedStructure) => !_.contains(ALLY_LIST, structure.owner.username));
+    }
     /**
      * Gets the work part ability adjusted for boost
      * @param creep The creep to check the body of

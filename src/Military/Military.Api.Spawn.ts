@@ -9,7 +9,8 @@ import {
     DOMESTIC_DEFENDER_MAN,
     SpawnApi,
     REMOTE_DEFENDER_MAN,
-    SOLO_ZEALOT_MAN
+    SOLO_ZEALOT_MAN,
+    OP_STRATEGY_INVADER
 } from "Utils/Imports/internals";
 
 export class Military_Spawn_Api {
@@ -147,7 +148,7 @@ export class Military_Spawn_Api {
             const operationUUID: string = SpawnApi.generateSquadUUID(remoteRoom.roomName);
             const currentMemory: RoomMemory = Memory.rooms[remoteRoom.roomName];
             if (currentMemory.hostileStructures.data[STRUCTURE_INVADER_CORE].length > 0) {
-                Military_Spawn_Api.createSquadInstance(SOLO_ZEALOT_MAN, remoteRoom.roomName, operationUUID);
+                Military_Spawn_Api.createSquadInstance(SOLO_ZEALOT_MAN, remoteRoom.roomName, operationUUID, OP_STRATEGY_INVADER);
                 return;
             }
 

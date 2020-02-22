@@ -194,7 +194,7 @@ type OP_STRATEGY_FFA = "ffa"; // Each squad should act independently of each oth
 type OP_STRATEGY_COMBINED = "combined"; // Each squad should move together
 type OP_STRATEGY_INVADER = "invader"; // We are fighting invaders, so less complex / more specific strategies are required
 
-type OpStrategyConstant = OP_STRATEGY_NONE | OP_STRATEGY_FFA | OP_STRATEGY_COMBINED;
+type OpStrategyConstant = OP_STRATEGY_NONE | OP_STRATEGY_FFA | OP_STRATEGY_COMBINED | OP_STRATEGY_INVADER;
 
 type OpStrategyTypes = { [key in OpStrategyConstant]?: string };
 
@@ -363,10 +363,12 @@ interface MilitaryDataAll {
 interface MilitaryDataRoom {
     openRamparts?: StructureRampart[];
     hostiles?: { allHostiles: Creep[]; attack: Creep[]; rangedAttack: Creep[]; heal: Creep[] };
+    hostileStructures?: AnyOwnedStructure[];
 }
 interface MilitaryDataParams {
     openRamparts?: boolean;
     hostiles?: boolean;
+    hostileStructures?: boolean;
 }
 
 // Cost matrix storage interface - used by CostMatrix.Api
