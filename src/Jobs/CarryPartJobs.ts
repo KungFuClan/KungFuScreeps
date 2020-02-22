@@ -160,13 +160,13 @@ export class CarryPartJobs implements IJobTypeHelper {
 
         // Consider different placement or function for this, we currently only have link jobs for get energy, but none for depositing
         // If we don't have upgrader link yet, break now to save cpu
-        if (!upgraderLink) {
+        if (upgraderLink === null) {
             return fillJobs;
         }
         const nonUpgraderLinks: StructureLink[] = MemoryApi_Room.getStructureOfType(
             room.name,
             STRUCTURE_LINK,
-            (l: StructureLink) => l.id !== upgraderLink.id
+            (l: StructureLink) => l.id !== upgraderLink!.id
         ) as StructureLink[];
         _.forEach(nonUpgraderLinks, (structure: StructureLink) => {
             const creepsUsing = MemoryApi_Creep.getMyCreeps(room.name, (creep: Creep) => {
