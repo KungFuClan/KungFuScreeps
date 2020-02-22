@@ -133,7 +133,7 @@ export class Military_Spawn_Api {
     public static requestRemoteDefenders(roomName: string): void {
         const room: Room = Game.rooms[roomName];
         const remoteRooms: RemoteRoomMemory[] = MemoryApi_Room.getRemoteRooms(room, (rr: RemoteRoomMemory) => Memory.rooms[rr.roomName].defcon >= 2);
-        if (remoteRooms.length > 0) {
+        if (remoteRooms.length === 0) {
             return;
         }
 

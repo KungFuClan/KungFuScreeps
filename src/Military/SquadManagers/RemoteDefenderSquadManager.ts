@@ -172,9 +172,6 @@ export class RemoteDefenderSquadManager implements ISquadManager {
         },
 
         decideMoveIntents(instance: ISquadManager, status: SquadStatusConstant, roomData: MilitaryDataAll): void {
-            if (!roomData[instance.targetRoom]?.hostiles) {
-                return;
-            }
 
             // Get objective
             const creeps = MemoryApi_Military.getLivingCreepsInSquadByInstance(instance);
