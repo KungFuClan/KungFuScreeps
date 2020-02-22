@@ -32,13 +32,13 @@ export class RemoteHarvesterCreepManager implements ICivCreepRoleManager {
             );
         }
 
-        if (creep.carry.energy === 0 && creep.room.name === creep.memory.targetRoom) {
+        if (creep.store.energy === 0 && creep.room.name === creep.memory.targetRoom) {
             // If creep is empty and in targetRoom - get energy
             return CreepCivApi.newGetEnergyJob(creep, targetRoom!);
-        } else if (creep.carry.energy === 0 && creep.room.name !== creep.memory.targetRoom) {
+        } else if (creep.store.energy === 0 && creep.room.name !== creep.memory.targetRoom) {
             // If creep is empty and not in targetRoom - Go to targetRoom
             return CreepCivApi.newMovePartJob(creep, creep.memory.targetRoom);
-        } else if (creep.carry.energy > 0 && creep.room.name === creep.memory.targetRoom) {
+        } else if (creep.store.energy > 0 && creep.room.name === creep.memory.targetRoom) {
             // If creep has energy and is in targetRoom - Get workpartJob
             let job = CreepCivApi.newWorkPartJob(creep, targetRoom!) as BaseJob;
 
@@ -48,7 +48,7 @@ export class RemoteHarvesterCreepManager implements ICivCreepRoleManager {
             }
 
             return job;
-        } else if (creep.carry.energy > 0 && creep.room.name === creep.memory.homeRoom) {
+        } else if (creep.store.energy > 0 && creep.room.name === creep.memory.homeRoom) {
             // If creep has energy and is in homeRoom - Get a carry job to use energy
             let job: BaseJob | undefined = this.newCarryPartJob(creep, homeRoom);
 
@@ -73,7 +73,7 @@ export class RemoteHarvesterCreepManager implements ICivCreepRoleManager {
             const linkJobs = MemoryApi_Jobs.getFillJobs(
                 room,
                 (job: CarryPartJob) =>
-                    !job.isTaken && job.targetType === STRUCTURE_LINK && job.remaining >= creep.carryCapacity
+                    !job.isTaken && job.targetType === STRUCTURE_LINK && job.remaining >= creep.store.getCapacity()
             );
 
             if (linkJobs.length > 0) {
@@ -98,7 +98,7 @@ export class RemoteHarvesterCreepManager implements ICivCreepRoleManager {
         if (creepOptions.fillStorage || creepOptions.fillTerminal) {
             const storeJobs = MemoryApi_Jobs.getStoreJobs(
                 room,
-                (bsJob: CarryPartJob) => !bsJob.isTaken && bsJob.remaining >= creep.carryCapacity
+                (bsJob: CarryPartJob) => !bsJob.isTaken && bsJob.remaining >= creep.store.getCapacity()
             );
 
             if (storeJobs.length > 0) {

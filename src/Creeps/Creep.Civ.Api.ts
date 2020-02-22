@@ -191,7 +191,7 @@ export class CreepCivApi {
             // All dropped resources with enough energy to fill at least 60% of carry
             const dropJobs = MemoryApi_Jobs.getPickupJobs(
                 room,
-                (dJob: GetEnergyJob) => !dJob.isTaken && dJob.resources!.energy >= creep.carryCapacity * 0.6
+                (dJob: GetEnergyJob) => !dJob.isTaken && dJob.resources!.energy >= creep.store.getCapacity() * 0.6
             );
 
             if (dropJobs.length > 0) {
@@ -203,7 +203,7 @@ export class CreepCivApi {
             // All tombstones / ruins with enough energy to fill at least 60% of carry
             const lootJobs = MemoryApi_Jobs.getLootJobs(
                 room,
-                (lJob: GetEnergyJob) => !lJob.isTaken && lJob.resources!.energy >= creep.carryCapacity * 0.6
+                (lJob: GetEnergyJob) => !lJob.isTaken && lJob.resources!.energy >= creep.store.getCapacity() * 0.6
             );
 
             if (lootJobs.length > 0) {
@@ -215,7 +215,7 @@ export class CreepCivApi {
             // All backupStructures with enough energy to fill creep.carry, and not taken
             const backupStructures = MemoryApi_Jobs.getBackupStructuresJobs(
                 room,
-                (job: GetEnergyJob) => !job.isTaken && job.resources!.energy >= creep.carryCapacity
+                (job: GetEnergyJob) => !job.isTaken && job.resources!.energy >= creep.store.getCapacity()
             );
 
             // Only get from the storage if there are jobs that don't involve just putting it right back

@@ -1487,3 +1487,6 @@ interface ETAMemory {
 type AllCreepCount = {
     [key in RoleConstant]: number;
 };
+
+type StoreStructure = StructureStorage | StructureContainer | StructureExtension | StructureFactory | StructureLab
+    | StructureLink | StructureNuker | StructurePowerSpawn | StructureSpawn | StructureTerminal | StructureTower;

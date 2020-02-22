@@ -112,7 +112,7 @@ export class CarryPartJobs implements IJobTypeHelper {
                 );
             });
 
-            const creepCapacity = _.sum(creepsUsing, (creep: Creep) => creep.carryCapacity - _.sum(creep.carry));
+            const creepCapacity = _.sum(creepsUsing, (creep: Creep) => creep.store.getFreeCapacity());
 
             const storageSpace = structure.energyCapacity - structure.energy - creepCapacity;
 
@@ -139,7 +139,7 @@ export class CarryPartJobs implements IJobTypeHelper {
                 return false;
             });
 
-            const creepCapacity = _.sum(creepsUsing, (creep: Creep) => creep.carryCapacity - _.sum(creep.carry));
+            const creepCapacity = _.sum(creepsUsing, (creep: Creep) => creep.store.getFreeCapacity());
 
             const storageSpace = structure.energyCapacity - structure.energy - creepCapacity;
 
@@ -174,7 +174,7 @@ export class CarryPartJobs implements IJobTypeHelper {
                 );
             });
 
-            const creepCapacity = _.sum(creepsUsing, (creep: Creep) => creep.carryCapacity - _.sum(creep.carry));
+            const creepCapacity = _.sum(creepsUsing, (creep: Creep) => creep.store.getFreeCapacity());
 
             const storageSpace = structure.energyCapacity - structure.energy - creepCapacity;
 
@@ -206,7 +206,7 @@ export class CarryPartJobs implements IJobTypeHelper {
                 jobType: "carryPartJob",
                 targetID: room.storage.id as string,
                 targetType: STRUCTURE_STORAGE,
-                remaining: room.storage.storeCapacity - _.sum(room.storage.store),
+                remaining: room.storage.store.getFreeCapacity(),
                 actionType: "transfer",
                 isTaken: false
             };
@@ -219,7 +219,7 @@ export class CarryPartJobs implements IJobTypeHelper {
                 jobType: "carryPartJob",
                 targetID: room.terminal.id as string,
                 targetType: STRUCTURE_TERMINAL,
-                remaining: room.terminal.storeCapacity - _.sum(room.terminal.store),
+                remaining: room.terminal.store.getFreeCapacity(),
                 actionType: "transfer",
                 isTaken: false
             };

@@ -21,17 +21,17 @@ export class WorkPartJobs implements IJobTypeHelper {
 
         if (job.actionType === "build" && target instanceof ConstructionSite) {
             returnCode = creep.build(target);
-            if (!target || creep.carry.energy === 0) {
+            if (!target || creep.store.energy === 0) {
                 deleteOnSuccess = true;
             }
         } else if (job.actionType === "repair" && target instanceof Structure) {
             returnCode = creep.repair(target);
-            if (target.hits === target.hitsMax || creep.carry.energy === 0) {
+            if (target.hits === target.hitsMax || creep.store.energy === 0) {
                 deleteOnSuccess = true;
             }
         } else if (job.actionType === "upgrade" && target instanceof StructureController) {
             returnCode = creep.upgradeController(target);
-            if (creep.carry.energy === 0) {
+            if (creep.store.energy === 0) {
                 deleteOnSuccess = true;
             }
         } else {
@@ -125,7 +125,7 @@ export class WorkPartJobs implements IJobTypeHelper {
 
             // Repair 20 hits/part/tick at .1 energy/hit rounded up to nearest whole number
             _.forEach(creepTargeting, (creep: Creep) => {
-                repairJob.remaining -= Math.ceil(creep.carry.energy * 0.1);
+                repairJob.remaining -= Math.ceil(creep.store.energy * 0.1);
             });
 
             if (repairJob.remaining <= 0) {
@@ -172,7 +172,7 @@ export class WorkPartJobs implements IJobTypeHelper {
 
             // Repair 20 hits/part/tick at .1 energy/hit rounded up to nearest whole number
             _.forEach(creepTargeting, (creep: Creep) => {
-                repairJob.remaining -= Math.ceil(creep.carry.energy * 0.1);
+                repairJob.remaining -= Math.ceil(creep.store.energy * 0.1);
             });
 
             if (repairJob.remaining <= 0) {
@@ -214,7 +214,7 @@ export class WorkPartJobs implements IJobTypeHelper {
             });
 
             // 1 to 1 ratio energy to points built
-            _.forEach(creepsTargeting, (creep: Creep) => (buildJob.remaining -= creep.carry.energy));
+            _.forEach(creepsTargeting, (creep: Creep) => (buildJob.remaining -= creep.store.energy));
 
             if (buildJob.remaining <= 0) {
                 buildJob.isTaken = true;

@@ -31,7 +31,7 @@ export class RoomHelper_Structure {
      */
     public static getStoredAmount(target: any, resourceType: ResourceConstant): number | undefined {
         if (target instanceof Creep) {
-            return target.carry[resourceType];
+            return target.store[resourceType];
         } else if (target.hasOwnProperty("store")) {
             return target.store[resourceType];
         } else if (resourceType === RESOURCE_ENERGY && target.hasOwnProperty("energy")) {
@@ -51,7 +51,7 @@ export class RoomHelper_Structure {
      */
     public static getStoredCapacity(target: any): number {
         if (target instanceof Creep) {
-            return target.carryCapacity;
+            return target.store.getCapacity();
         } else if (target.hasOwnProperty("store")) {
             return target.storeCapacity;
         } else if (target.hasOwnProperty("energyCapacity")) {

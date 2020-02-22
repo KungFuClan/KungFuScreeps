@@ -422,20 +422,6 @@ export class SpawnHelper {
     }
 
     /**
-     * get a remote room that needs a remote reserver
-     */
-    public static getRemoteRoomNeedingRemoteDefender(room: Room): RemoteRoomMemory | undefined {
-        return _.first(
-            MemoryApi_Room.getRemoteRooms(room, (rr: RemoteRoomMemory) => {
-                if (Memory.rooms[rr.roomName]) {
-                    return Memory.rooms[rr.roomName].defcon > 1;
-                }
-                return false;
-            })
-        );
-    }
-
-    /**
      * check if we need a harvester as the highest priority
      * @param room the room we are in
      * @returns boolean that represents if we need a harvester as priority
