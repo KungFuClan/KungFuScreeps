@@ -192,6 +192,7 @@ type ROLE_MANAGER = "manager"; //
 type OP_STRATEGY_NONE = "none"; // Default implementation for each squad
 type OP_STRATEGY_FFA = "ffa"; // Each squad should act independently of each other
 type OP_STRATEGY_COMBINED = "combined"; // Each squad should move together
+type OP_STRATEGY_INVADER = "invader"; // We are fighting invaders, so less complex / more specific strategies are required
 
 type OpStrategyConstant = OP_STRATEGY_NONE | OP_STRATEGY_FFA | OP_STRATEGY_COMBINED;
 

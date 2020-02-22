@@ -138,6 +138,12 @@ export class Military_Spawn_Api {
         }
 
         remoteRooms.forEach((remoteRoom: RemoteRoomMemory) => {
+            
+            // If we already have an operation defending the room, don't create another one
+            const existingOperation: MilitaryOperation | undefined = this.getOperationTargetingRoom(remoteRoom.roomName);
+            if (existingOperation) {
+                return;
+            }
             const operationUUID: string = SpawnApi.generateSquadUUID(remoteRoom.roomName);
             const currentMemory: RoomMemory = Memory.rooms[remoteRoom.roomName];
             if (currentMemory.hostileStructures.data[STRUCTURE_INVADER_CORE].length > 0) {

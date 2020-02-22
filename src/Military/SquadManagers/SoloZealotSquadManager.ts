@@ -7,8 +7,12 @@ import {
     MemoryApi_Military,
     SQUAD_STATUS_OK,
     OP_STRATEGY_COMBINED,
-    OP_STRATEGY_FFA
+    OP_STRATEGY_FFA,,
+    militaryDataHelper
+    MilitaryCombat_Api
 } from "Utils/Imports/internals";
+import { MilitaryStatus_Helper } from "Military/Military.Status.Helper";
+import { MilitaryIntents_Api } from "Military/Military.Api.Intents";
 
 export class SoloZealotSquadManager implements ISquadManager {
     public name: SquadManagerConstant = SOLO_ZEALOT_MAN;
@@ -118,6 +122,79 @@ export class SoloZealotSquadManager implements ISquadManager {
 
     }
 
+    /**
+     * Implementation of OP_STRATEGY_INVADER
+     */
+    public invader = {
+
+        runSquad(instance: ISquadManager): void { 
+
+            const singleton: ISquadManager = MemoryApi_Military.getSingletonSquadManager(instance.name);
+            const status: SquadStatusConstant = singleton.checkStatus(instance);
+
+            if (MilitaryStatus_Helper.handleSquadDeadStatus(status, instance)) {
+                return;
+            }
+
+            MilitaryStatus_Helper.handleNotOKStatus(status);
+
+            const dataNeeded: MilitaryDataParams = {
+                hostiles: true
+            };
+            const creeps: Creep[] = MemoryApi_Military.getLivingCreepsInSquadByInstance(instance);
+            const roomData: MilitaryDataAll = militaryDataHelper.getRoomData(creeps, {}, dataNeeded, instance);
+
+            MilitaryIntents_Api.resetSquadIntents(instance);
+            this.decideMoveIntents(instance, status, roomData);
+            this.decideAttackIntents(instance, status, roomData);
+
+            for (const i in creeps) {
+                const creep: Creep = creeps[i];
+                MilitaryCombat_Api.runIntents(instance, creep, roomData);
+            }
+
+        },
+
+        decideMoveIntents(instance: ISquadManager, status: SquadStatusConstant, roomData: MilitaryDataAll): void {
+            const creeps = MemoryApi_Military.getLivingCreepsInSquadByInstance(instance);
+
+            _.forEach(creeps, (creep: Creep) => {
+                if(creep.room.name === instance.targetRoom) {
+                    this.decideMoveIntents_TARGET_ROOM(instance, status, roomData, creep);
+                } else {
+                    this.decideMoveIntents_NON_TARGET_ROOM(instance, status, roomData, creep);
+                }
+            });
+
+            
+        },
+
+        decideMoveIntents_TARGET_ROOM(instance: ISquadManager, status: SquadStatusConstant, roomData: MilitaryDataAll, creep: Creep): void {
+
+        },
+
+        decideMoveIntents_NON_TARGET_ROOM(instance: ISquadManager, status: SquadStatusConstant, roomData: MilitaryDataAll, creep: Creep): void {
+            // Get away from a creep in range while in transit
+            if (
+                MilitaryIntents_Api.queueIntentMoveNearHostileKiting(
+                    creep,
+                    instance,
+                    roomData[creep.room.name].hostiles?.allHostiles!
+                )
+            ) {
+                return;
+            }
+
+            // Move towards the target room
+            if (MilitaryIntents_Api.queueIntentMoveToTargetRoom(creep, instance)) {
+                return;
+            }
+        },
+
+        decideAttackIntents(instance: ISquadManager, status: SquadStatusConstant, roomData: MilitaryDataAll) {
+
+        },
+    }
     /**
      * Implementation of OP_STRATEGY_COMBINED
      */
