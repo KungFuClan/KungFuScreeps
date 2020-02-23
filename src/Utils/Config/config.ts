@@ -138,7 +138,7 @@ export const RUN_ROOM_STATE_TIMER = 5;
 export const RUN_DEFCON_TIMER = 2;
 export const RUN_RESERVE_TTL_TIMER = 1;
 export const RUN_RAMPART_STATUS_UPDATE = 1;
-export const RESERVER_MIN_TTL = 500;
+export const RESERVER_MIN_TTL = 1500;
 
 /**
  * bucket limits for manager
@@ -156,7 +156,7 @@ export const MILITARY_MANAGER_BUCKET_LIMIT = 2000;
 /**
  * List of allies
  */
-export const ALLY_LIST: string[] = ["jakesboy2", "Uhmbrock", "Atanner", "Faff", "Yoner"];
+export const ALLY_LIST: string[] = ["jakesboy2", "UhmBrock", "Atanner", "Faff", "Yoner"];
 
 /**
  * List of structures a tower in a bunker is allowed to repair

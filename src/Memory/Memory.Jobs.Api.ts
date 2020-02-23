@@ -687,6 +687,9 @@ export class MemoryApi_Jobs {
         }
 
         if (roomJob === undefined) {
+            return;
+            // ! No error needed, since this just means the job list was refreshed while the worker was performing a task
+            /*
             throw new UserException(
                 "Error in updateJobMemory",
                 "Could not find the job in room memory to update." +
@@ -696,6 +699,7 @@ export class MemoryApi_Jobs {
                 JSON.stringify(creep.memory.job),
                 ERROR_ERROR
             );
+            */
         }
 
         // We have the roomJob location in memory
