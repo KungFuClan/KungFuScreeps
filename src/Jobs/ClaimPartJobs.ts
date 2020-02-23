@@ -1,4 +1,4 @@
-import { CreepAllHelper, CreepAllApi, PathfindingApi, RESERVER_MIN_TTL, UserException, RoomHelper_State, MemoryApi_Room } from "Utils/Imports/internals";
+import { CreepAllHelper, CreepAllApi, PathfindingApi, RESERVER_MIN_TTL, UserException, RoomHelper_State, MemoryApi_Room, ALLY_LIST } from "Utils/Imports/internals";
 import { CreepCivHelper } from "Creeps/Creep.Civ.Helper";
 
 export class ClaimPartJobs implements IJobTypeHelper {
@@ -162,8 +162,9 @@ export class ClaimPartJobs implements IJobTypeHelper {
      * @param room The room to get the jobs for
      */
     public static createReserveJobs(room: Room): ClaimPartJob[] {
+        // Consider the room if we are under our reserve threshold, or if it belongs to someone not on the ally list
         const reserveRooms: RemoteRoomMemory[] = MemoryApi_Room.getRemoteRooms(room, (roomMemory: RemoteRoomMemory) => {
-            return roomMemory.reserveTTL < RESERVER_MIN_TTL;
+            return (roomMemory.reserveTTL < RESERVER_MIN_TTL) || !_.contains(ALLY_LIST, roomMemory.reserveUsername);
         });
 
         if (reserveRooms.length === 0) {

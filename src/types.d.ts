@@ -1367,6 +1367,10 @@ interface RemoteRoomMemory extends DependentRoomParentMemory {
      * time remaining for reserving the controller
      */
     reserveTTL: number;
+    /**
+     * username reserving the controller - used to detect invader reserve
+     */
+    reserveUsername: string | undefined;
 }
 
 /**

@@ -417,7 +417,7 @@ export class SpawnHelper {
      */
     public static getRemoteRoomNeedingRemoteReserver(room: Room): RemoteRoomMemory | undefined {
         const reserversInRoom: Creep[] = MemoryApi_Creep.getMyCreeps(room.name, (c: Creep) => c.memory.role === ROLE_REMOTE_RESERVER);
-        const remoteRooms: RemoteRoomMemory[] = MemoryApi_Room.getRemoteRooms(room, (rr: RemoteRoomMemory) => rr.reserveTTL < RESERVER_MIN_TTL);
+        const remoteRooms: RemoteRoomMemory[] = MemoryApi_Room.getRemoteRooms(room, (rr: RemoteRoomMemory) => rr.reserveTTL < RESERVER_MIN_TTL || this.isRemoteRoomEnemyReserved(rr));
         return _.find(remoteRooms, (rr: RemoteRoomMemory) => !_.some(reserversInRoom, (c: Creep) => c.memory.targetRoom === rr.roomName));
     }
 

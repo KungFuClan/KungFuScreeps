@@ -58,7 +58,8 @@ export class ProcessDefaultRemoteRoom implements IFlagProcesser {
             structures: { cache: Game.time, data: null },
             roomName: flag.pos.roomName,
             flags: [remoteFlagMemory],
-            reserveTTL: 0
+            reserveTTL: 0,
+            reserveUsername: undefined
         };
 
         MemoryApi_Empire.createEmpireAlertNode(

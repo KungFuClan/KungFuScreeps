@@ -209,13 +209,16 @@ export class RoomApi_State {
                 remoteRoom.reserveTTL -= RUN_RESERVE_TTL_TIMER;
                 if (remoteRoom.reserveTTL < 0) {
                     remoteRoom.reserveTTL = 0;
+                    remoteRoom.reserveUsername = undefined;
                 }
             } else if (currentRoom.controller) {
                 // Get the actual value of the reserve timer
                 if (currentRoom.controller!.reservation) {
                     remoteRoom.reserveTTL = Game.rooms[remoteRoom.roomName].controller!.reservation!.ticksToEnd;
+                    remoteRoom.reserveUsername = Game.rooms[remoteRoom.roomName].controller!.reservation!.username;
                 } else {
                     remoteRoom.reserveTTL = 0;
+                    remoteRoom.reserveUsername = undefined;
                 }
             }
         }

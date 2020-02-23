@@ -4,7 +4,8 @@ import {
     STIMULATE_FLAG,
     MemoryApi_Room,
     MemoryApi_Creep,
-    MemoryApi_Empire
+    MemoryApi_Empire,
+    ALLY_LIST
 } from "Utils/Imports/internals";
 
 export class RoomHelper_State {
@@ -53,9 +54,8 @@ export class RoomHelper_State {
         if (room.controller === undefined) {
             return false;
         } else if (
-            // TODO Fix this to actually use our Ally List
             room.controller.owner !== undefined &&
-            (room.controller.owner.username === "UhmBrock" || room.controller.owner.username === "jakesboy2" || room.controller.owner.username === "atanner")
+            _.contains(ALLY_LIST, room.controller.owner.username)
         ) {
             return true;
         } else if (this.isAllyReserved(room)) {
@@ -76,9 +76,7 @@ export class RoomHelper_State {
         return (
             room.controller.reservation !== undefined &&
             room.controller.reservation.username !== undefined &&
-            (room.controller.reservation!.username === "UhmBrock" ||
-                room.controller.reservation!.username === "jakesboy2" ||
-                room.controller.reservation!.username === "atanner")
+            _.contains(ALLY_LIST, room.controller.reservation.username)
         );
     }
 
