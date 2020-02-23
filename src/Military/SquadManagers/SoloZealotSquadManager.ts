@@ -12,7 +12,11 @@ import {
     MilitaryCombat_Api,
     ACTION_MOVE,
     ACTION_ATTACK,
-    OP_STRATEGY_INVADER
+    OP_STRATEGY_INVADER,
+    MilitaryMovment_Api,
+    SQUAD_STATUS_RALLY,
+    SQUAD_STATUS_DONE,
+    SQUAD_STATUS_DEAD
 } from "Utils/Imports/internals";
 import { MilitaryStatus_Helper } from "Military/Military.Status.Helper";
 import { MilitaryIntents_Api } from "Military/Military.Api.Intents";
@@ -92,6 +96,26 @@ export class SoloZealotSquadManager implements ISquadManager {
      * @returns boolean representing the squads current status
      */
     public checkStatus(instance: ISquadManager): SquadStatusConstant {
+        // Handle initial rally status
+        if (!instance.initialRallyComplete) {
+            if (MilitaryMovment_Api.isSquadRallied(instance)) {
+                instance.initialRallyComplete = true;
+                return SQUAD_STATUS_OK;
+            }
+            return SQUAD_STATUS_RALLY;
+        }
+
+        // Check if the squad is done with the attack (ie, attack success)
+        if (MilitaryCombat_Api.isOperationDone(instance)) {
+            return SQUAD_STATUS_DONE;
+        }
+
+        // Check if the squad was killed
+        if (MilitaryCombat_Api.isSquadDead(instance)) {
+            return SQUAD_STATUS_DEAD;
+        }
+
+        // If nothing else, we are OK
         return SQUAD_STATUS_OK;
     }
 

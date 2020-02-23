@@ -92,7 +92,7 @@ export class militaryDataHelper {
         if (!Game.rooms[roomName]) {
             return { allHostiles: [], attack: [], rangedAttack: [], heal: [] };
         }
-        const allHostiles: Creep[] = Game.rooms[roomName].find(FIND_HOSTILE_CREEPS);
+        const allHostiles: Creep[] = Game.rooms[roomName].find(FIND_HOSTILE_CREEPS).filter((c: Creep) => !_.contains(ALLY_LIST, c.owner.username));
         const attackCreeps: Creep[] = [];
         const rangedAttackCreeps: Creep[] = [];
         const healCreeps: Creep[] = [];
