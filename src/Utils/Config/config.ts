@@ -138,7 +138,7 @@ export const RUN_ROOM_STATE_TIMER = 5;
 export const RUN_DEFCON_TIMER = 2;
 export const RUN_RESERVE_TTL_TIMER = 1;
 export const RUN_RAMPART_STATUS_UPDATE = 1;
-export const RESERVER_MIN_TTL = 1500;
+export const RESERVER_MIN_TTL = 2000;
 
 /**
  * bucket limits for manager
