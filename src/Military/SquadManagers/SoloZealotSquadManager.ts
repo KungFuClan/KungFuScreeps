@@ -181,14 +181,19 @@ export class SoloZealotSquadManager implements ISquadManager {
                 const creep: Creep = creeps[i];
                 MilitaryCombat_Api.runIntents(instance, creep, roomData);
             }
-
         },
 
         decideMoveIntents(instance: ISquadManager, status: SquadStatusConstant, roomData: MilitaryDataAll): void {
             const creeps = MemoryApi_Military.getLivingCreepsInSquadByInstance(instance);
 
             _.forEach(creeps, (creep: Creep) => {
-                if(creep.room.name === instance.targetRoom) {
+
+                // Try to get off exit tile first, then get a move target based on what room we're in
+                if (MilitaryIntents_Api.queueIntentMoveOffExitTile(creep, instance)) {
+                    return;
+                }
+
+                if (creep.room.name === instance.targetRoom) {
                     this.decideMoveIntents_TARGET_ROOM(instance, status, roomData, creep);
                 } else {
                     this.decideMoveIntents_NON_TARGET_ROOM(instance, status, roomData, creep);
@@ -202,7 +207,7 @@ export class SoloZealotSquadManager implements ISquadManager {
 
             const invaderCore = _.find(roomData[creep.room.name]!.hostileStructures!, (struct: AnyOwnedStructure) => struct.structureType === STRUCTURE_INVADER_CORE);
 
-            if(invaderCore === undefined) { 
+            if (invaderCore === undefined) {
                 return;
             }
 
@@ -213,7 +218,7 @@ export class SoloZealotSquadManager implements ISquadManager {
                 directionToTarget = path[0].direction;
             }
 
-            if(directionToTarget === undefined) {
+            if (directionToTarget === undefined) {
                 return;
             }
 
@@ -247,22 +252,22 @@ export class SoloZealotSquadManager implements ISquadManager {
         decideAttackIntents(instance: ISquadManager, status: SquadStatusConstant, roomData: MilitaryDataAll) {
 
             const creeps = MemoryApi_Military.getLivingCreepsInSquadByInstance(instance);
-            
+
             // Return early if we do not have a creep in the target room yet
-            if(roomData[instance.targetRoom] === undefined) { 
+            if (roomData[instance.targetRoom] === undefined) {
                 return;
             }
-            
+
             const invaderCore = _.find(roomData[instance.targetRoom]!.hostileStructures!, (struct: AnyOwnedStructure) => struct.structureType === STRUCTURE_INVADER_CORE);
 
-            if(invaderCore === undefined) { 
+            if (invaderCore === undefined) {
                 return;
             }
 
 
             _.forEach(creeps, (creep: Creep) => {
 
-                if(MilitaryCombat_Api.isInAttackRange(creep, invaderCore.pos, true)) {
+                if (MilitaryCombat_Api.isInAttackRange(creep, invaderCore.pos, true)) {
 
                     const intent: Attack_MiliIntent = {
                         action: ACTION_ATTACK,

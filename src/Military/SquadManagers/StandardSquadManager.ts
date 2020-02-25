@@ -8,8 +8,18 @@ import {
     MemoryApi_Military,
     SQUAD_STATUS_OK,
     OP_STRATEGY_COMBINED,
-    OP_STRATEGY_FFA
+    OP_STRATEGY_FFA,
+    MilitaryMovment_Api,
+    SQUAD_STATUS_RALLY,
+    SQUAD_STATUS_DONE,
+    SQUAD_STATUS_DEAD,
+    MilitaryCombat_Api,
+    militaryDataHelper,
+    ACTION_MOVE,
+    ACTION_ATTACK
 } from "Utils/Imports/internals";
+import { MilitaryStatus_Helper } from "Military/Military.Status.Helper";
+import { MilitaryIntents_Api } from "Military/Military.Api.Intents";
 
 export class StandardSquadManager implements ISquadManager {
     public name: SquadManagerConstant = STANDARD_MAN;
@@ -85,6 +95,26 @@ export class StandardSquadManager implements ISquadManager {
      * @returns boolean representing the squads current status
      */
     public checkStatus(instance: ISquadManager): SquadStatusConstant {
+        // Handle initial rally status
+        if (!instance.initialRallyComplete) {
+            if (MilitaryMovment_Api.isSquadRallied(instance)) {
+                instance.initialRallyComplete = true;
+                return SQUAD_STATUS_OK;
+            }
+            return SQUAD_STATUS_RALLY;
+        }
+
+        // Check if the squad is done with the attack (ie, attack success)
+        if (MilitaryCombat_Api.isOperationDone(instance)) {
+            return SQUAD_STATUS_DONE;
+        }
+
+        // Check if the squad was killed
+        if (MilitaryCombat_Api.isSquadDead(instance)) {
+            return SQUAD_STATUS_DEAD;
+        }
+
+        // If nothing else, we are OK
         return SQUAD_STATUS_OK;
     }
 
@@ -118,7 +148,100 @@ export class StandardSquadManager implements ISquadManager {
     public ffa = {
 
         runSquad(instance: ISquadManager): void {
-            return;
+            const singleton: ISquadManager = MemoryApi_Military.getSingletonSquadManager(instance.name);
+            const status: SquadStatusConstant = singleton.checkStatus(instance);
+
+            if (MilitaryStatus_Helper.handleSquadDeadStatus(status, instance)) {
+                return;
+            }
+            MilitaryStatus_Helper.handleNotOKStatus(status);
+
+            const dataNeeded: MilitaryDataParams = {
+                hostiles: true,
+                hostileStructures: true
+            };
+            const creeps: Creep[] = MemoryApi_Military.getLivingCreepsInSquadByInstance(instance);
+            const roomData: MilitaryDataAll = militaryDataHelper.getRoomData(creeps, {}, dataNeeded, instance);
+
+            MilitaryIntents_Api.resetSquadIntents(instance);
+            this.decideMoveIntents(instance, status, roomData);
+            this.decideAttackIntents(instance, status, roomData);
+            this.decideHealIntents(instance, status, roomData);
+
+            for (const i in creeps) {
+                const creep: Creep = creeps[i];
+                MilitaryCombat_Api.runIntents(instance, creep, roomData);
+            }
+        },
+
+        decideMoveIntents(instance: ISquadManager, status: SquadStatusConstant, roomData: MilitaryDataAll): void {
+            const creeps = MemoryApi_Military.getLivingCreepsInSquadByInstance(instance);
+
+            _.forEach(creeps, (creep: Creep) => {
+
+                // Try to get off exit tile first, then get a move target based on what room we're in
+                if (MilitaryIntents_Api.queueIntentMoveOffExitTile(creep, instance)) {
+                    return;
+                }
+
+                if (creep.room.name === instance.targetRoom) {
+                    this.decideMoveIntents_TARGET_ROOM(instance, status, roomData, creep);
+                } else {
+                    this.decideMoveIntents_NON_TARGET_ROOM(instance, status, roomData, creep);
+                }
+            });
+
+
+        },
+
+        decideMoveIntents_TARGET_ROOM(instance: ISquadManager, status: SquadStatusConstant, roomData: MilitaryDataAll, creep: Creep): void {
+            // move to our ideal target i guess
+        },
+
+        decideMoveIntents_NON_TARGET_ROOM(instance: ISquadManager, status: SquadStatusConstant, roomData: MilitaryDataAll, creep: Creep): void {
+            // Get away from a creep in range while in transit
+            if (
+                MilitaryIntents_Api.queueIntentMoveNearHostileKiting(
+                    creep,
+                    instance,
+                    roomData[creep.room.name].hostiles?.allHostiles!
+                )
+            ) {
+                return;
+            }
+
+            // Move towards the target room
+            if (MilitaryIntents_Api.queueIntentMoveToTargetRoom(creep, instance)) {
+                return;
+            }
+        },
+
+        decideAttackIntents(instance: ISquadManager, status: SquadStatusConstant, roomData: MilitaryDataAll) {
+            const creeps = MemoryApi_Military.getLivingCreepsInSquadByInstance(instance);
+            if (roomData[instance.targetRoom] === undefined) {
+                return;
+            }
+
+            // get the ideal target we wanna SLAP
+
+            const zealots: Creep[] = _.filter(creeps, (creep: Creep) => creep.memory.role === ROLE_ZEALOT);
+            _.forEach(zealots, (creep: Creep) => {
+                // queue up the attack intents
+            });
+        },
+
+        decideHealIntents(instance: ISquadManager, status: SquadStatusConstant, roomData: MilitaryDataAll): void {
+            const creeps = MemoryApi_Military.getLivingCreepsInSquadByInstance(instance);
+            if (roomData[instance.targetRoom] === undefined) {
+                return;
+            }
+
+            // get our ideal heal target we wanna HEAL
+
+            const healers: Creep[] = _.filter(creeps, (creep: Creep) => creep.memory.role === ROLE_MEDIC);
+            _.forEach(healers, (creep: Creep) => {
+                // queue up the heal intents
+            });
         }
 
     }
