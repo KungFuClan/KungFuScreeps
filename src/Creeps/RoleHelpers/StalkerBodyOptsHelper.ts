@@ -42,31 +42,33 @@ export class StalkerBodyOptsHelper implements ICreepBodyOptsHelper {
         const opts: CreepBodyOptions = { mixType: GROUPED };
 
         switch (tier) {
-            case TIER_1: // 1 Ranged Attack, 2 Move - Total Cost: 200
+            case TIER_1: // 200
                 body = { ranged_attack: 1, move: 1 };
                 break;
 
-            case TIER_2: // 3 Ranged Attack, 2 Move - Total Cost: 550
-                body = { ranged_attack: 3, move: 2 };
+            case TIER_2: // 400 - can afford one more ranged attack, but could not kite then
+                body = { ranged_attack: 2, move: 2 };
                 break;
 
-            case TIER_3: // 4 Ranged Attack, 4 Move - Total Cost: 800
+            case TIER_3: // 800
                 body = { ranged_attack: 4, move: 4 };
                 break;
 
-            case TIER_4: // 6 Ranged Attack, 6 Move - Total Cost: 1200
-                body = { ranged_attack: 6, move: 6 };
+            case TIER_4: // 1300
+                body = { ranged_attack: 5, move: 6, heal: 1 };
                 break;
 
-            case TIER_5: // 8 Ranged Attack, 8 Move - Total Cost: 1600
-                body = { ranged_attack: 8, move: 8 };
+            case TIER_5: // 1700
+                body = { ranged_attack: 7, move: 8, heal: 1 };
+                break;
+
+            case TIER_6: // 2200
+                body = { ranged_attack: 8, move: 10, heal: 2 };
                 break;
 
             case TIER_8:
-            case TIER_7:
-            case TIER_6 || TIER_7 || TIER_8: // 12 Ranged Attack, 10 Move - Total Cost: 2300
-                body = { ranged_attack: 12, move: 10 };
-                break;
+            case TIER_7: // 3000
+                body = { ranged_attack: 12, move: 14, heal: 2 };
         }
 
         // ! Important DONT FORGET TO CHANGE

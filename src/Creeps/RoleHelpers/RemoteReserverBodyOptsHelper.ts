@@ -41,6 +41,8 @@ export class RemoteReserverBodyOptsHelper implements ICreepBodyOptsHelper {
         switch (tier) {
             case TIER_8:
             case TIER_7:
+                body = { claim: 3, move: 3 }; 
+                break;
             case TIER_6:
             case TIER_5:
             case TIER_4: // 2 Claim, 2 Move - Total Cost: 800
