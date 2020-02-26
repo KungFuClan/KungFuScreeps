@@ -69,7 +69,7 @@ export class MilitaryIntents_Api {
         const currPos: RoomPosition = Normalize.convertMockToRealPos(instance.rallyPos);
         const exit = Game.map.findExit(currPos.roomName, instance.targetRoom);
         if (exit === ERR_NO_PATH || exit === ERR_INVALID_ARGS) {
-            throw new UserException("No path or invalid args for isQuadSquadInRallyPos", "rip", ERROR_ERROR);
+            throw new UserException("No path or invalid args for queueIntentMoveQuadSquadRallyPos", "rip", ERROR_ERROR);
         }
 
         const posArr: RoomPosition[] = MilitaryMovement_Helper.getQuadSquadRallyPosArray(currPos, exit);
