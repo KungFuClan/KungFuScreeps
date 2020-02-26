@@ -4,7 +4,11 @@ import {
     MilitaryMovment_Api,
     ACTION_MOVE,
     ACTION_RANGED_ATTACK,
-    ACTION_HEAL
+    ACTION_HEAL,
+    Normalize,
+    UserException,
+    ERROR_ERROR,
+    SQUAD_STATUS_RALLY
 } from "Utils/Imports/internals";
 import { MilitaryMovement_Helper } from "./Military.Movement.Helper";
 
@@ -25,6 +29,59 @@ export class MilitaryIntents_Api {
 
             creepStack.intents = [];
         });
+    }
+
+    /**
+     * Queue the intent to move the creep to their rally position
+     * @param creep The creep we're queueing the intent for
+     * @param instance the instance we're currently inside
+     */
+    public static queueIntentsMoveToRallyPos(creep: Creep, instance: ISquadManager, status: SquadStatusConstant): boolean {
+        if (!instance.rallyPos || status !== SQUAD_STATUS_RALLY) {
+            return false;
+        }
+
+        const rallyPos: RoomPosition = Normalize.convertMockToRealPos(instance.rallyPos);
+        const direction: DirectionConstant = rallyPos.findPathTo(rallyPos)[0].direction;
+        const intent: Move_MiliIntent = {
+            action: ACTION_MOVE,
+            target: direction,
+            targetType: "direction"
+        };
+
+        MemoryApi_Military.pushIntentToCreepStack(instance, creep.name, intent);
+        return true;
+    }
+
+    /**
+     * Move the squad into their rally positions for quad squad
+     * @param instance the instance we're controlling
+     */
+    public static queueIntentMoveQuadSquadRallyPos(creep: Creep, instance: ISquadManager, status: SquadStatusConstant): boolean {
+        if (!instance.rallyPos || status !== SQUAD_STATUS_RALLY || !MilitaryMovment_Api.isSquadRallied(instance)) {
+            return false;
+        }
+        const options: CreepOptionsMili = creep.memory.options as CreepOptionsMili;
+        if (!options.caravanPos) {
+            return false;
+        }
+
+        const currPos: RoomPosition = Normalize.convertMockToRealPos(instance.rallyPos);
+        const exit = Game.map.findExit(currPos.roomName, instance.targetRoom);
+        if (exit === ERR_NO_PATH || exit === ERR_INVALID_ARGS) {
+            throw new UserException("No path or invalid args for isQuadSquadInRallyPos", "rip", ERROR_ERROR);
+        }
+
+        const posArr: RoomPosition[] = MilitaryMovement_Helper.getQuadSquadRallyPosArray(currPos, exit);
+        const direction: DirectionConstant = currPos.findPathTo(posArr[options.caravanPos])[0].direction;
+        const intent: Move_MiliIntent = {
+            action: ACTION_MOVE,
+            target: direction,
+            targetType: "direction"
+        };
+
+        MemoryApi_Military.pushIntentToCreepStack(instance, creep.name, intent);
+        return true;
     }
 
     /**

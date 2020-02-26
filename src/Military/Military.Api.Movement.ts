@@ -1,4 +1,5 @@
-import { MemoryApi_Military, UtilHelper, Normalize, UserException, ERROR_ERROR } from "Utils/Imports/internals";
+import { MemoryApi_Military, UtilHelper, Normalize, UserException, ERROR_ERROR, militaryDataHelper } from "Utils/Imports/internals";
+import { MilitaryMovement_Helper } from "./Military.Movement.Helper";
 
 export class MilitaryMovment_Api {
 
@@ -36,6 +37,33 @@ export class MilitaryMovment_Api {
         }
 
         // We make it here, everyones rallied
+        return true;
+    }
+
+    /**
+     *
+     * @param instance the instance we're checking for
+     * @returns boolean representing if quad squad is rallied
+     */
+    public static isQuadSquadInRallyPos(instance: ISquadManager): boolean {
+        if (!instance.rallyPos) {
+            return true;
+        }
+
+        const currPos: RoomPosition = Normalize.convertMockToRealPos(instance.rallyPos);
+        const exit = Game.map.findExit(currPos.roomName, instance.targetRoom);
+        if (exit === ERR_NO_PATH || exit === ERR_INVALID_ARGS) {
+            throw new UserException("No path or invalid args for isQuadSquadInRallyPos", "rip", ERROR_ERROR);
+        }
+
+        const posArr: RoomPosition[] = MilitaryMovement_Helper.getQuadSquadRallyPosArray(currPos, exit);
+        const squad: Creep[] = MemoryApi_Military.getLivingCreepsInSquadByInstance(instance);
+
+        for (const i in squad) {
+            if (!squad[i].pos.isEqualTo(posArr[i])) {
+                return false;
+            }
+        }
         return true;
     }
 

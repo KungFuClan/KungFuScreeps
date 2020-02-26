@@ -8,7 +8,9 @@ import {
     UserException,
     RoomManager,
     ERROR_INFO,
-    ERROR_ERROR
+    ERROR_ERROR,
+    UtilHelper,
+    Normalize
 } from "Utils/Imports/internals";
 
 export class MilitaryMovement_Helper {
@@ -122,62 +124,58 @@ export class MilitaryMovement_Helper {
     /**
      * Check if the potential rally pos has an open 2x2 around it
      * @param currPos the posistion we're checking
-     * @param exitX the x coord of the exit
-     * @param exitY the y coord of the exit
+     * @param exit the exit direction
      */
     public static isQuadSquadLocation(currPos: RoomPosition, exit: ExitConstant): boolean {
         const terrain: RoomTerrain = new Room.Terrain(currPos.roomName);
-        if (exit === FIND_EXIT_LEFT) {
-            const pos1: RoomPosition = new RoomPosition(currPos.x, currPos.y - 1, currPos.roomName);
-            const pos2: RoomPosition = new RoomPosition(currPos.x + 1, currPos.y, currPos.roomName);
-            const pos3: RoomPosition = new RoomPosition(currPos.x + 1, currPos.y - 1, currPos.roomName);
-            if (this.isValid2x2(pos1, pos2, pos3, terrain)) {
-                return true;
-            }
-        }
-
-        if (exit === FIND_EXIT_RIGHT) {
-            const pos1: RoomPosition = new RoomPosition(currPos.x, currPos.y + 1, currPos.roomName);
-            const pos2: RoomPosition = new RoomPosition(currPos.x - 1, currPos.y, currPos.roomName);
-            const pos3: RoomPosition = new RoomPosition(currPos.x - 1, currPos.y + 1, currPos.roomName);
-            if (this.isValid2x2(pos1, pos2, pos3, terrain)) {
-                return true;
-            }
-        }
-
-        if (exit === FIND_EXIT_TOP) {
-            const pos1: RoomPosition = new RoomPosition(currPos.x, currPos.y + 1, currPos.roomName);
-            const pos2: RoomPosition = new RoomPosition(currPos.x + 1, currPos.y, currPos.roomName);
-            const pos3: RoomPosition = new RoomPosition(currPos.x + 1, currPos.y + 1, currPos.roomName);
-            if (this.isValid2x2(pos1, pos2, pos3, terrain)) {
-                return true;
-            }
-        }
-
-        if (exit === FIND_EXIT_BOTTOM) {
-            const pos1: RoomPosition = new RoomPosition(currPos.x, currPos.y - 1, currPos.roomName);
-            const pos2: RoomPosition = new RoomPosition(currPos.x - 1, currPos.y, currPos.roomName);
-            const pos3: RoomPosition = new RoomPosition(currPos.x - 1, currPos.y - 1, currPos.roomName);
-            if (this.isValid2x2(pos1, pos2, pos3, terrain)) {
-                return true;
-            }
-        }
-
-        return false;
+        const posArr: RoomPosition[] = this.getQuadSquadRallyPosArray(currPos, exit);
+        return this.isOpenSpace(posArr, terrain);
     }
 
     /**
      *
-     * @param pos1 the first position we're checking
-     * @param pos2 the second position we're checking
-     * @param pos3 the third position we're checking
+     * @param posArr the array of room positions we're checking
      * @param terrain the room terrain object to check against
      */
-    public static isValid2x2(pos1: RoomPosition, pos2: RoomPosition, pos3: RoomPosition, terrain: RoomTerrain): boolean {
-        const t1: number = terrain.get(pos1.x, pos1.y);
-        const t2: number = terrain.get(pos2.x, pos2.y);
-        const t3: number = terrain.get(pos3.x, pos3.y);
-        return (t1 !== TERRAIN_MASK_WALL && t2 !== TERRAIN_MASK_WALL && t3 !== TERRAIN_MASK_WALL);
+    public static isOpenSpace(posArr: RoomPosition[], terrain: RoomTerrain): boolean {
+        for (const i in posArr) {
+            if (terrain.get(posArr[i].x, posArr[i].y) === TERRAIN_MASK_WALL) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Get the position array for the quad squad rallying
+     * @param currPos the posistion we're checking
+     * @param exit the exit direction
+     */
+    public static getQuadSquadRallyPosArray(currPos: RoomPosition, exit: ExitConstant): RoomPosition[] {
+
+        const posArr: RoomPosition[] = [currPos];
+        if (exit === FIND_EXIT_LEFT) {
+            posArr.push(new RoomPosition(currPos.x, currPos.y - 1, currPos.roomName));
+            posArr.push(new RoomPosition(currPos.x + 1, currPos.y, currPos.roomName));
+            posArr.push(new RoomPosition(currPos.x + 1, currPos.y - 1, currPos.roomName));
+        }
+        else if (exit === FIND_EXIT_RIGHT) {
+            posArr.push(new RoomPosition(currPos.x, currPos.y + 1, currPos.roomName));
+            posArr.push(new RoomPosition(currPos.x - 1, currPos.y, currPos.roomName));
+            posArr.push(new RoomPosition(currPos.x - 1, currPos.y + 1, currPos.roomName));
+        }
+        else if (exit === FIND_EXIT_TOP) {
+            posArr.push(new RoomPosition(currPos.x, currPos.y + 1, currPos.roomName));
+            posArr.push(new RoomPosition(currPos.x + 1, currPos.y, currPos.roomName));
+            posArr.push(new RoomPosition(currPos.x + 1, currPos.y + 1, currPos.roomName));
+        }
+        else if (exit === FIND_EXIT_BOTTOM) {
+            posArr.push(new RoomPosition(currPos.x, currPos.y - 1, currPos.roomName));
+            posArr.push(new RoomPosition(currPos.x - 1, currPos.y, currPos.roomName));
+            posArr.push(new RoomPosition(currPos.x - 1, currPos.y - 1, currPos.roomName));
+        }
+
+        return posArr;
     }
 
     /**

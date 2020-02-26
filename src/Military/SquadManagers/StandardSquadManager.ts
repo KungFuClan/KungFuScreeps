@@ -98,14 +98,9 @@ export class StandardSquadManager implements ISquadManager {
     public checkStatus(instance: ISquadManager): SquadStatusConstant {
         // Handle initial rally status
         if (!instance.initialRallyComplete) {
-            if (MilitaryMovment_Api.isSquadRallied(instance)) {
-                if (MilitaryMovment_Api.isQuadSquadInRallyPos(instance)) {
-                    instance.initialRallyComplete = true;
-                    return SQUAD_STATUS_OK;
-                }
-                else {
-                    MilitaryMovment_Api.moveQuadSquadRallyPos(instance);
-                }
+            if (MilitaryMovment_Api.isQuadSquadInRallyPos(instance)) {
+                instance.initialRallyComplete = true;
+                return SQUAD_STATUS_OK;
             }
             return SQUAD_STATUS_RALLY;
         }
@@ -195,6 +190,14 @@ export class StandardSquadManager implements ISquadManager {
 
                 // Try to get off exit tile first, then get a move target based on what room we're in
                 if (MilitaryIntents_Api.queueIntentMoveOffExitTile(creep, instance)) {
+                    return;
+                }
+
+                if (MilitaryIntents_Api.queueIntentMoveQuadSquadRallyPos(creep, instance, status)) {
+                    return;
+                }
+
+                if (MilitaryIntents_Api.queueIntentsMoveToRallyPos(creep, instance, status)) {
                     return;
                 }
 

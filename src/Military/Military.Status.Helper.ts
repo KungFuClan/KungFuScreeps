@@ -1,4 +1,4 @@
-import { SQUAD_STATUS_OK, SQUAD_STATUS_DEAD } from "Utils/Imports/constants";
+import { SQUAD_STATUS_OK, SQUAD_STATUS_DEAD, SQUAD_STATUS_RALLY } from "Utils/Imports/constants";
 import { UserException } from "Utils/Imports/internals";
 
 export class MilitaryStatus_Helper {
@@ -9,7 +9,7 @@ export class MilitaryStatus_Helper {
      * @throws exception based on status NOT okay
      */
     public static handleNotOKStatus(status: SquadStatusConstant): void {
-        if (status !== SQUAD_STATUS_OK) {
+        if (status !== SQUAD_STATUS_OK && status !== SQUAD_STATUS_RALLY) {
             throw new UserException(
                 "Unhandled status for squad manager",
                 "Status: " + status + "\nCheck that this status is being handled appropriately.",
