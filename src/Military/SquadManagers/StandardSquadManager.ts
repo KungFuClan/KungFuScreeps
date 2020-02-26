@@ -20,6 +20,7 @@ import {
 } from "Utils/Imports/internals";
 import { MilitaryStatus_Helper } from "Military/Military.Status.Helper";
 import { MilitaryIntents_Api } from "Military/Military.Api.Intents";
+import { MilitaryMovement_Helper } from "Military/Military.Movement.Helper";
 
 export class StandardSquadManager implements ISquadManager {
     public name: SquadManagerConstant = STANDARD_MAN;
@@ -98,8 +99,13 @@ export class StandardSquadManager implements ISquadManager {
         // Handle initial rally status
         if (!instance.initialRallyComplete) {
             if (MilitaryMovment_Api.isSquadRallied(instance)) {
-                instance.initialRallyComplete = true;
-                return SQUAD_STATUS_OK;
+                if (MilitaryMovment_Api.isQuadSquadInRallyPos(instance)) {
+                    instance.initialRallyComplete = true;
+                    return SQUAD_STATUS_OK;
+                }
+                else {
+                    MilitaryMovment_Api.moveQuadSquadRallyPos(instance);
+                }
             }
             return SQUAD_STATUS_RALLY;
         }
@@ -127,11 +133,19 @@ export class StandardSquadManager implements ISquadManager {
             role: ROLE_ZEALOT,
             caravanPos: 0
         };
-        const medic1: SquadDefinition = {
-            role: ROLE_MEDIC,
+        const zealot2: SquadDefinition = {
+            role: ROLE_ZEALOT,
             caravanPos: 1
         };
-        return [zealot1, medic1];
+        const medic1: SquadDefinition = {
+            role: ROLE_MEDIC,
+            caravanPos: 2
+        };
+        const medic2: SquadDefinition = {
+            role: ROLE_MEDIC,
+            caravanPos: 3
+        };
+        return [zealot1, zealot2, medic1, medic2];
     }
 
     /**

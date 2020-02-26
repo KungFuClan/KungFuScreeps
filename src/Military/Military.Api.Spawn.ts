@@ -12,6 +12,7 @@ import {
     SOLO_ZEALOT_MAN,
     OP_STRATEGY_INVADER
 } from "Utils/Imports/internals";
+import { MilitaryMovement_Helper } from "./Military.Movement.Helper";
 
 export class Military_Spawn_Api {
     /**
@@ -31,7 +32,10 @@ export class Military_Spawn_Api {
         const managerImplementation: ISquadManager | undefined = MemoryApi_Military.getSingletonSquadManager(
             managerType
         );
+        const dependentRoom: string = EmpireHelper.findDependentRoom(targetRoom);
         const squadInstance: ISquadManager = managerImplementation.createInstance(targetRoom, operationUUID);
+        squadInstance.rallyPos = MilitaryMovement_Helper.chooseRallyLocation(dependentRoom, targetRoom, { rallyInTargetRoom: false });
+
 
         // Check for existing instance
         // If none, create new operation and push onto memory, If existing, push instance onto it
@@ -58,7 +62,7 @@ export class Military_Spawn_Api {
         const squadArray: SquadDefinition[] = squadInstance.getSquadArray();
         const tickToSpawn: number = Game.time;
         const priority: number = squadInstance.getSpawnPriority();
-        this.addSquadToSpawnQueue(squadUUID, operationUUID, squadArray, targetRoom, tickToSpawn, priority);
+        this.addSquadToSpawnQueue(squadUUID, operationUUID, squadArray, targetRoom, tickToSpawn, priority, dependentRoom);
     }
 
     /**
@@ -76,9 +80,9 @@ export class Military_Spawn_Api {
         squadArray: SquadDefinition[],
         targetRoom: string,
         tickToSpawn: number,
-        priority: number
+        priority: number,
+        dependentRoom: string
     ): void {
-        const dependentRoom: string = EmpireHelper.findDependentRoom(targetRoom);
         if (!Memory.rooms[dependentRoom].creepLimit?.militaryQueue) {
             MemoryApi_Room.initCreepLimits(Game.rooms[dependentRoom]);
         }
@@ -139,7 +143,7 @@ export class Military_Spawn_Api {
         }
 
         remoteRooms.forEach((remoteRoom: RemoteRoomMemory) => {
-            
+
             // If we already have an operation defending the room, don't create another one
             const existingOperation: MilitaryOperation | undefined = this.getOperationTargetingRoom(remoteRoom.roomName);
             if (existingOperation) {

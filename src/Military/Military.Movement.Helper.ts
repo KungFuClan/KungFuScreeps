@@ -94,27 +94,90 @@ export class MilitaryMovement_Helper {
      * @param PathInfo The part of a result of a Game.map.findRoute that we will use to find an open position near the exit
      */
     public static getOpenPositionNearExit(roomName: string, exit: ExitConstant): RoomPosition | undefined {
-        // Get Terrain object and search for an open area, at least 3x3 and choose the rally point as the top-center
-        const terrain = new Room.Terrain(roomName);
 
         // Only one of these will be defined - gets the exit row number based on the exit direction
-        let exitX = exit === FIND_EXIT_LEFT ? 0 : exit === FIND_EXIT_RIGHT ? 49 : undefined;
-        let exitY = exit === FIND_EXIT_TOP ? 0 : exit === FIND_EXIT_BOTTOM ? 49 : undefined;
+        const exitX: number | undefined = exit === FIND_EXIT_LEFT ? 0 : exit === FIND_EXIT_RIGHT ? 49 : undefined;
+        const exitY: number | undefined = exit === FIND_EXIT_TOP ? 0 : exit === FIND_EXIT_BOTTOM ? 49 : undefined;
 
-        let exitRange = this.getOpenTilesInRow(roomName, exitX, exitY);
+        const exitRange = this.getOpenTilesInRow(roomName, exitX, exitY);
 
-        // Get roughly the middle of the array to try for the center exit tile
-        let exitPositionIndex: number = exitRange.length / 2;
+        const xOffset: number = exit === FIND_EXIT_LEFT ? 1 : exit === FIND_EXIT_RIGHT ? -1 : 0;
+        const yOffset: number = exit === FIND_EXIT_TOP ? -1 : exit === FIND_EXIT_BOTTOM ? 1 : 0;
 
-        // TODO make this more dynamic to find a larger open area
-        let xOffset = exit === FIND_EXIT_LEFT ? 1 : exit === FIND_EXIT_RIGHT ? -1 : 0;
-        let yOffset = exit === FIND_EXIT_TOP ? -1 : exit === FIND_EXIT_BOTTOM ? 1 : 0;
+        for (const i in exitRange) {
+            const currPos: RoomPosition = exitRange[i];
+            currPos.x += xOffset;
+            currPos.y += yOffset;
+            if (this.isQuadSquadLocation(currPos, exit)) {
+                return new RoomPosition(
+                    currPos.x,
+                    currPos.y,
+                    roomName
+                );
+            }
+        }
+        return undefined;
+    }
 
-        return new RoomPosition(
-            exitRange[exitPositionIndex].x + xOffset,
-            exitRange[exitPositionIndex].y + yOffset,
-            roomName
-        );
+    /**
+     * Check if the potential rally pos has an open 2x2 around it
+     * @param currPos the posistion we're checking
+     * @param exitX the x coord of the exit
+     * @param exitY the y coord of the exit
+     */
+    public static isQuadSquadLocation(currPos: RoomPosition, exit: ExitConstant): boolean {
+        const terrain: RoomTerrain = new Room.Terrain(currPos.roomName);
+        if (exit === FIND_EXIT_LEFT) {
+            const pos1: RoomPosition = new RoomPosition(currPos.x, currPos.y - 1, currPos.roomName);
+            const pos2: RoomPosition = new RoomPosition(currPos.x + 1, currPos.y, currPos.roomName);
+            const pos3: RoomPosition = new RoomPosition(currPos.x + 1, currPos.y - 1, currPos.roomName);
+            if (this.isValid2x2(pos1, pos2, pos3, terrain)) {
+                return true;
+            }
+        }
+
+        if (exit === FIND_EXIT_RIGHT) {
+            const pos1: RoomPosition = new RoomPosition(currPos.x, currPos.y + 1, currPos.roomName);
+            const pos2: RoomPosition = new RoomPosition(currPos.x - 1, currPos.y, currPos.roomName);
+            const pos3: RoomPosition = new RoomPosition(currPos.x - 1, currPos.y + 1, currPos.roomName);
+            if (this.isValid2x2(pos1, pos2, pos3, terrain)) {
+                return true;
+            }
+        }
+
+        if (exit === FIND_EXIT_TOP) {
+            const pos1: RoomPosition = new RoomPosition(currPos.x, currPos.y + 1, currPos.roomName);
+            const pos2: RoomPosition = new RoomPosition(currPos.x + 1, currPos.y, currPos.roomName);
+            const pos3: RoomPosition = new RoomPosition(currPos.x + 1, currPos.y + 1, currPos.roomName);
+            if (this.isValid2x2(pos1, pos2, pos3, terrain)) {
+                return true;
+            }
+        }
+
+        if (exit === FIND_EXIT_BOTTOM) {
+            const pos1: RoomPosition = new RoomPosition(currPos.x, currPos.y - 1, currPos.roomName);
+            const pos2: RoomPosition = new RoomPosition(currPos.x - 1, currPos.y, currPos.roomName);
+            const pos3: RoomPosition = new RoomPosition(currPos.x - 1, currPos.y - 1, currPos.roomName);
+            if (this.isValid2x2(pos1, pos2, pos3, terrain)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     *
+     * @param pos1 the first position we're checking
+     * @param pos2 the second position we're checking
+     * @param pos3 the third position we're checking
+     * @param terrain the room terrain object to check against
+     */
+    public static isValid2x2(pos1: RoomPosition, pos2: RoomPosition, pos3: RoomPosition, terrain: RoomTerrain): boolean {
+        const t1: number = terrain.get(pos1.x, pos1.y);
+        const t2: number = terrain.get(pos2.x, pos2.y);
+        const t3: number = terrain.get(pos3.x, pos3.y);
+        return (t1 !== TERRAIN_MASK_WALL && t2 !== TERRAIN_MASK_WALL && t3 !== TERRAIN_MASK_WALL);
     }
 
     /**
