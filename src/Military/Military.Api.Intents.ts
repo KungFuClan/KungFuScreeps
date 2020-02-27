@@ -41,8 +41,16 @@ export class MilitaryIntents_Api {
             return false;
         }
 
+        const options: CreepOptionsMili = creep.memory.options as CreepOptionsMili;
+        if (options.caravanPos === null || options.caravanPos === undefined) {
+            return false;
+        }
         const rallyPos: RoomPosition = Normalize.convertMockToRealPos(instance.rallyPos);
-        const direction: DirectionConstant = rallyPos.findPathTo(rallyPos)[0].direction;
+        const path = creep.pos.findPathTo(rallyPos, { range: options.caravanPos })[0];
+        if (!path) {
+            return true;
+        }
+        const direction: DirectionConstant = path.direction;
         const intent: Move_MiliIntent = {
             action: ACTION_MOVE,
             target: direction,
@@ -80,6 +88,7 @@ export class MilitaryIntents_Api {
             targetType: "direction"
         };
 
+        console.log(creep.name + ": " + JSON.stringify(intent));
         MemoryApi_Military.pushIntentToCreepStack(instance, creep.name, intent);
         return true;
     }

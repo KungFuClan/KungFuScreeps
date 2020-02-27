@@ -103,8 +103,8 @@ export class MilitaryMovement_Helper {
 
         const exitRange = this.getOpenTilesInRow(roomName, exitX, exitY);
 
-        const xOffset: number = exit === FIND_EXIT_LEFT ? 1 : exit === FIND_EXIT_RIGHT ? -1 : 0;
-        const yOffset: number = exit === FIND_EXIT_TOP ? -1 : exit === FIND_EXIT_BOTTOM ? 1 : 0;
+        const xOffset: number = exit === FIND_EXIT_LEFT ? 2 : exit === FIND_EXIT_RIGHT ? -2 : 0;
+        const yOffset: number = exit === FIND_EXIT_TOP ? -2 : exit === FIND_EXIT_BOTTOM ? 2 : 0;
 
         for (const i in exitRange) {
             const currPos: RoomPosition = exitRange[i];

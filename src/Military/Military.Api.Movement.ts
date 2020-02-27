@@ -22,7 +22,7 @@ export class MilitaryMovment_Api {
             }
 
             const creepOptions: CreepOptionsMili = creep.memory.options as CreepOptionsMili;
-            if (!creepOptions.caravanPos) {
+            if (creepOptions.caravanPos === undefined || creepOptions.caravanPos === null) {
                 throw new UserException(
                     "Undefined caravanPos in squadRally Method",
                     "Creep [ " + creep.name + " ].",
@@ -58,6 +58,9 @@ export class MilitaryMovment_Api {
 
         const posArr: RoomPosition[] = MilitaryMovement_Helper.getQuadSquadRallyPosArray(currPos, exit);
         const squad: Creep[] = MemoryApi_Military.getLivingCreepsInSquadByInstance(instance);
+        if (squad.length === 0) {
+            return false;
+        }
 
         for (const i in squad) {
             if (!squad[i].pos.isEqualTo(posArr[i])) {
