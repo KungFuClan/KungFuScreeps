@@ -36,7 +36,11 @@ export class MilitaryIntents_Api {
      * @param creep The creep we're queueing the intent for
      * @param instance the instance we're currently inside
      */
-    public static queueIntentsMoveToRallyPos(creep: Creep, instance: ISquadManager, status: SquadStatusConstant): boolean {
+    public static queueIntentsMoveToRallyPos(
+        creep: Creep,
+        instance: ISquadManager,
+        status: SquadStatusConstant
+    ): boolean {
         if (!instance.rallyPos || status !== SQUAD_STATUS_RALLY) {
             return false;
         }
@@ -46,7 +50,7 @@ export class MilitaryIntents_Api {
             return false;
         }
         const rallyPos: RoomPosition = Normalize.convertMockToRealPos(instance.rallyPos);
-        const path = creep.pos.findPathTo(rallyPos, { range: options.caravanPos })[0];
+        const path: PathStep = creep.pos.findPathTo(rallyPos, { range: options.caravanPos })[0];
         if (!path) {
             return true;
         }
@@ -65,12 +69,16 @@ export class MilitaryIntents_Api {
      * Move the squad into their rally positions for quad squad
      * @param instance the instance we're controlling
      */
-    public static queueIntentMoveQuadSquadRallyPos(creep: Creep, instance: ISquadManager, status: SquadStatusConstant): boolean {
-        if (!instance.rallyPos || status !== SQUAD_STATUS_RALLY || !MilitaryMovment_Api.isSquadRallied(instance)) {
+    public static queueIntentMoveQuadSquadRallyPos(
+        creep: Creep,
+        instance: ISquadManager,
+        status: SquadStatusConstant
+    ): boolean {
+        if (!instance.rallyPos || status !== SQUAD_STATUS_RALLY) {
             return false;
         }
         const options: CreepOptionsMili = creep.memory.options as CreepOptionsMili;
-        if (!options.caravanPos) {
+        if (options.caravanPos === null || options.caravanPos === undefined) {
             return false;
         }
 
@@ -81,14 +89,19 @@ export class MilitaryIntents_Api {
         }
 
         const posArr: RoomPosition[] = MilitaryMovement_Helper.getQuadSquadRallyPosArray(currPos, exit);
-        const direction: DirectionConstant = currPos.findPathTo(posArr[options.caravanPos])[0].direction;
+        const path: PathStep = creep.pos.findPathTo(posArr[options.caravanPos])[0];
+
+        if (!path) {
+            return true;
+        }
+
+        const direction: DirectionConstant = path.direction;
         const intent: Move_MiliIntent = {
             action: ACTION_MOVE,
             target: direction,
             targetType: "direction"
         };
 
-        console.log(creep.name + ": " + JSON.stringify(intent));
         MemoryApi_Military.pushIntentToCreepStack(instance, creep.name, intent);
         return true;
     }

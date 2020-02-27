@@ -51,7 +51,6 @@ export class StandardSquadManager implements ISquadManager {
 
         // Run the specific strategy for the current operation
         squadImplementation.runSquad(instance);
-
     }
 
     /**
@@ -60,9 +59,12 @@ export class StandardSquadManager implements ISquadManager {
      */
     public getSquadStrategyImplementation(operation: MilitaryOperation): SquadStrategyImplementation {
         switch (operation.operationStrategy) {
-            case OP_STRATEGY_COMBINED: return this[OP_STRATEGY_COMBINED];
-            case OP_STRATEGY_FFA: return this[OP_STRATEGY_FFA];
-            default: return this[OP_STRATEGY_FFA];
+            case OP_STRATEGY_COMBINED:
+                return this[OP_STRATEGY_COMBINED];
+            case OP_STRATEGY_FFA:
+                return this[OP_STRATEGY_FFA];
+            default:
+                return this[OP_STRATEGY_FFA];
         }
     }
 
@@ -151,12 +153,10 @@ export class StandardSquadManager implements ISquadManager {
         return LOW_PRIORITY;
     }
 
-
     /**
      * Implementation of OP_STRATEGY_FFA
      */
     public ffa = {
-
         runSquad(instance: ISquadManager): void {
             const singleton: ISquadManager = MemoryApi_Military.getSingletonSquadManager(instance.name);
             const status: SquadStatusConstant = singleton.checkStatus(instance);
@@ -188,7 +188,6 @@ export class StandardSquadManager implements ISquadManager {
             const creeps = MemoryApi_Military.getLivingCreepsInSquadByInstance(instance);
 
             _.forEach(creeps, (creep: Creep) => {
-
                 // Try to get off exit tile first, then get a move target based on what room we're in
                 if (MilitaryIntents_Api.queueIntentMoveOffExitTile(creep, instance)) {
                     return;
@@ -198,25 +197,29 @@ export class StandardSquadManager implements ISquadManager {
                     return;
                 }
 
-                if (MilitaryIntents_Api.queueIntentsMoveToRallyPos(creep, instance, status)) {
-                    return;
-                }
-
                 if (creep.room.name === instance.targetRoom) {
                     this.decideMoveIntents_TARGET_ROOM(instance, status, roomData, creep);
                 } else {
                     this.decideMoveIntents_NON_TARGET_ROOM(instance, status, roomData, creep);
                 }
             });
-
-
         },
 
-        decideMoveIntents_TARGET_ROOM(instance: ISquadManager, status: SquadStatusConstant, roomData: MilitaryDataAll, creep: Creep): void {
+        decideMoveIntents_TARGET_ROOM(
+            instance: ISquadManager,
+            status: SquadStatusConstant,
+            roomData: MilitaryDataAll,
+            creep: Creep
+        ): void {
             // move to our ideal target i guess
         },
 
-        decideMoveIntents_NON_TARGET_ROOM(instance: ISquadManager, status: SquadStatusConstant, roomData: MilitaryDataAll, creep: Creep): void {
+        decideMoveIntents_NON_TARGET_ROOM(
+            instance: ISquadManager,
+            status: SquadStatusConstant,
+            roomData: MilitaryDataAll,
+            creep: Creep
+        ): void {
             // Get away from a creep in range while in transit
             if (
                 MilitaryIntents_Api.queueIntentMoveNearHostileKiting(
@@ -261,17 +264,14 @@ export class StandardSquadManager implements ISquadManager {
                 // queue up the heal intents
             });
         }
-
-    }
+    };
 
     /**
      * Implementation of OP_STRATEGY_COMBINED
      */
     public combined = {
-
         runSquad(instance: ISquadManager): void {
             return;
         }
-
-    }
+    };
 }
