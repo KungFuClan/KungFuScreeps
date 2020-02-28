@@ -470,6 +470,7 @@ declare namespace NodeJS {
     interface Global {
         Memory: Memory;
         age?: number;
+        Profiler: Profiler;
         removeConstructionSites(roomName: string, structureType?: string): void;
         removeFlags(substr: string): void;
         displayRoomStatus(roomName: string): void;

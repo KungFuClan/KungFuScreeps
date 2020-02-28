@@ -5,8 +5,10 @@ import {
     ROOM_DEBUG_OVERLAY_ON,
     MemoryApi_Empire
 } from "Utils/Imports/internals";
+import { profile } from "Profiler";
 
 // Manager for room visuals
+@profile
 export class RoomVisualManager {
     /**
      * run the manager for each room

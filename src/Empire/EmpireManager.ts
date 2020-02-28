@@ -1,6 +1,8 @@
 import { EmpireApi } from "Utils/Imports/internals";
+import { profile } from "Profiler";
 
 // empire-wide manager
+@profile
 export class EmpireManager {
     /**
      * run the empire for the AI

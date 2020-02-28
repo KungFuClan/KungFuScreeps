@@ -27,6 +27,7 @@ import {
     ALL_MILITARY_ROLES,
     MemoryApi_Military,
 } from "Utils/Imports/internals";
+import { profile } from "Profiler";
 
 /**
  * The API used by the spawn manager

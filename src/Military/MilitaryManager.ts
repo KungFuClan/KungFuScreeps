@@ -1,5 +1,7 @@
 import { MemoryApi_Military, SQUAD_MANAGERS } from "Utils/Imports/internals";
+import { profile } from "Profiler";
 
+@profile
 export class MilitaryManager {
 
     /**
