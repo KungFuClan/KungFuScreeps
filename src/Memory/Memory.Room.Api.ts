@@ -667,26 +667,22 @@ export class MemoryApi_Room {
         targetRoom?: string
     ): RemoteRoomMemory[] {
         
-        if (!Memory.rooms[room.name] || !Memory.rooms[room.name].remoteRooms || Memory.rooms[room.name].remoteRooms!.length === 0) {
+        if (Memory.rooms[room.name] === undefined || Memory.rooms[room.name]!.remoteRooms === undefined) {
             return [];
         }
         
         let remoteRooms: RemoteRoomMemory[] = Memory.rooms[room.name].remoteRooms!;
 
         // TargetRoom parameter provided
-        if (targetRoom) {
+        if (targetRoom !== undefined) {
             remoteRooms = _.filter(
-                Memory.rooms[room.name].remoteRooms!,
+                remoteRooms,
                 (roomMemory: RemoteRoomMemory) => roomMemory.roomName === targetRoom);
         } 
 
         if(filterFunction !== undefined) {
             // No target room provided, just return them all
-            remoteRooms = _.filter(Memory.rooms[room.name].remoteRooms!, filterFunction);
-        }
-
-        if (remoteRooms.length === 0) {
-            return [];
+            remoteRooms = _.filter(remoteRooms, filterFunction);
         }
 
         return remoteRooms;
@@ -705,29 +701,20 @@ export class MemoryApi_Room {
         filterFunction?: (object: ClaimRoomMemory) => boolean,
         targetRoom?: string
     ): ClaimRoomMemory[] {
-        let claimRooms: ClaimRoomMemory[];
 
-        if (!Memory.rooms[room.name]) {
+        if (Memory.rooms[room.name] === undefined || Memory.rooms[room.name].claimRooms === undefined) {
             return [];
         }
-        // Kind of hacky, but if filter function isn't provided then its just true so that is won't effect evaulation on getting the attack rooms
-        if (!filterFunction) {
-            filterFunction = () => true;
-        }
 
-        // TargetRoom parameter provided
-        if (targetRoom) {
-            claimRooms = _.filter(
-                Memory.rooms[room.name].claimRooms!,
-                (roomMemory: ClaimRoomMemory) => roomMemory.roomName === targetRoom);
-            claimRooms = _.filter(claimRooms, filterFunction);
-        } else {
+        let claimRooms: ClaimRoomMemory[] = Memory.rooms[room.name].claimRooms!;
+
+        if (targetRoom !== undefined) {
+            claimRooms = _.filter(claimRooms, (roomMemory: ClaimRoomMemory) => roomMemory.roomName === targetRoom);
+        } 
+
+        if (filterFunction !== undefined) {
             // No target room provided, just return them all
-            claimRooms = _.filter(Memory.rooms[room.name].claimRooms!, filterFunction);
-        }
-
-        if (claimRooms.length === 0) {
-            return [];
+            claimRooms = _.filter(claimRooms, filterFunction);
         }
 
         return claimRooms;

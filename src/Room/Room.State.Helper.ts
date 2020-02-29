@@ -114,10 +114,7 @@ export class RoomHelper_State {
      * @param room the room we want to check
      */
     public static inTravelRange(homeRoom: string, targetRoom: string): boolean {
-        const routeArray: Array<{ exit: ExitConstant; room: string}> | -2 = Game.map.findRoute(
-            homeRoom,
-            targetRoom
-        );
+        const routeArray: Array<{ exit: ExitConstant; room: string }> | -2 = Game.map.findRoute(homeRoom, targetRoom);
 
         return !(routeArray === -2 || routeArray.length > 20);
     }
@@ -155,13 +152,16 @@ export class RoomHelper_State {
 
         const terminal: StructureTerminal | undefined = room.terminal;
 
-        if(!terminal) { 
+        if (!terminal) {
             return false;
         }
 
         // Check if we have a stimulate flag with the same room name as this flag
-        return _.some(Memory.flags, (flag: FlagMemory) => flag.flagType === STIMULATE_FLAG && Game.flags[flag.flagName].pos.roomName === room.name);
-
+        return _.some(
+            Memory.flags,
+            (flag: FlagMemory) =>
+                flag.flagType === STIMULATE_FLAG && Game.flags[flag.flagName].pos.roomName === room.name
+        );
     }
 
     /**
@@ -217,7 +217,13 @@ export class RoomHelper_State {
                 return;
             }
 
-            numSources += this.numSources(room);
+            let sourcesInRoom: number = 0;
+            if (Memory.rooms[rr.roomName] && Memory.rooms[rr.roomName].sources && Memory.rooms[rr.roomName].sources.data) {
+                sourcesInRoom = Memory.rooms[rr.roomName].sources.data.length;
+            } else {
+                sourcesInRoom = rr.sources.data;
+            }
+            numSources += sourcesInRoom;
         });
         return numSources;
     }
@@ -237,7 +243,8 @@ export class RoomHelper_State {
         }
 
         for (const claimRoom of allClaimRooms) {
-            if (!_.some(ownedRooms, ownedRoom => {
+            if (
+                !_.some(ownedRooms, ownedRoom => {
                     if (claimRoom) {
                         return ownedRoom.name === claimRoom!.roomName;
                     }
@@ -250,8 +257,6 @@ export class RoomHelper_State {
 
         return sum;
     }
-
-    
 
     /**
      * check if the first room is a remote room of the second
