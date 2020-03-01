@@ -4,6 +4,39 @@ import { MilitaryMovement_Helper } from "./Military.Movement.Helper";
 export class MilitaryMovment_Api {
 
     /**
+     * Verify that the path provided leads to the correct target
+     * @param path The PathStep[] to check
+     * @param target A room position, or any object with a room position
+     */
+    public static verifyPathTarget(path: PathStep[], target: _HasRoomPosition | RoomPosition): boolean {
+
+        if(path.length === 0) {
+            return false;
+        }
+
+        const pathEndStep = path[path.length-1];
+
+        const targetPosition = target instanceof RoomPosition ? target : target.pos;
+
+        return (targetPosition.x === pathEndStep.x && targetPosition.y === pathEndStep.y);
+    }
+
+    /**
+     * Finds the next step along a defined path for a creep to take
+     * @param path The PathStep[] to check
+     * @param creep The creep to check the path for
+     */
+    public static nextPathStep(creep: Creep, path: PathStep[]): number | -1 {
+
+        if(path.length === 0) { 
+            return -1;
+        }
+
+        // Return the index of the next step (where the previous step is our current position) or -1 if not found
+        return _.findIndex(path, (step: PathStep) => step.x - step.dx === creep.pos.x && step.y - step.dy === creep.pos.y);
+    }
+
+    /**
      * Check if every creep in the squad is at the rally point in their proper position
      * TODO
      * @param instance the squad instance we're using to check

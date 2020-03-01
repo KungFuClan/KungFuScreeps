@@ -1,4 +1,17 @@
-import { ROLE_MINER, ROLE_HARVESTER, ROLE_WORKER, ROOM_STATE_INTER, MemoryApi_Room } from "Utils/Imports/internals";
+import {
+    ROLE_MINER,
+    ROLE_HARVESTER,
+    ROLE_WORKER,
+    ROOM_STATE_INTER,
+    ROLE_REMOTE_MINER,
+    ROLE_REMOTE_HARVESTER,
+    ROLE_REMOTE_RESERVER,
+    ROLE_COLONIZER,
+    ROLE_CLAIMER,
+    MemoryApi_Room,
+    RoomHelper_State,
+    SpawnHelper
+} from "Utils/Imports/internals";
 
 export class IntermediateStateCreepLimits implements ICreepSpawnLimits {
     public roomState: RoomStateConstant = ROOM_STATE_INTER;
@@ -47,7 +60,29 @@ export class IntermediateStateCreepLimits implements ICreepSpawnLimits {
             claimer: 0
         };
 
-        // No remote creeps for intermediate room state
+        const numRemoteRooms: number = RoomHelper_State.numRemoteRooms(room);
+        const numClaimRooms: number = RoomHelper_State.numClaimRooms(room);
+        // If we do not have any remote rooms, return the initial remote limits (Empty)
+        if (numRemoteRooms <= 0 && numClaimRooms <= 0) {
+            return remoteLimits;
+        }
+        // Gather the rest of the data only if we have a remote room or a claim room
+        const numRemoteSources: number = RoomHelper_State.numRemoteSources(room);
+        const numCurrentlyUnclaimedClaimRooms: number = RoomHelper_State.numCurrentlyUnclaimedClaimRooms(room);
+
+        // Generate Limits -----
+        remoteLimits[ROLE_REMOTE_MINER] = SpawnHelper.getLimitPerRemoteRoomForRolePerSource(
+            ROLE_REMOTE_MINER,
+            numRemoteSources
+        );
+        remoteLimits[ROLE_REMOTE_HARVESTER] = SpawnHelper.getLimitPerRemoteRoomForRolePerSource(
+            ROLE_REMOTE_HARVESTER,
+            numRemoteSources
+        );
+        remoteLimits[ROLE_REMOTE_RESERVER] = SpawnHelper.getRemoteReserverLimitForRoom(room);
+        remoteLimits[ROLE_COLONIZER] = numClaimRooms * SpawnHelper.getLimitPerClaimRoomForRole(ROLE_COLONIZER);
+        remoteLimits[ROLE_CLAIMER] =
+            numCurrentlyUnclaimedClaimRooms * SpawnHelper.getLimitPerClaimRoomForRole(ROLE_CLAIMER);
 
         return remoteLimits;
     }

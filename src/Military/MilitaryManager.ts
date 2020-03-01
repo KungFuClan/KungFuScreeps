@@ -3,7 +3,6 @@ import { profile } from "Profiler";
 
 @profile
 export class MilitaryManager {
-
     /**
      * Run all operations
      */
