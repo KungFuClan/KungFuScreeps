@@ -57,7 +57,7 @@ export class AdvancedStateCreepLimits implements ICreepSpawnLimits {
         const numLorries: number = SpawnHelper.getLorryLimitForRoom(room, room.memory.roomState!);
         const numRemoteRooms: number = RoomHelper_State.numRemoteRooms(room);
         const minerLimits: number = MemoryApi_Room.getSources(room.name).length;
-        let numWorkers: number = 3 + numRemoteRooms;
+        let numWorkers: number = Math.min(3 + numRemoteRooms, 5);
 
         // If we have more than 100k energy in storage, we want another worker to help whittle it down
         if (room.storage && room.storage!.store[RESOURCE_ENERGY] > STORAGE_ADDITIONAL_WORKER_THRESHOLD) {

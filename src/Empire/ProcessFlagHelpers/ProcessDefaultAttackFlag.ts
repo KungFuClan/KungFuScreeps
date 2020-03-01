@@ -8,7 +8,8 @@ import {
     UserException,
     ERROR_ERROR,
     DOMESTIC_DEFENDER_MAN,
-    REMOTE_DEFENDER_MAN
+    REMOTE_DEFENDER_MAN,
+    OP_STRATEGY_INVADER
 } from "Utils/Imports/internals";
 
 export class ProcessDefaultAttackFlag implements IFlagProcesser {
@@ -40,8 +41,8 @@ export class ProcessDefaultAttackFlag implements IFlagProcesser {
                 break;
 
             case COLOR_BLUE:    // Solo Zealot
-                // Military_Spawn_Api.createSquadInstance(SOLO_ZEALOT_MAN, roomName, operationUUID);
-                Military_Spawn_Api.createSquadInstance(REMOTE_DEFENDER_MAN, roomName, operationUUID); // TEMP DOMESTIC DEFENDER TESTING
+                Military_Spawn_Api.createSquadInstance(SOLO_ZEALOT_MAN, roomName, operationUUID, OP_STRATEGY_INVADER); // Temp testing
+                // Military_Spawn_Api.createSquadInstance(REMOTE_DEFENDER_MAN, roomName, operationUUID); // TEMP DOMESTIC DEFENDER TESTING
                 break;
 
             case COLOR_BROWN:   // Solo Stalker
