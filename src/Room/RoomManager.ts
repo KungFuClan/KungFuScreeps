@@ -15,8 +15,10 @@ import {
     MemoryApi_Empire,
     MemoryApi_Room,
 } from "Utils/Imports/internals";
+import { profile } from "Profiler";
 
 // room-wide manager
+@profile
 export class RoomManager {
     /**
      * run the room for every room

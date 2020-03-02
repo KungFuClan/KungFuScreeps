@@ -1,7 +1,9 @@
 // @ts-ignore
 import { MemoryApi_All, MemoryApi_Empire, MemoryApi_Room } from "Utils/Imports/internals";
+import { profile } from "Profiler";
 
 // manager for the memory of the empire
+@profile
 export class MemoryManager {
     /**
      * run the memory for the AI

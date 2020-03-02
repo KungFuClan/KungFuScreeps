@@ -379,8 +379,7 @@ export class SpawnHelper {
     public static reserverExistsForRoomCurrently(room: Room, remoteRoom: RemoteRoomMemory): boolean {
         const creepsInRemoteRoom: Creep[] = MemoryApi_Creep.getMyCreeps(room.name,
             (c: Creep) => c.memory.role === ROLE_REMOTE_RESERVER
-                && c.memory.targetRoom === remoteRoom.roomName
-                && c.ticksToLive !== undefined && c.ticksToLive >= 50);
+                && c.memory.targetRoom === remoteRoom.roomName);
         return creepsInRemoteRoom.length > 0;
     }
 

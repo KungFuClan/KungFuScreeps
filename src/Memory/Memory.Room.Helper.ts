@@ -62,7 +62,6 @@ export class MemoryHelper_Room {
             cache: null
         };
         _.forEach(enemies, (enemy: Creep) => {
-            // * Check for boosted creeps and put them at the front of the if else stack
             if (enemy.getActiveBodyparts(HEAL) > 0) {
                 Memory.rooms[roomName].hostiles.data.heal.push(enemy.id);
             } else if (enemy.getActiveBodyparts(RANGED_ATTACK) > 0) {

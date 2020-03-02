@@ -20,7 +20,7 @@ import {
     SpawnHelper,
     SpawnApi,
     UserException,
-    MemoryApi_Room,
+    MemoryApi_Room
 } from "Utils/Imports/internals";
 
 export class ZealotBodyOptsHelper implements ICreepBodyOptsHelper {
@@ -62,19 +62,19 @@ export class ZealotBodyOptsHelper implements ICreepBodyOptsHelper {
                 break;
 
             case TIER_5: // 15 Attack, 12 Move - Total Cost: 1800
-                body = { attack: 15, move: 12 };
+                body = { attack: 14, move: 14 };
                 break;
 
             case TIER_8:
             case TIER_7:
             case TIER_6: // 20 Attack, 14 Move - Total Cost: 2300
-                body = { attack: 20, move: 14 };
+                body = { attack: 18, move: 18 };
                 break;
         }
 
         // ! Important DONT FORGET TO CHANGE
         // Temp override
-        body = { attack: 1, move: 1 };
+        // bdy = { attack: 1, move: 1 };
         // Generate creep body based on body array and options
         return SpawnApi.createCreepBody(body, opts);
     }
@@ -134,7 +134,16 @@ export class ZealotBodyOptsHelper implements ICreepBodyOptsHelper {
      */
     public getSpawnDirection(centerSpawn: StructureSpawn, room: Room): DirectionConstant[] {
         const roomCenter: RoomPosition = MemoryApi_Room.getBunkerCenter(room, false);
-        const directions: DirectionConstant[] = [TOP, TOP_RIGHT, RIGHT, BOTTOM_RIGHT, BOTTOM, BOTTOM_LEFT, LEFT, TOP_LEFT];
+        const directions: DirectionConstant[] = [
+            TOP,
+            TOP_RIGHT,
+            RIGHT,
+            BOTTOM_RIGHT,
+            BOTTOM,
+            BOTTOM_LEFT,
+            LEFT,
+            TOP_LEFT
+        ];
         const managerDirection: DirectionConstant = centerSpawn.pos.getDirectionTo(roomCenter!.x, roomCenter!.y);
         directions.splice(directions.indexOf(managerDirection), 1);
         return directions;

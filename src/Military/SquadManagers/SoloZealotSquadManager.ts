@@ -16,10 +16,12 @@ import {
     MilitaryMovment_Api,
     SQUAD_STATUS_RALLY,
     SQUAD_STATUS_DONE,
-    SQUAD_STATUS_DEAD
+    SQUAD_STATUS_DEAD,
+    Military_Spawn_Api
 } from "Utils/Imports/internals";
 import { MilitaryStatus_Helper } from "Military/Military.Status.Helper";
 import { MilitaryIntents_Api } from "Military/Military.Api.Intents";
+import { MilitaryMovement_Helper } from "Military/Military.Movement.Helper";
 
 export class SoloZealotSquadManager implements ISquadManager {
     public name: SquadManagerConstant = SOLO_ZEALOT_MAN;
@@ -29,6 +31,8 @@ export class SoloZealotSquadManager implements ISquadManager {
     public operationUUID: string = "";
     public initialRallyComplete: boolean = false;
     public rallyPos: MockRoomPos | undefined;
+    // Store path finding by squad
+    public static movePath: { [squadUUID: string]: { path: PathStep[] } };
 
     constructor() {
         const self = this;
@@ -50,7 +54,6 @@ export class SoloZealotSquadManager implements ISquadManager {
 
         // Run the specific strategy for the current operation
         squadImplementation.runSquad(instance);
-
     }
 
     /**
@@ -59,10 +62,14 @@ export class SoloZealotSquadManager implements ISquadManager {
      */
     public getSquadStrategyImplementation(operation: MilitaryOperation): SquadStrategyImplementation {
         switch (operation.operationStrategy) {
-            case OP_STRATEGY_COMBINED: return this[OP_STRATEGY_COMBINED];
-            case OP_STRATEGY_FFA: return this[OP_STRATEGY_FFA];
-            case OP_STRATEGY_INVADER: return this[OP_STRATEGY_INVADER];
-            default: return this[OP_STRATEGY_FFA];
+            case OP_STRATEGY_COMBINED:
+                return this[OP_STRATEGY_COMBINED];
+            case OP_STRATEGY_FFA:
+                return this[OP_STRATEGY_FFA];
+            case OP_STRATEGY_INVADER:
+                return this[OP_STRATEGY_INVADER];
+            default:
+                return this[OP_STRATEGY_FFA];
         }
     }
 
@@ -138,25 +145,92 @@ export class SoloZealotSquadManager implements ISquadManager {
         return LOW_PRIORITY;
     }
 
-
     /**
      * Implementation of OP_STRATEGY_FFA
      */
     public ffa = {
-
         runSquad(instance: ISquadManager): void {
-            return;
-        }
+            const singleton: ISquadManager = MemoryApi_Military.getSingletonSquadManager(instance.name);
+            const status: SquadStatusConstant = singleton.checkStatus(instance);
 
-    }
+            if (MilitaryStatus_Helper.handleSquadDeadStatus(status, instance)) {
+                return;
+            }
+
+            MilitaryStatus_Helper.handleNotOKStatus(status);
+
+            const dataNeeded: MilitaryDataParams = {
+                hostiles: true,
+                hostileStructures: true
+            };
+            const creeps: Creep[] = MemoryApi_Military.getLivingCreepsInSquadByInstance(instance);
+            const roomData: MilitaryDataAll = militaryDataHelper.getRoomData(creeps, {}, dataNeeded, instance);
+
+            MilitaryIntents_Api.resetSquadIntents(instance);
+            this.decideMoveIntents(instance, status, roomData);
+            // this.decideRangedAttackIntents(instance, status, roomData);
+            // this.decideHealIntents(instance, status, roomData);
+
+            for (const i in creeps) {
+                const creep: Creep = creeps[i];
+                MilitaryCombat_Api.runIntents(instance, creep, roomData);
+            }
+        },
+
+        decideMoveIntents(instance: ISquadManager, status: SquadStatusConstant, roomData: MilitaryDataAll): void {
+            const creeps = MemoryApi_Military.getLivingCreepsInSquadByInstance(instance);
+
+            _.forEach(creeps, (creep: Creep) => {
+                // Try to get off exit tile first, then get a move target based on what room we're in
+                if (MilitaryIntents_Api.queueIntentMoveOffExitTile(creep, instance)) {
+                    return;
+                }
+
+                if (creep.room.name === instance.targetRoom) {
+                    this.decideMoveIntents_TARGET_ROOM(instance, status, roomData, creeps, creep);
+                } else {
+                    this.decideMoveIntents_NON_TARGET_ROOM(instance, status, roomData, creeps, creep);
+                }
+
+                return;
+            });
+        },
+
+        decideMoveIntents_TARGET_ROOM(
+            instance: ISquadManager,
+            status: SquadStatusConstant,
+            roomData: MilitaryDataAll,
+            creeps: Creep[],
+            creep: Creep
+        ): void {
+            const hostiles: Creep[] | undefined = roomData[instance.targetRoom].hostiles?.allHostiles;
+            const hostileStructures: AnyOwnedStructure[] | undefined = roomData[instance.targetRoom].hostileStructures;
+
+            //
+        },
+
+        decideMoveIntents_NON_TARGET_ROOM(
+            instance: ISquadManager,
+            status: SquadStatusConstant,
+            roomData: MilitaryDataAll,
+            creeps: Creep[],
+            creep: Creep
+        ): void {
+            const target = new RoomPosition(25, 25, instance.targetRoom);
+
+            const movePath = SoloZealotSquadManager.movePath[instance.squadUUID].path;
+            // If we have a path already, use it to get the target room
+            if (MilitaryMovment_Api.verifyPathTarget(movePath, target)) {
+                const nextStepIndex: number = MilitaryMovment_Api.nextPathStep(creep, movePath);
+            }
+        }
+    };
 
     /**
      * Implementation of OP_STRATEGY_INVADER
      */
     public invader = {
-
         runSquad(instance: ISquadManager): void {
-
             const singleton: ISquadManager = MemoryApi_Military.getSingletonSquadManager(instance.name);
             const status: SquadStatusConstant = singleton.checkStatus(instance);
 
@@ -187,7 +261,6 @@ export class SoloZealotSquadManager implements ISquadManager {
             const creeps = MemoryApi_Military.getLivingCreepsInSquadByInstance(instance);
 
             _.forEach(creeps, (creep: Creep) => {
-
                 // Try to get off exit tile first, then get a move target based on what room we're in
                 if (MilitaryIntents_Api.queueIntentMoveOffExitTile(creep, instance)) {
                     return;
@@ -199,13 +272,18 @@ export class SoloZealotSquadManager implements ISquadManager {
                     this.decideMoveIntents_NON_TARGET_ROOM(instance, status, roomData, creep);
                 }
             });
-
-
         },
 
-        decideMoveIntents_TARGET_ROOM(instance: ISquadManager, status: SquadStatusConstant, roomData: MilitaryDataAll, creep: Creep): void {
-
-            const invaderCore = _.find(roomData[creep.room.name]!.hostileStructures!, (struct: AnyOwnedStructure) => struct.structureType === STRUCTURE_INVADER_CORE);
+        decideMoveIntents_TARGET_ROOM(
+            instance: ISquadManager,
+            status: SquadStatusConstant,
+            roomData: MilitaryDataAll,
+            creep: Creep
+        ): void {
+            const invaderCore = _.find(
+                roomData[creep.room.name]!.hostileStructures!,
+                (struct: AnyOwnedStructure) => struct.structureType === STRUCTURE_INVADER_CORE
+            );
 
             if (invaderCore === undefined) {
                 return;
@@ -231,7 +309,12 @@ export class SoloZealotSquadManager implements ISquadManager {
             MemoryApi_Military.pushIntentToCreepStack(instance, creep.name, intent);
         },
 
-        decideMoveIntents_NON_TARGET_ROOM(instance: ISquadManager, status: SquadStatusConstant, roomData: MilitaryDataAll, creep: Creep): void {
+        decideMoveIntents_NON_TARGET_ROOM(
+            instance: ISquadManager,
+            status: SquadStatusConstant,
+            roomData: MilitaryDataAll,
+            creep: Creep
+        ): void {
             // Get away from a creep in range while in transit
             if (
                 MilitaryIntents_Api.queueIntentMoveNearHostileKiting(
@@ -250,7 +333,6 @@ export class SoloZealotSquadManager implements ISquadManager {
         },
 
         decideAttackIntents(instance: ISquadManager, status: SquadStatusConstant, roomData: MilitaryDataAll) {
-
             const creeps = MemoryApi_Military.getLivingCreepsInSquadByInstance(instance);
 
             // Return early if we do not have a creep in the target room yet
@@ -258,37 +340,35 @@ export class SoloZealotSquadManager implements ISquadManager {
                 return;
             }
 
-            const invaderCore = _.find(roomData[instance.targetRoom]!.hostileStructures!, (struct: AnyOwnedStructure) => struct.structureType === STRUCTURE_INVADER_CORE);
+            const invaderCore = _.find(
+                roomData[instance.targetRoom]!.hostileStructures!,
+                (struct: AnyOwnedStructure) => struct.structureType === STRUCTURE_INVADER_CORE
+            );
 
             if (invaderCore === undefined) {
                 return;
             }
 
-
             _.forEach(creeps, (creep: Creep) => {
-
                 if (MilitaryCombat_Api.isInAttackRange(creep, invaderCore.pos, true)) {
-
                     const intent: Attack_MiliIntent = {
                         action: ACTION_ATTACK,
                         target: invaderCore.id,
                         targetType: "structure"
-                    }
+                    };
 
                     MemoryApi_Military.pushIntentToCreepStack(instance, creep.name, intent);
                     return;
                 }
             });
         }
-    }
+    };
     /**
      * Implementation of OP_STRATEGY_COMBINED
      */
     public combined = {
-
         runSquad(instance: ISquadManager): void {
             return;
         }
-
-    }
+    };
 }

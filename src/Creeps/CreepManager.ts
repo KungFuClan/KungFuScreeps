@@ -9,8 +9,10 @@ import {
     ROLE_COLONIZER,
     ALL_MILITARY_ROLES
 } from "Utils/Imports/internals";
+import { profile } from "Profiler";
 
 // Call the creep manager for each role
+@profile
 export class CreepManager {
     /**
      * loop over all creeps and call single creep manager for it

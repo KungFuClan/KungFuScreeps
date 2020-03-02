@@ -8,9 +8,9 @@ export class MemoryApi_Empire {
      */
     public static getOwnedRooms(filterFunction?: (room: Room) => boolean): Room[] {
         if (filterFunction) {
-            return _.filter(Game.rooms, currentRoom => RoomHelper_State.isOwnedRoom(currentRoom) && filterFunction);
+            return _.filter(Game.rooms, currentRoom => RoomHelper_State.isMyRoom(currentRoom) && filterFunction);
         }
-        return _.filter(Game.rooms, currentRoom => RoomHelper_State.isOwnedRoom(currentRoom));
+        return _.filter(Game.rooms, currentRoom => RoomHelper_State.isMyRoom(currentRoom));
     }
 
     /**

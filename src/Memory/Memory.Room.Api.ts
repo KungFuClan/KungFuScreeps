@@ -36,7 +36,7 @@ export class MemoryApi_Room {
      */
     public static getUpgraderLink(room: Room): Structure<StructureConstant> | null {
         // Throw warning if we do not own this room
-        if (!RoomHelper_State.isOwnedRoom(room)) {
+        if (!RoomHelper_State.isMyRoom(room)) {
             throw new UserException(
                 "Stimulate flag check on non-owned room",
                 "You attempted to check for a stimulate flag in a room we do not own. Room [" + room.name + "]",
@@ -666,29 +666,23 @@ export class MemoryApi_Room {
         filterFunction?: (object: RemoteRoomMemory) => boolean,
         targetRoom?: string
     ): RemoteRoomMemory[] {
-        let remoteRooms: RemoteRoomMemory[];
-
-        if (!Memory.rooms[room.name]) {
+        
+        if (Memory.rooms[room.name] === undefined || Memory.rooms[room.name]!.remoteRooms === undefined) {
             return [];
         }
-        // Kind of hacky, but if filter function isn't provided then its just true so that is won't effect evaulation on getting the attack rooms
-        if (!filterFunction) {
-            filterFunction = () => true;
-        }
+        
+        let remoteRooms: RemoteRoomMemory[] = Memory.rooms[room.name].remoteRooms!;
 
         // TargetRoom parameter provided
-        if (targetRoom) {
+        if (targetRoom !== undefined) {
             remoteRooms = _.filter(
-                Memory.rooms[room.name].remoteRooms!,
+                remoteRooms,
                 (roomMemory: RemoteRoomMemory) => roomMemory.roomName === targetRoom);
-            remoteRooms = _.filter(remoteRooms, filterFunction);
-        } else {
-            // No target room provided, just return them all
-            remoteRooms = _.filter(Memory.rooms[room.name].remoteRooms!, filterFunction);
-        }
+        } 
 
-        if (remoteRooms.length === 0) {
-            return [];
+        if(filterFunction !== undefined) {
+            // No target room provided, just return them all
+            remoteRooms = _.filter(remoteRooms, filterFunction);
         }
 
         return remoteRooms;
@@ -707,29 +701,20 @@ export class MemoryApi_Room {
         filterFunction?: (object: ClaimRoomMemory) => boolean,
         targetRoom?: string
     ): ClaimRoomMemory[] {
-        let claimRooms: ClaimRoomMemory[];
 
-        if (!Memory.rooms[room.name]) {
+        if (Memory.rooms[room.name] === undefined || Memory.rooms[room.name].claimRooms === undefined) {
             return [];
         }
-        // Kind of hacky, but if filter function isn't provided then its just true so that is won't effect evaulation on getting the attack rooms
-        if (!filterFunction) {
-            filterFunction = () => true;
-        }
 
-        // TargetRoom parameter provided
-        if (targetRoom) {
-            claimRooms = _.filter(
-                Memory.rooms[room.name].claimRooms!,
-                (roomMemory: ClaimRoomMemory) => roomMemory.roomName === targetRoom && filterFunction
-            );
-        } else {
+        let claimRooms: ClaimRoomMemory[] = Memory.rooms[room.name].claimRooms!;
+
+        if (targetRoom !== undefined) {
+            claimRooms = _.filter(claimRooms, (roomMemory: ClaimRoomMemory) => roomMemory.roomName === targetRoom);
+        } 
+
+        if (filterFunction !== undefined) {
             // No target room provided, just return them all
-            claimRooms = _.filter(Memory.rooms[room.name].claimRooms!, () => filterFunction);
-        }
-
-        if (claimRooms.length === 0) {
-            return [];
+            claimRooms = _.filter(claimRooms, filterFunction);
         }
 
         return claimRooms;

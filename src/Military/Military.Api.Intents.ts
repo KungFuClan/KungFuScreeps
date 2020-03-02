@@ -118,6 +118,7 @@ export class MilitaryIntents_Api {
             return false;
         }
 
+        // TODO Look at the target tile to see if it occupied, if so try adding/subtracting 1 to the direction to offset and check again
         const intent: Move_MiliIntent = {
             action: ACTION_MOVE,
             target: directionOffExitTile,

@@ -1,6 +1,8 @@
 import { ERROR_ERROR, UserException, SpawnHelper, SpawnApi, MemoryApi_Empire, Military_Spawn_Api } from "Utils/Imports/internals";
+import { profile } from "Profiler";
 
 // handles spawning for every room
+@profile
 export class SpawnManager {
     /**
      * run the spawning for the AI for each room

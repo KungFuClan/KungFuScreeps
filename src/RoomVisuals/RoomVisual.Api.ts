@@ -93,19 +93,30 @@ export class RoomVisualApi {
             manager: _.filter(creepsInRoom, (c: Creep) => c.memory.role === ROLE_MANAGER).length,
             scout: _.filter(creepsInRoom, (c: Creep) => c.memory.role === ROLE_SCOUT).length
         };
-        const spawningCreep: Creep[] = _.filter(MemoryApi_Creep.getMyCreeps(room.name), (c: Creep) => c.spawning);
-        let spawningRole: string;
+        
         const lines: string[] = [];
         lines.push("");
         lines.push("Creep Info");
         lines.push("");
-        if (spawningCreep.length === 0) {
-            lines.push("Spawning: " + "None");
+        
+        const spawningCreepInfo: Spawning[] = [];
+
+        _.forEach(Game.spawns, (spawn: StructureSpawn) => {
+            if(spawn.room.name === room.name && spawn.spawning) {
+                spawningCreepInfo.push(spawn.spawning)
+            }
+        });
+        
+        lines.push("Spawning:");
+        for (const spawning of spawningCreepInfo) {
+            const spawningRole = Game.creeps[spawning.name].memory.role;
+            lines.push("   [ " + spawningRole + " ] (" + (spawning.needTime - spawning.remainingTime) + "/" + spawning.needTime + ")");
         }
-        for (const creep of spawningCreep) {
-            spawningRole = creep.memory.role;
-            lines.push("Spawning: [ " + spawningRole + " ]");
+
+        if(spawningCreepInfo.length === 0) {
+            lines.push("   [ None ]");
         }
+
         lines.push("Creeps in Room:     " + MemoryApi_Room.getCreepCount(room));
 
         if (creepLimits["domesticLimits"]) {

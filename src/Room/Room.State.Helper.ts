@@ -9,7 +9,6 @@ import {
 } from "Utils/Imports/internals";
 
 export class RoomHelper_State {
-
     /**
      * check if container mining is active in a room (each source has a container in range)
      * @param room the room we are checking
@@ -37,7 +36,7 @@ export class RoomHelper_State {
      * check if a specified room is owned by you
      * @param room the room we want to check
      */
-    public static isOwnedRoom(room: Room): boolean {
+    public static isMyRoom(room: Room): boolean {
         if (room.controller !== undefined) {
             return room.controller.my;
         } else {
@@ -53,12 +52,13 @@ export class RoomHelper_State {
         // returns true if a room has one of our names or is reserved by us
         if (room.controller === undefined) {
             return false;
-        } else if (
-            room.controller.owner !== undefined &&
-            _.contains(ALLY_LIST, room.controller.owner.username)
-        ) {
+        }
+
+        if (room.controller.owner !== undefined && _.contains(ALLY_LIST, room.controller.owner.username)) {
             return true;
-        } else if (this.isAllyReserved(room)) {
+        }
+
+        if (this.isAllyReserved(room)) {
             return true;
         }
 
@@ -90,8 +90,7 @@ export class RoomHelper_State {
         const xOffset = parsedName[1] % 10;
         const yOffset = parsedName[2] % 10;
         // If x & y === 5 it's not SK, but both must be between 4 and 6
-        const isSK =
-            !(xOffset === 5 && xOffset === 5) && (xOffset >= 4 && xOffset <= 6) && (yOffset >= 4 && yOffset <= 6);
+        const isSK = !(xOffset === 5 && xOffset === 5) && xOffset >= 4 && xOffset <= 6 && yOffset >= 4 && yOffset <= 6;
         return isSK;
     }
 
@@ -115,11 +114,9 @@ export class RoomHelper_State {
      * @param room the room we want to check
      */
     public static inTravelRange(homeRoom: string, targetRoom: string): boolean {
-        const routeArray: Array<{ exit: ExitConstant; room: string }> = Game.map.findRoute(
-            homeRoom,
-            targetRoom
-        ) as Array<{ exit: ExitConstant; room: string }>;
-        return routeArray.length < 20;
+        const routeArray: Array<{ exit: ExitConstant; room: string }> | -2 = Game.map.findRoute(homeRoom, targetRoom);
+
+        return !(routeArray === -2 || routeArray.length > 20);
     }
 
     /**
@@ -128,7 +125,7 @@ export class RoomHelper_State {
      */
     public static isUpgraderLink(room: Room): boolean {
         // Throw warning if we do not own this room
-        if (!this.isOwnedRoom(room)) {
+        if (!this.isMyRoom(room)) {
             throw new UserException(
                 "Stimulate flag check on non-owned room",
                 "You attempted to check for a stimulate flag in a room we do not own. Room [" + room.name + "]",
@@ -145,7 +142,7 @@ export class RoomHelper_State {
      */
     public static isStimulateRoom(room: Room): boolean {
         // Throw warning if we do not own this room
-        if (!this.isOwnedRoom(room)) {
+        if (!this.isMyRoom(room)) {
             throw new UserException(
                 "Stimulate flag check on non-owned room",
                 "You attempted to check for a stimulate flag in a room we do not own. Room [" + room.name + "]",
@@ -154,13 +151,17 @@ export class RoomHelper_State {
         }
 
         const terminal: StructureTerminal | undefined = room.terminal;
-        // Check if we have a stimulate flag with the same room name as this flag
-        return _.some(Memory.flags, (flag: FlagMemory) => {
-            if (flag.flagType === STIMULATE_FLAG) {
-                return Game.flags[flag.flagName].pos.roomName === room.name && terminal !== undefined;
-            }
+
+        if (!terminal) {
             return false;
-        });
+        }
+
+        // Check if we have a stimulate flag with the same room name as this flag
+        return _.some(
+            Memory.flags,
+            (flag: FlagMemory) =>
+                flag.flagType === STIMULATE_FLAG && Game.flags[flag.flagName].pos.roomName === room.name
+        );
     }
 
     /**
@@ -177,8 +178,7 @@ export class RoomHelper_State {
      * @param room
      */
     public static numRemoteRooms(room: Room): number {
-        const remoteRooms = MemoryApi_Room.getRemoteRooms(room);
-        return remoteRooms.length;
+        return MemoryApi_Room.getRemoteRooms(room).length;
     }
 
     /**
@@ -186,8 +186,7 @@ export class RoomHelper_State {
      * @param room
      */
     public static numClaimRooms(room: Room): number {
-        const claimRooms = MemoryApi_Room.getClaimRooms(room);
-        return claimRooms.length;
+        return MemoryApi_Room.getClaimRooms(room).length;
     }
 
     /**
@@ -195,10 +194,7 @@ export class RoomHelper_State {
      * @param room The room to check
      */
     public static numSources(room: Room): number {
-        if (!Memory.rooms[room.name].sources) {
-            return room.find(FIND_SOURCES).length;
-        }
-        return Memory.rooms[room.name].sources.data.length;
+        return MemoryApi_Room.getSources(room.name).length;
     }
     /**
      * Returns the number of sources in all remoteRooms connected to room
@@ -222,11 +218,7 @@ export class RoomHelper_State {
             }
 
             let sourcesInRoom: number = 0;
-            if (
-                Memory.rooms[rr.roomName] &&
-                Memory.rooms[rr.roomName].sources &&
-                Memory.rooms[rr.roomName].sources.data
-            ) {
+            if (Memory.rooms[rr.roomName] && Memory.rooms[rr.roomName].sources && Memory.rooms[rr.roomName].sources.data) {
                 sourcesInRoom = Memory.rooms[rr.roomName].sources.data.length;
             } else {
                 sourcesInRoom = rr.sources.data;
@@ -246,7 +238,7 @@ export class RoomHelper_State {
         let sum: number = 0;
 
         // No existing claim rooms
-        if (allClaimRooms[0] === undefined) {
+        if (allClaimRooms.length === 0) {
             return 0;
         }
 
@@ -254,7 +246,7 @@ export class RoomHelper_State {
             if (
                 !_.some(ownedRooms, ownedRoom => {
                     if (claimRoom) {
-                        return room.name === claimRoom!.roomName;
+                        return ownedRoom.name === claimRoom!.roomName;
                     }
                     return false;
                 })
@@ -264,21 +256,6 @@ export class RoomHelper_State {
         }
 
         return sum;
-    }
-
-    /**
-     * convert a room object to a room position object
-     * TODO move to utils/normalize prolly
-     * @param roomObj the room object we are converting
-     */
-    public static convertRoomObjToRoomPosition(roomObj: RoomObject): RoomPosition | null {
-        if (roomObj.room === undefined) {
-            return null;
-        }
-        const x: number = roomObj.pos.x;
-        const y: number = roomObj.pos.y;
-        const roomName: string = roomObj.room!.name;
-        return new RoomPosition(x, y, roomName);
     }
 
     /**
@@ -308,22 +285,10 @@ export class RoomHelper_State {
     }
 
     /**
-     * verify that the object exists in the game
-     * @param id the id we are checking for
-     * @returns if the object exists
-     */
-    public static verifyObjectByID(id: string): boolean {
-        return Game.getObjectById(id) !== undefined;
-    }
-
-    /**
      * Check if a room has no reservation on it
      * @param room the room we are checking
      */
     public static isNoReservation(room: Room): boolean {
-        if (room.controller) {
-            return room.controller.reservation === undefined;
-        }
-        return false;
+        return room.controller !== undefined && room.controller.reservation === undefined;
     }
 }
