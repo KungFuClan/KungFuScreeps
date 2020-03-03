@@ -30,6 +30,8 @@ export class StandardSquadManager implements ISquadManager {
     public operationUUID: string = "";
     public initialRallyComplete: boolean = false;
     public rallyPos: MockRoomPos | undefined;
+    // Store path finding by squad
+    public static movePath: { [squadUUID: string]: { path: PathStep[] } };
 
     constructor() {
         const self = this;
@@ -80,6 +82,8 @@ export class StandardSquadManager implements ISquadManager {
         instance.operationUUID = operationUUID;
         instance.initialRallyComplete = false;
         instance.rallyPos = undefined;
+        StandardSquadManager.movePath = {};
+        StandardSquadManager.movePath[uuid] = { path: [] };
         return instance;
     }
 

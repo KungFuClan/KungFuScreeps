@@ -10,11 +10,11 @@ export class MilitaryMovment_Api {
      */
     public static verifyPathTarget(path: PathStep[], target: _HasRoomPosition | RoomPosition): boolean {
 
-        if(path.length === 0) {
+        if (path.length === 0) {
             return false;
         }
 
-        const pathEndStep = path[path.length-1];
+        const pathEndStep = path[path.length - 1];
 
         const targetPosition = target instanceof RoomPosition ? target : target.pos;
 
@@ -25,10 +25,11 @@ export class MilitaryMovment_Api {
      * Finds the next step along a defined path for a creep to take
      * @param path The PathStep[] to check
      * @param creep The creep to check the path for
+     * @returns the index of the next step, -1 if we're at the end
      */
     public static nextPathStep(creep: Creep, path: PathStep[]): number | -1 {
 
-        if(path.length === 0) { 
+        if (path.length === 0) {
             return -1;
         }
 
