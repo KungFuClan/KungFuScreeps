@@ -94,11 +94,13 @@ export class MilitaryIntents_Api {
 
         const posArr: RoomPosition[] = MilitaryMovement_Helper.getQuadSquadRallyPosArray(currPos, exit);
         const target: RoomPosition = posArr[options.caravanPos];
+        // need to abstract this call to work on any quad squad manager
         let movePath: PathStep[] = StandardSquadManager.movePath[instance.squadUUID].path;
 
         // If we have a path already, use it to get the target room
         if (MilitaryMovment_Api.verifyPathTarget(movePath, target) === false) {
             movePath = creep.pos.findPathTo(posArr[options.caravanPos]);
+            // this one too
             StandardSquadManager.movePath[instance.squadUUID].path = movePath;
         }
 
