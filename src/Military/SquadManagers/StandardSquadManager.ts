@@ -198,14 +198,6 @@ export class StandardSquadManager implements ISquadManager {
                 }
             });
 
-            if (_.some(creeps, (c: Creep) => c.room.name !== instance.targetRoom)) {
-                this.decideMoveIntents_PathToEnemyRoom(instance, creeps);
-            }
-
-        },
-
-        decideMoveIntents_PathToEnemyRoom(instance: ISquadManager, creeps: Creep[]): void {
-            // no idea how im gonna get these clowns to move yet lol
         },
 
         decideAttackIntents(instance: ISquadManager, status: SquadStatusConstant, roomData: MilitaryDataAll) {
