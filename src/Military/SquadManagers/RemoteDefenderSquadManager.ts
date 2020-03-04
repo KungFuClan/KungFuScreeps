@@ -12,7 +12,7 @@ import {
     MilitaryCombat_Api,
     militaryDataHelper,
     ACTION_MOVE,
-    MilitaryMovment_Api,
+    MilitaryMovement_Api,
     ACTION_RANGED_ATTACK,
     ACTION_HEAL,
     SQUAD_STATUS_RALLY,
@@ -100,7 +100,7 @@ export class RemoteDefenderSquadManager implements ISquadManager {
     public checkStatus(instance: ISquadManager): SquadStatusConstant {
         // Handle initial rally status
         if (!instance.initialRallyComplete) {
-            if (MilitaryMovment_Api.isSquadRallied(instance)) {
+            if (MilitaryMovement_Api.isSquadRallied(instance)) {
                 instance.initialRallyComplete = true;
                 return SQUAD_STATUS_OK;
             }

@@ -9,7 +9,7 @@ import {
     SQUAD_STATUS_OK,
     OP_STRATEGY_COMBINED,
     OP_STRATEGY_FFA,
-    MilitaryMovment_Api,
+    MilitaryMovement_Api,
     SQUAD_STATUS_RALLY,
     SQUAD_STATUS_DONE,
     SQUAD_STATUS_DEAD,
@@ -30,8 +30,6 @@ export class StandardSquadManager implements ISquadManager {
     public operationUUID: string = "";
     public initialRallyComplete: boolean = false;
     public rallyPos: MockRoomPos | undefined;
-    // Store path finding by squad
-    public static movePath: { [squadUUID: string]: { path: PathStep[] } };
 
     constructor() {
         const self = this;
@@ -82,8 +80,6 @@ export class StandardSquadManager implements ISquadManager {
         instance.operationUUID = operationUUID;
         instance.initialRallyComplete = false;
         instance.rallyPos = undefined;
-        StandardSquadManager.movePath = {};
-        StandardSquadManager.movePath[uuid] = { path: [] };
         return instance;
     }
 
@@ -104,7 +100,7 @@ export class StandardSquadManager implements ISquadManager {
     public checkStatus(instance: ISquadManager): SquadStatusConstant {
         // Handle initial rally status
         if (!instance.initialRallyComplete) {
-            if (MilitaryMovment_Api.isQuadSquadInRallyPos(instance)) {
+            if (MilitaryMovement_Api.isQuadSquadInRallyPos(instance)) {
                 console.log(JSON.stringify(instance));
                 instance.initialRallyComplete = true;
                 return SQUAD_STATUS_OK;

@@ -1,7 +1,7 @@
 import { MemoryApi_Military, UtilHelper, Normalize, UserException, ERROR_ERROR, militaryDataHelper } from "Utils/Imports/internals";
 import { MilitaryMovement_Helper } from "./Military.Movement.Helper";
 
-export class MilitaryMovment_Api {
+export class MilitaryMovement_Api {
 
     /**
      * Verify that the path provided leads to the correct target

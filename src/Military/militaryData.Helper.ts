@@ -2,6 +2,7 @@ import { UserException, MemoryApi_Creep, MemoryApi_Room, ALLY_LIST, Normalize, R
 import { close } from "inspector";
 
 export class militaryDataHelper {
+    public static movePath: { [squadUUID: string]: { [creepName: string]: PathStep[] } };
 
     /**
      * Get the data for the room. If the data requested is already present, it will be skipped since this object
@@ -130,6 +131,18 @@ export class militaryDataHelper {
         });
 
         return { allHostiles, attack: attackCreeps, rangedAttack: rangedAttackCreeps, heal: healCreeps };
+    }
+
+    /**
+     * Always returns at least an empty array for move path - will initialize the values if they have not been created yet
+     * @param instance The instance to get the movePath for
+     */
+    public static getMovePath(instance: ISquadManager, creepName: string): PathStep[] {
+        if(!militaryDataHelper.movePath[instance.squadUUID] || !militaryDataHelper.movePath[instance.squadUUID][creepName]) {
+            militaryDataHelper.movePath[instance.squadUUID][creepName] = [];
+        }
+
+        return militaryDataHelper.movePath[instance.squadUUID][creepName];
     }
 
     /**

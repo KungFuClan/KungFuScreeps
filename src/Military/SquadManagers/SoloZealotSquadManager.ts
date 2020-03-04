@@ -13,7 +13,7 @@ import {
     ACTION_MOVE,
     ACTION_ATTACK,
     OP_STRATEGY_INVADER,
-    MilitaryMovment_Api,
+    MilitaryMovement_Api,
     SQUAD_STATUS_RALLY,
     SQUAD_STATUS_DONE,
     SQUAD_STATUS_DEAD,
@@ -31,8 +31,6 @@ export class SoloZealotSquadManager implements ISquadManager {
     public operationUUID: string = "";
     public initialRallyComplete: boolean = false;
     public rallyPos: MockRoomPos | undefined;
-    // Store path finding by squad
-    public static movePath: { [squadUUID: string]: { path: PathStep[] } };
 
     constructor() {
         const self = this;
@@ -105,7 +103,7 @@ export class SoloZealotSquadManager implements ISquadManager {
     public checkStatus(instance: ISquadManager): SquadStatusConstant {
         // Handle initial rally status
         if (!instance.initialRallyComplete) {
-            if (MilitaryMovment_Api.isSquadRallied(instance)) {
+            if (MilitaryMovement_Api.isSquadRallied(instance)) {
                 instance.initialRallyComplete = true;
                 return SQUAD_STATUS_OK;
             }
@@ -218,10 +216,10 @@ export class SoloZealotSquadManager implements ISquadManager {
         ): void {
             const target = new RoomPosition(25, 25, instance.targetRoom);
 
-            const movePath = SoloZealotSquadManager.movePath[instance.squadUUID].path;
+            const movePath = militaryDataHelper.movePath[instance.squadUUID].path;
             // If we have a path already, use it to get the target room
-            if (MilitaryMovment_Api.verifyPathTarget(movePath, target)) {
-                const nextStepIndex: number = MilitaryMovment_Api.nextPathStep(creep, movePath);
+            if (MilitaryMovement_Api.verifyPathTarget(movePath, target)) {
+                const nextStepIndex: number = MilitaryMovement_Api.nextPathStep(creep, movePath);
             }
         }
     };

@@ -11,7 +11,7 @@ import {
     HIGH_PRIORITY,
     SQUAD_STATUS_RALLY,
     SQUAD_STATUS_DONE,
-    MilitaryMovment_Api,
+    MilitaryMovement_Api,
     MilitaryCombat_Api,
     SQUAD_STATUS_DEAD,
     MemoryApi_Room,
@@ -104,7 +104,7 @@ export class DomesticDefenderSquadManager implements ISquadManager {
     public checkStatus(instance: ISquadManager): SquadStatusConstant {
         // Handle initial rally status
         if (!instance.initialRallyComplete) {
-            if (MilitaryMovment_Api.isSquadRallied(instance)) {
+            if (MilitaryMovement_Api.isSquadRallied(instance)) {
                 instance.initialRallyComplete = true;
                 return SQUAD_STATUS_OK;
             }
@@ -224,7 +224,7 @@ export class DomesticDefenderSquadManager implements ISquadManager {
                 }
 
                 // TODO Create a place we can store data like this for use from tick to tick
-                const pathOpts: FindPathOpts = MilitaryMovment_Api.getDomesticDefenderCostMatrix(
+                const pathOpts: FindPathOpts = MilitaryMovement_Api.getDomesticDefenderCostMatrix(
                     instance.targetRoom,
                     false,
                     roomData

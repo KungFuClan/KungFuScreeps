@@ -1,7 +1,7 @@
 import {
     MemoryApi_Military,
     MilitaryCombat_Api,
-    MilitaryMovment_Api,
+    MilitaryMovement_Api as MilitaryMovement_Api,
     ACTION_MOVE,
     ACTION_RANGED_ATTACK,
     ACTION_HEAL,
@@ -9,7 +9,9 @@ import {
     UserException,
     ERROR_ERROR,
     SQUAD_STATUS_RALLY,
-    StandardSquadManager
+    StandardSquadManager,
+    militaryDataHelper,
+    CreepManager
 } from "Utils/Imports/internals";
 import { MilitaryMovement_Helper } from "./Military.Movement.Helper";
 
@@ -94,17 +96,14 @@ export class MilitaryIntents_Api {
 
         const posArr: RoomPosition[] = MilitaryMovement_Helper.getQuadSquadRallyPosArray(currPos, exit);
         const target: RoomPosition = posArr[options.caravanPos];
-        // need to abstract this call to work on any quad squad manager
-        let movePath: PathStep[] = StandardSquadManager.movePath[instance.squadUUID].path;
+        let movePath: PathStep[] = militaryDataHelper.getMovePath(instance, creep.name);
 
-        // If we have a path already, use it to get the target room
-        if (MilitaryMovment_Api.verifyPathTarget(movePath, target) === false) {
+        if (MilitaryMovement_Api.verifyPathTarget(movePath, target) === false) {
             movePath = creep.pos.findPathTo(posArr[options.caravanPos]);
-            // this one too
-            StandardSquadManager.movePath[instance.squadUUID].path = movePath;
+            militaryDataHelper.movePath[instance.squadUUID][creep.name] = movePath;
         }
 
-        const nextStepIndex: number = MilitaryMovment_Api.nextPathStep(creep, movePath);
+        const nextStepIndex: number = MilitaryMovement_Api.nextPathStep(creep, movePath);
         if (nextStepIndex === -1) {
             return true;
         }
@@ -127,7 +126,7 @@ export class MilitaryIntents_Api {
      * @returns boolean representing if we queued the intent
      */
     public static queueIntentMoveOffExitTile(creep: Creep, instance: ISquadManager): boolean {
-        const directionOffExitTile: DirectionConstant | undefined = MilitaryMovment_Api.getDirectionOffExitTile(creep);
+        const directionOffExitTile: DirectionConstant | undefined = MilitaryMovement_Api.getDirectionOffExitTile(creep);
         if (!directionOffExitTile) {
             return false;
         }
@@ -154,8 +153,20 @@ export class MilitaryIntents_Api {
             return false;
         }
 
-        const path = creep.pos.findPathTo(new RoomPosition(25, 25, instance.targetRoom), { range: 25 });
-        const directionToTarget = path[0].direction;
+        const target = new RoomPosition(25, 25, instance.targetRoom);
+        const movePath = militaryDataHelper.getMovePath(instance, creep.name);
+
+        if(!MilitaryMovement_Api.verifyPathTarget(movePath, target)) {
+            const movePath = creep.pos.findPathTo(target, { range: 25 });
+        }
+
+        const moveIndex: number = MilitaryMovement_Api.nextPathStep(creep, movePath);
+
+        if(moveIndex === -1) {
+            return false;
+        }
+
+        const directionToTarget = movePath[moveIndex].direction;
         const intent: Move_MiliIntent = {
             action: ACTION_MOVE,
             target: directionToTarget,
