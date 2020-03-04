@@ -154,18 +154,17 @@ export class MilitaryIntents_Api {
         }
 
         const target = new RoomPosition(25, 25, instance.targetRoom);
-        const movePath = militaryDataHelper.getMovePath(instance, creep.name);
+        let movePath = militaryDataHelper.getMovePath(instance, creep.name);
 
-        if(!MilitaryMovement_Api.verifyPathTarget(movePath, target)) {
-            const movePath = creep.pos.findPathTo(target, { range: 25 });
+        if (!MilitaryMovement_Api.verifyPathTarget(movePath, target)) {
+            movePath = creep.pos.findPathTo(target, { range: 25 });
         }
 
         const moveIndex: number = MilitaryMovement_Api.nextPathStep(creep, movePath);
 
-        if(moveIndex === -1) {
+        if (moveIndex === -1) {
             return false;
         }
-
         const directionToTarget = movePath[moveIndex].direction;
         const intent: Move_MiliIntent = {
             action: ACTION_MOVE,

@@ -6,12 +6,12 @@ export class militaryDataHelper {
 
     /**
      * Get the data for the room. If the data requested is already present, it will be skipped since this object
-     * is invalidated each tick. 
+     * is invalidated each tick.
      * @param creeps the creeps we're getting data for
      * @param dataNeeded the booleans representing the data we need
      */
     public static getRoomData(creeps: Creep[], roomData: MilitaryDataAll, dataNeeded: MilitaryDataParams, instance: ISquadManager): MilitaryDataAll {
-        
+
         _.forEach(creeps, (creep: Creep) => {
             const roomName = creep.room.name;
 
@@ -138,7 +138,13 @@ export class militaryDataHelper {
      * @param instance The instance to get the movePath for
      */
     public static getMovePath(instance: ISquadManager, creepName: string): PathStep[] {
-        if(!militaryDataHelper.movePath[instance.squadUUID] || !militaryDataHelper.movePath[instance.squadUUID][creepName]) {
+        if (!militaryDataHelper.movePath) {
+            militaryDataHelper.movePath = {};
+        }
+        if (!militaryDataHelper.movePath[instance.squadUUID]) {
+            militaryDataHelper.movePath[instance.squadUUID] = {};
+        }
+        if (!militaryDataHelper.movePath[instance.squadUUID][creepName]) {
             militaryDataHelper.movePath[instance.squadUUID][creepName] = [];
         }
 
