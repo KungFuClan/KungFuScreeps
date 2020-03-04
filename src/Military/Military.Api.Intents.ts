@@ -8,7 +8,8 @@ import {
     Normalize,
     UserException,
     ERROR_ERROR,
-    SQUAD_STATUS_RALLY
+    SQUAD_STATUS_RALLY,
+    StandardSquadManager
 } from "Utils/Imports/internals";
 import { MilitaryMovement_Helper } from "./Military.Movement.Helper";
 
@@ -67,7 +68,10 @@ export class MilitaryIntents_Api {
 
     /**
      * Move the squad into their rally positions for quad squad
+     * @param creep the creep we're currently controlling
      * @param instance the instance we're controlling
+     * @param status the status of the squad
+     * @returns boolean representing if we queued an intent
      */
     public static queueIntentMoveQuadSquadRallyPos(
         creep: Creep,
@@ -89,13 +93,23 @@ export class MilitaryIntents_Api {
         }
 
         const posArr: RoomPosition[] = MilitaryMovement_Helper.getQuadSquadRallyPosArray(currPos, exit);
-        const path: PathStep = creep.pos.findPathTo(posArr[options.caravanPos])[0];
+        const target: RoomPosition = posArr[options.caravanPos];
+        // need to abstract this call to work on any quad squad manager
+        let movePath: PathStep[] = StandardSquadManager.movePath[instance.squadUUID].path;
 
-        if (!path) {
+        // If we have a path already, use it to get the target room
+        if (MilitaryMovment_Api.verifyPathTarget(movePath, target) === false) {
+            movePath = creep.pos.findPathTo(posArr[options.caravanPos]);
+            // this one too
+            StandardSquadManager.movePath[instance.squadUUID].path = movePath;
+        }
+
+        const nextStepIndex: number = MilitaryMovment_Api.nextPathStep(creep, movePath);
+        if (nextStepIndex === -1) {
             return true;
         }
 
-        const direction: DirectionConstant = path.direction;
+        const direction: DirectionConstant = movePath[nextStepIndex].direction;
         const intent: Move_MiliIntent = {
             action: ACTION_MOVE,
             target: direction,

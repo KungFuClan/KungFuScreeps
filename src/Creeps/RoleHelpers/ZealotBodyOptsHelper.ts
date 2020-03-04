@@ -74,7 +74,7 @@ export class ZealotBodyOptsHelper implements ICreepBodyOptsHelper {
 
         // ! Important DONT FORGET TO CHANGE
         // Temp override
-        // bdy = { attack: 1, move: 1 };
+        // body = { attack: 1, move: 1 };
         // Generate creep body based on body array and options
         return SpawnApi.createCreepBody(body, opts);
     }
