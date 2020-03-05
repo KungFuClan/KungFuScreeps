@@ -8,25 +8,74 @@ export class CostMatrixApi {
     public static costMatrices: CostMatrixIndex = {};
 
     /**
-     * Gets the tower damage at each tile in the room, displays as 1% of the total value to avoid slowing pathfinder down
-     * @param roomName Room to get the damage for - REQUIRES ROOM VISION
+     * Returns the existing costMatrices, or initializes the empty object
+     * @param roomName Room to get the costMatrices for
      */
-    public static getTowerDamageMatrix(roomName: string): CostMatrix {
+    public static getOrInitializeCostMatrices(roomName: string): RoomCostMatrices {
         if (this.costMatrices[roomName] === undefined) {
             this.costMatrices[roomName] = {};
         }
 
-        const roomCostMatrices: RoomCostMatrices = this.costMatrices[roomName];
+        return this.costMatrices[roomName];
+    }
 
-        if (
-            roomCostMatrices.towerDamageMatrix &&
-            (roomCostMatrices.towerDamageMatrix.expires === false ||
-                (roomCostMatrices.towerDamageMatrix.expires === true &&
-                    roomCostMatrices.towerDamageMatrix.expirationTick! > Game.time))
-        ) {
-            return this.deserializeStoredCostMatrix(roomCostMatrices.towerDamageMatrix);
+    /**
+     * Validates that a matrix is not expired or undefined
+     * @param costMatrix The matrix to validate expiration, or undefined
+     */
+    public static isCostMatrixValid(costMatrix: StoredCostMatrix | undefined): boolean {
+        return (
+            costMatrix !== undefined &&
+            (costMatrix.expires === false ||
+                (costMatrix.expirationTick !== undefined && costMatrix.expirationTick > Game.time))
+        );
+    }
+
+    /**
+     * Returns a cost matrix adjusted to make walkable for a quad squad
+     * @param roomName Room to get the cost matrix for
+     */
+    public static getQuadSquadMatrix(roomName: string): CostMatrix {
+
+        const roomCostMatrices: RoomCostMatrices = this.getOrInitializeCostMatrices(roomName);
+
+        if(this.isCostMatrixValid(roomCostMatrices.quadSquadMatrix)) {
+            return this.deserializeStoredCostMatrix(roomCostMatrices.quadSquadMatrix!);
         }
 
+        const terrain: RoomTerrain = new Room.Terrain(roomName);
+        const quadSquadMatrix = new PathFinder.CostMatrix();
+
+        for (let x = 0; x < 50; x++) {
+            for (let y = 0; y < 50; y++) {
+                const terrainType = terrain.get(x, y);
+                if(terrainType === 1) {
+                    quadSquadMatrix.set(x, y, 255);
+                    if(x+1 <= 49) {
+                        quadSquadMatrix.set(x+1, y, 255);
+                    }
+                    if(y-1 >= 0) {
+                        quadSquadMatrix.set(x, y-1, 255);
+                    }
+                }
+            }
+        }
+
+        this.costMatrices[roomName].terrainMatrix = this.serializeCostMatrix(quadSquadMatrix, roomName, false);
+        return quadSquadMatrix;
+    }
+    /**
+     * Gets the tower damage at each tile in the room, displays as 1% of the total value to avoid slowing pathfinder down
+     * @param roomName Room to get the damage for - REQUIRES ROOM VISION
+     */
+    public static getTowerDamageMatrix(roomName: string): CostMatrix {
+        const roomCostMatrices: RoomCostMatrices = this.getOrInitializeCostMatrices(roomName);
+
+        if (this.isCostMatrixValid(roomCostMatrices.towerDamageMatrix)) {
+            return this.deserializeStoredCostMatrix(roomCostMatrices.towerDamageMatrix!);
+        }
+
+        // We require vision from this point on, to generate a new cost matrix
         if (Game.rooms[roomName] === undefined) {
             throw new UserException(
                 "Unable to getTowerDamageMatrix for room " + roomName,
@@ -69,19 +118,10 @@ export class CostMatrixApi {
      * @param roomName The room to check - DOES NOT REQUIRE VISION
      */
     public static getTerrainMatrix(roomName: string): CostMatrix {
-        if (this.costMatrices[roomName] === undefined) {
-            this.costMatrices[roomName] = {};
-        }
+        const roomCostMatrices: RoomCostMatrices = this.getOrInitializeCostMatrices(roomName);
 
-        const roomCostMatrices: RoomCostMatrices = this.costMatrices[roomName];
-
-        if (
-            roomCostMatrices.terrainMatrix &&
-            (roomCostMatrices.terrainMatrix.expires === false ||
-                (roomCostMatrices.terrainMatrix.expires === true &&
-                    roomCostMatrices.terrainMatrix.expirationTick! > Game.time))
-        ) {
-            return this.deserializeStoredCostMatrix(roomCostMatrices.terrainMatrix);
+        if (this.isCostMatrixValid(roomCostMatrices.terrainMatrix)) {
+            return this.deserializeStoredCostMatrix(roomCostMatrices.terrainMatrix!);
         }
 
         const terrain: RoomTerrain = new Room.Terrain(roomName);
