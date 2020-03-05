@@ -94,14 +94,6 @@ export class RoomManager {
             RoomApi_Structure.runTerminal(room);
         }
 
-        // Set Rampart access status
-        if (
-            RoomHelper_Structure.isExistInRoom(room, STRUCTURE_RAMPART) &&
-            RoomHelper_Structure.excecuteEveryTicks(RUN_RAMPART_STATUS_UPDATE)
-        ) {
-            RoomApi_Structure.runSetRampartStatus(room);
-        }
-
         // Run accessory functions for dependent rooms ----
         // Update reserve timer for remote rooms
         if (RoomHelper_Structure.excecuteEveryTicks(RUN_RESERVE_TTL_TIMER)) {
