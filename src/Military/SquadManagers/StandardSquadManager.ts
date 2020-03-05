@@ -196,45 +196,8 @@ export class StandardSquadManager implements ISquadManager {
                 if (MilitaryIntents_Api.queueIntentMoveQuadSquadRallyPos(creep, instance, status)) {
                     return;
                 }
-
-                if (creep.room.name === instance.targetRoom) {
-                    this.decideMoveIntents_TARGET_ROOM(instance, status, roomData, creep);
-                } else {
-                    this.decideMoveIntents_NON_TARGET_ROOM(instance, status, roomData, creep);
-                }
             });
-        },
 
-        decideMoveIntents_TARGET_ROOM(
-            instance: ISquadManager,
-            status: SquadStatusConstant,
-            roomData: MilitaryDataAll,
-            creep: Creep
-        ): void {
-            // move to our ideal target i guess
-        },
-
-        decideMoveIntents_NON_TARGET_ROOM(
-            instance: ISquadManager,
-            status: SquadStatusConstant,
-            roomData: MilitaryDataAll,
-            creep: Creep
-        ): void {
-            // Get away from a creep in range while in transit
-            if (
-                MilitaryIntents_Api.queueIntentMoveNearHostileKiting(
-                    creep,
-                    instance,
-                    roomData[creep.room.name].hostiles?.allHostiles!
-                )
-            ) {
-                return;
-            }
-
-            // Move towards the target room
-            if (MilitaryIntents_Api.queueIntentMoveToTargetRoom(creep, instance)) {
-                return;
-            }
         },
 
         decideAttackIntents(instance: ISquadManager, status: SquadStatusConstant, roomData: MilitaryDataAll) {
