@@ -19,6 +19,6 @@ global.Profiler = Profiler.init();
 export const loop = ErrorMapper.wrapLoop(() => {
     Mem.loadCachedMemory();
     ManagerManager.runManagerManager();
-    const cm = CostMatrixApi.getQuadSquadMatrix("W11N13");
-    CostMatrixApi.visualizeCostMatrix(cm, "W11N13",undefined, 10);
+    const cm = CostMatrixApi.getQuadSquadMatrix("W8N7", LEFT);
+    CostMatrixApi.visualizeCostMatrix(cm, "W8N7", undefined, 255);
 });

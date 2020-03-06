@@ -1,4 +1,4 @@
-import { UserException, MemoryApi_Room, RoomHelper_Structure } from "Utils/Imports/internals";
+import { UserException, MemoryApi_Room, RoomHelper_Structure, militaryDataHelper } from "Utils/Imports/internals";
 
 /**
  * This file creates and stores all cost matrices in a global context so that they are only created on demand
@@ -35,7 +35,7 @@ export class CostMatrixApi {
      * Returns a cost matrix adjusted to make walkable for a quad squad
      * @param roomName Room to get the cost matrix for
      */
-    public static getQuadSquadMatrix(roomName: string): CostMatrix {
+    public static getQuadSquadMatrix(roomName: string, direction: TOP | RIGHT | BOTTOM | LEFT): CostMatrix {
 
         const roomCostMatrices: RoomCostMatrices = this.getOrInitializeCostMatrices(roomName);
 
@@ -46,22 +46,49 @@ export class CostMatrixApi {
         const terrain: RoomTerrain = new Room.Terrain(roomName);
         const quadSquadMatrix = new PathFinder.CostMatrix();
 
+        let dx: number;
+        let dy: number;
+        
+        switch(direction){
+            case TOP: dx = -1; dy = -1; break;
+            case RIGHT: dx = +1; dy = -1; break;
+            case BOTTOM: dx = +1; dy = +1; break;
+            case LEFT: dx = -1; dy = +1; break;
+            default: dx = 0; dy = 0; break;
+        }
+
         for (let x = 0; x < 50; x++) {
             for (let y = 0; y < 50; y++) {
                 const terrainType = terrain.get(x, y);
                 if(terrainType === 1) {
                     quadSquadMatrix.set(x, y, 255);
-                    if(x+1 <= 49) {
-                        quadSquadMatrix.set(x+1, y, 255);
+                    if(x+dx >= 0 && x+dx <= 49) {
+                        quadSquadMatrix.set(x+dx, y, 255);
                     }
-                    if(y-1 >= 0) {
-                        quadSquadMatrix.set(x, y-1, 255);
+                    if(y+dy >= 0 && y+dy <= 49) {
+                        quadSquadMatrix.set(x, y+dy, 255);
                     }
                 }
             }
         }
 
-        this.costMatrices[roomName].terrainMatrix = this.serializeCostMatrix(quadSquadMatrix, roomName, false);
+        if(Game.rooms[roomName] !== undefined) {
+            // if we have vision, get structures
+            let structures = Game.rooms[roomName].find(FIND_STRUCTURES);
+            structures = _.filter(structures, (struct) => struct.structureType !== STRUCTURE_ROAD && struct.structureType !== STRUCTURE_CONTAINER && !(struct.structureType === STRUCTURE_RAMPART && <OwnedStructure><unknown>struct.my))
+
+            _.forEach(structures, (struct: Structure) => {
+                quadSquadMatrix.set(struct.pos.x, struct.pos.y, 255);
+                if(struct.pos.x+dx >= 0 && struct.pos.x+dx <= 49) {
+                    quadSquadMatrix.set(struct.pos.x+dx, struct.pos.y, 255);
+                }
+                if(struct.pos.y+dy >= 0 && struct.pos.y+dy <= 49) {
+                    quadSquadMatrix.set(struct.pos.x, struct.pos.y+dy, 255);
+                }
+            });
+        }
+
+        this.costMatrices[roomName].terrainMatrix = this.serializeCostMatrix(quadSquadMatrix, roomName, true, Game.time + 2000);
         return quadSquadMatrix;
     }
     /**
