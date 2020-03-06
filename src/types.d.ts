@@ -993,10 +993,6 @@ interface EmpireMemory {
      */
     alertMessages?: AlertMessageNode[];
     /**
-     * PathfindingApi empire-wide memory
-     */
-    movementData?: MovementData;
-    /**
      * Military operations
      */
     militaryOperations: OperationData;
@@ -1016,51 +1012,6 @@ interface MilitaryOperation {
     operationStrategy: OpStrategyConstant;
 }
 
-interface MovementData {
-    [key: string]: RoomMovementData;
-}
-/**
- * Contains pathfinding information about a room
- */
-interface RoomMovementData {
-    /**
-     * Name of the room
-     */
-    roomName: string;
-    /**
-     * Status of the room
-     */
-    roomStatus: RoomStatusType;
-    /**
-     * Last tick this room was scouted
-     */
-    lastSeen: number;
-    /**
-     * Optional SERIALIZED costMatrix data to be used with PathFinder.CostMatrix.deserialize()
-     * -- Useful for storing data to be shared between multiple creeps
-     */
-    costMatrix?: number[];
-}
-
-type ROOM_STATUS_ALLY = "ally";
-type ROOM_STATUS_ALLY_REMOTE = "allyRemote";
-type ROOM_STATUS_NEUTRAL = "neutral";
-type ROOM_STATUS_HIGHWAY = "highway";
-type ROOM_STATUS_SOURCE_KEEPER = "sourceKeeper";
-type ROOM_STATUS_HOSTILE = "hostile";
-type ROOM_STATUS_HOSTILE_REMOTE = "hostileRemote";
-type ROOM_STATUS_INVADER_REMOTE = "invaderRemote";
-type ROOM_STATUS_UNKNOWN = "unknown";
-type RoomStatusType =
-    | ROOM_STATUS_ALLY
-    | ROOM_STATUS_ALLY_REMOTE
-    | ROOM_STATUS_NEUTRAL
-    | ROOM_STATUS_HIGHWAY
-    | ROOM_STATUS_SOURCE_KEEPER
-    | ROOM_STATUS_HOSTILE
-    | ROOM_STATUS_HOSTILE_REMOTE
-    | ROOM_STATUS_INVADER_REMOTE
-    | ROOM_STATUS_UNKNOWN;
 
 /**
  * override structure type
