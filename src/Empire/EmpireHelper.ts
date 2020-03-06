@@ -51,7 +51,8 @@ export class EmpireHelper {
      * @param targetRoom the room we want to support
      */
     public static findDependentRoomAuto(targetRoom: string): string {
-        const ownedRooms = MemoryApi_Empire.getOwnedRooms();
+        const ownedRooms = MemoryApi_Empire.getOwnedRooms((r: Room) => r.controller?.level! > 4);
+        console.log(JSON.stringify(ownedRooms));
         let shortestPathRoom: Room | undefined;
 
         // Loop over owned rooms, finding the shortest path

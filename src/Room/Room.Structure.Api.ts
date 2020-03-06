@@ -313,25 +313,6 @@ export class RoomApi_Structure {
     }
 
     /**
-     * sets the ramparts status in the room to public or private
-     * @param room the room we are setting ramparts for
-     */
-    public static runSetRampartStatus(room: Room): void {
-        // If defcon is on in the room, set to private, otherwise, public
-        const rampartsInRoom: StructureRampart[] = MemoryApi_Room.getStructureOfType(
-            room.name,
-            STRUCTURE_RAMPART
-        ) as StructureRampart[];
-        const shouldBePublic: boolean = !(MemoryApi_Room.getDefconLevel(room) > 0);
-        for (const i in rampartsInRoom) {
-            const rampart: StructureRampart = rampartsInRoom[i];
-            if (rampart.isPublic !== shouldBePublic) {
-                rampart.setPublic(shouldBePublic);
-            }
-        }
-    }
-
-    /**
      * get the rampart the defender should stand on when defending the room
      * @param room the room we are looking for the rampart in
      * @param target the target creep we are defending against

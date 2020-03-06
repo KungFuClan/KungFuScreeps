@@ -418,7 +418,7 @@ export class SpawnHelper {
         const reserversInRoom: Creep[] = MemoryApi_Creep.getMyCreeps(room.name, (c: Creep) => c.memory.role === ROLE_REMOTE_RESERVER);
         const remoteRooms: RemoteRoomMemory[] = MemoryApi_Room.getRemoteRooms(room, (rr: RemoteRoomMemory) => rr.reserveTTL < RESERVER_MIN_TTL || this.isRemoteRoomEnemyReserved(rr));
         return _.min(remoteRooms, (rr: RemoteRoomMemory) => _.sum(reserversInRoom, (c: Creep) => {
-            if(c.memory.targetRoom === rr.roomName) {
+            if (c.memory.targetRoom === rr.roomName) {
                 return 1;
             } else {
                 return 0;

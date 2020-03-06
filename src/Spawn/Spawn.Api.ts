@@ -26,6 +26,7 @@ import {
     HIGH_PRIORITY,
     ALL_MILITARY_ROLES,
     MemoryApi_Military,
+    ROLE_SCOUT
 } from "Utils/Imports/internals";
 import { profile } from "Profiler";
 
@@ -208,6 +209,9 @@ export class SpawnApi {
      */
     public static handleMilitaryCreepSpawnSuccess(roleName: RoleConstant, operationUUID: string, squadUUID: string, room: Room, creepName: string): void {
         // Handle _only_ military roles in this function
+        if (roleName === ROLE_SCOUT) {
+            MemoryApi_Room.updateLastTickScoutSpawned(room);
+        }
         if (!ALL_MILITARY_ROLES.includes(roleName)) {
             return;
         }

@@ -19,6 +19,7 @@ export class MilitaryManager {
      */
     private static runSingleOperation(operation: MilitaryOperation): void {
         const squads: SquadData = operation.squads;
+
         for (const squad in squads) {
             this.runSingleSquad(squads[squad]);
         }

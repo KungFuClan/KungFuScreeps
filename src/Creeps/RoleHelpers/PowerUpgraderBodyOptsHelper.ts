@@ -53,7 +53,8 @@ export class PowerUpgraderBodyOptsHelper implements ICreepBodyOptsHelper {
                 break;
 
             case TIER_8: // 15 Work, 8 Carry, 4 Move - Total Cost: 2100
-                body = { work: 15, carry: NUM_CARRY, move: NUM_MOVE }; // RCL 8 you can only do 15 per tick
+                numWorkParts = storageLevel < STORAGE_LEVEL_MINI_UPGRADERS ? MINI_UPGRADER_WORK_PARTS : 15;
+                body = { work: numWorkParts, carry: NUM_CARRY, move: NUM_MOVE }; // RCL 8 you can only do 15 per tick
                 break;
         }
 
