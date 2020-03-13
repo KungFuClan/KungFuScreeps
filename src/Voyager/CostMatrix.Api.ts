@@ -19,6 +19,24 @@ export class CostMatrixApi {
         return this.costMatrices[roomName];
     }
 
+    public static getCostMatrix(matrixType: MatrixTypes, roomName: string, additionalParams?: { direction?: TOP | LEFT | BOTTOM | RIGHT }): CostMatrix | undefined{
+
+        switch(matrixType) {
+            case "nonOwnedCreepMatrix": return this.getNonOwnedCreepMatrix(roomName);
+            case "ownedCreepMatrix": return this.getOwnedCreepMatrix(roomName);
+            case "quadSquadMatrix": 
+                if(additionalParams && additionalParams.direction) {
+                    return this.getQuadSquadMatrix(roomName, additionalParams.direction);
+                }
+                throw new UserException("Error in getCostMatrix", "Attempted to getQuadSquadMatrix without passing in direction", ERROR_WARN);
+            case "structureMatrix": return this.getStructureMatrix(roomName);
+            case "terrainMatrix": return this.getTerrainMatrix(roomName);
+            case "roadTerrainMatrix": return this.getRoadTerrainMatrix(roomName);
+            case "towerDamageMatrix": return this.getTowerDamageMatrix(roomName);
+        }
+
+    }
+
     /**
      * Validates that a matrix is not expired or undefined
      * @param costMatrix The matrix to validate expiration, or undefined
@@ -29,6 +47,98 @@ export class CostMatrixApi {
             (costMatrix.expires === false ||
                 (costMatrix.expirationTick !== undefined && costMatrix.expirationTick > Game.time))
         );
+    }
+
+    /**
+     * Returns a cost matrix of all non-owned creeps in a room
+     * @param roomName Room to get the cost matrix for
+     */
+    public static getNonOwnedCreepMatrix(roomName: string) : CostMatrix | undefined {
+        const roomCostMatrices: RoomCostMatrices = this.getOrInitializeCostMatrices(roomName);
+
+        if(this.isCostMatrixValid(roomCostMatrices.structureMatrix)) {
+            return this.deserializeStoredCostMatrix(roomCostMatrices.structureMatrix!);
+        }
+
+        if(Game.rooms[roomName] === undefined) {
+            return;
+        }
+
+        const room = Game.rooms[roomName];
+        const creepsInRoom = room.find(FIND_CREEPS).filter((creep) => !creep.my);
+
+        const newMatrix = new PathFinder.CostMatrix();
+
+        for(const creep of creepsInRoom) {
+            newMatrix.set(creep.pos.x, creep.pos.y, 255);
+        }
+
+        roomCostMatrices.nonOwnedCreepMatrix = this.serializeCostMatrix(newMatrix, roomName, true, Game.time);
+        return newMatrix;
+    }
+
+    /**
+     * Returns a cost matrix of all owned creeps in a room - only blocks those that are marked as working
+     * @param roomName Room to get the cost matrix for
+     */
+    public static getOwnedCreepMatrix(roomName: string) : CostMatrix | undefined {
+        const roomCostMatrices: RoomCostMatrices = this.getOrInitializeCostMatrices(roomName);
+
+        if(this.isCostMatrixValid(roomCostMatrices.structureMatrix)) {
+            return this.deserializeStoredCostMatrix(roomCostMatrices.structureMatrix!);
+        }
+
+        if(Game.rooms[roomName] === undefined) {
+            return;
+        }
+
+        const room = Game.rooms[roomName];
+        const creepsInRoom = room.find(FIND_CREEPS).filter((creep) => creep.my && (creep.memory.working === undefined || creep.memory.working === true));
+
+        const newMatrix = new PathFinder.CostMatrix();
+
+        for(const creep of creepsInRoom) {
+            newMatrix.set(creep.pos.x, creep.pos.y, 255);
+        }
+
+        roomCostMatrices.ownedCreepMatrix = this.serializeCostMatrix(newMatrix, roomName, true, Game.time);
+        return newMatrix;
+    }
+
+    /**
+     * Returns a cost matrix of all unwalkable structures in a room
+     * @param roomName Room to get the cost matrix for
+     */
+    public static getStructureMatrix(roomName: string) : CostMatrix | undefined {
+        const roomCostMatrices: RoomCostMatrices = this.getOrInitializeCostMatrices(roomName);
+
+        if(this.isCostMatrixValid(roomCostMatrices.structureMatrix)) {
+            return this.deserializeStoredCostMatrix(roomCostMatrices.structureMatrix!);
+        }
+
+        if(Game.rooms[roomName] === undefined) {
+            return;
+        }
+
+        const room = Game.rooms[roomName];
+        const structures = room.find(FIND_STRUCTURES).filter((struct) => {
+            const type = struct.structureType;
+
+            if(type === STRUCTURE_ROAD || type === STRUCTURE_CONTAINER || (type === STRUCTURE_RAMPART && ( (<StructureRampart>struct).my || (<StructureRampart>struct).isPublic) )) {
+                return false;
+            }
+
+            return true;
+        });
+
+        const newMatrix = new PathFinder.CostMatrix();
+
+        for(const struct of structures) {
+            newMatrix.set(struct.pos.x, struct.pos.y, 255);
+        }
+
+        roomCostMatrices.structureMatrix = this.serializeCostMatrix(newMatrix, roomName, true, Game.time);
+        return newMatrix;
     }
 
     /**
@@ -135,9 +245,49 @@ export class CostMatrixApi {
             newTowerDamageMatrix,
             roomName,
             true,
-            Game.time + 5000 // TODO Move this value to a config file
+            Game.time + 6000 // TODO Move this value to a config file
         );
         return newTowerDamageMatrix;
+    }
+
+    /**
+     * Gets the base terrain values - 1 = Plain, 5 = Swamp
+     * @param roomName The room to check 
+     */
+    public static getRoadTerrainMatrix(roomName: string): CostMatrix {
+        const roomCostMatrices: RoomCostMatrices = this.getOrInitializeCostMatrices(roomName);
+
+        if (this.isCostMatrixValid(roomCostMatrices.terrainMatrix)) {
+            return this.deserializeStoredCostMatrix(roomCostMatrices.terrainMatrix!);
+        }
+
+        // We require vision from this point on, to generate a new cost matrix
+        if (Game.rooms[roomName] === undefined) {
+            throw new UserException(
+                "Unable to getTowerDamageMatrix for room " + roomName,
+                "We do not have vision on the room to calculate the damage.",
+                ERROR_ERROR
+            );
+        }
+
+        const terrain: RoomTerrain = new Room.Terrain(roomName);
+        const newTerrainMatrix = new PathFinder.CostMatrix();
+        const roads = Game.rooms[roomName].find(FIND_STRUCTURES, { filter: (struct: Structure) => struct.structureType === STRUCTURE_ROAD});
+        
+        for (let x = 0; x < 50; x++) {
+            for (let y = 0; y < 50; y++) {
+                const terrainType = terrain.get(x, y);
+                const terrainWeight = terrainType === 0 ? 2 : terrainType === 1 ? 255 : 10;
+                newTerrainMatrix.set(x, y, terrainWeight);
+            }
+        }
+
+        for(const road of roads){
+            newTerrainMatrix.set(road.pos.x, road.pos.y, 1);
+        }
+
+        this.costMatrices[roomName].terrainMatrix = this.serializeCostMatrix(newTerrainMatrix, roomName, false);
+        return newTerrainMatrix;
     }
 
     /**
@@ -275,17 +425,26 @@ export class CostMatrixApi {
      * @param costMatrix Cost matrix to scale
      * @param scaleMax Max value of the scale
      */
-    public static scaleCostMatrix(costMatrix: CostMatrix, scaleMax: number): CostMatrix {
+    public static scaleCostMatrix(costMatrix: CostMatrix, scaleMin: number = 1, scaleMax: number): CostMatrix {
         const scaledMatrix = new PathFinder.CostMatrix();
 
-        // +1 to make scale 1 based instead of zero based
-        const range = 1 + _.max(costMatrix.serialize()) - _.min(costMatrix.serialize());
+        const matrixAsArray = costMatrix.serialize();
+        const min = _.min(matrixAsArray);
+        const max = _.max(matrixAsArray);
 
-        const valueScale = scaleMax / range;
+        console.log('Min: ${min}\nMax: ${max}');
 
         for (let x = 0; x < 50; x++) {
             for (let y = 0; y < 50; y++) {
-                const scaledValue = costMatrix.get(x, y) * valueScale;
+                const cmValue = costMatrix.get(x, y);
+                
+                if(cmValue >= 255) {
+                    scaledMatrix.set(x, y, 255);
+                    continue;
+                }
+
+                const valueAsPercent = (cmValue - min) / (max - min);
+                const scaledValue = (valueAsPercent * (scaleMax - scaleMin)) + scaleMin;
                 scaledMatrix.set(x, y, scaledValue);
             }
         }
@@ -308,6 +467,7 @@ export class CostMatrixApi {
                     summedValue += costMatrices[i].get(x, y);
                 }
 
+                summedValue = summedValue > 255 ? 255 : summedValue;
                 resultMatrix.set(x, y, summedValue);
             }
         }

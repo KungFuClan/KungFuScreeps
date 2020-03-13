@@ -33,32 +33,90 @@ export class RoomHelper_State {
     }
 
     /**
-     * check if a specified room is owned by you
-     * @param room the room we want to check
+     * Returns if a room is neutral - Note: Neutral is defined as having a controller that is neither reserved or claimed by anyone
+     * @param room The room to check
      */
-    public static isMyRoom(room: Room): boolean {
-        if (room.controller !== undefined) {
-            return room.controller.my;
-        } else {
-            return false;
-        }
+    public static isNeutralRoom(room: Room): boolean {
+        return (
+            room.controller !== undefined &&
+            room.controller.owner === undefined &&
+            room.controller.reservation === undefined
+        );
     }
 
     /**
-     * check if a specified room is an ally room
+     * check if a specified room is owned by an enemy
      * @param room the room we want to check
      */
-    public static isAllyRoom(room: Room): boolean {
+    public static isMyRoom(room: Room): boolean {
+        return room.controller !== undefined && room.controller.my;
+    }
+
+    /**
+     * Returns if a room is hostile owned - does not count invaders or reserved rooms
+     * @param room The room to check
+     */
+    public static isHostileOwnedRoom(room: Room): boolean {
+        if (room.controller === undefined) {
+            return false;
+        }
+
+        if (
+            room.controller.owner !== undefined &&
+            room.controller.owner.username !== "Invader" &&
+            !_.contains(ALLY_LIST, room.controller.owner.username)
+        ) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if a room is reserved by an enemy
+     * @param room the room we are checking the reservation for
+     */
+    public static isHostileReserved(room: Room): boolean {
+        return (
+            room.controller !== undefined &&
+            room.controller.reservation !== undefined &&
+            room.controller.reservation.username !== undefined &&
+            room.controller.reservation.username !== "Invader" &&
+            !_.contains(ALLY_LIST, room.controller.reservation.username)
+        );
+    }
+
+    /**
+     * Returns if a room is owned by an invader
+     * @param room The room we are checking for
+     */
+    public static isInvaderOwnedRoom(room: Room): boolean {
+        return room.controller !== undefined && room.controller.owner && room.controller.owner.username === "Invader";
+    }
+
+    /**
+     * Returns if a room is reserved by an invader
+     * @param room The room we are checking for
+     */
+    public static isInvaderReserved(room: Room): boolean {
+        return (
+            room.controller !== undefined &&
+            room.controller.reservation !== undefined &&
+            room.controller.reservation.username === "Invader"
+        );
+    }
+
+    /**
+     * check if a specified room is an ally room - excludes reserved rooms
+     * @param room the room we want to check
+     */
+    public static isAllyOwnedRoom(room: Room): boolean {
         // returns true if a room has one of our names or is reserved by us
         if (room.controller === undefined) {
             return false;
         }
 
         if (room.controller.owner !== undefined && _.contains(ALLY_LIST, room.controller.owner.username)) {
-            return true;
-        }
-
-        if (this.isAllyReserved(room)) {
             return true;
         }
 
@@ -70,10 +128,8 @@ export class RoomHelper_State {
      * @param room the room we are checking the reservation for
      */
     public static isAllyReserved(room: Room): boolean {
-        if (!room || !room.controller) {
-            return false;
-        }
         return (
+            room.controller !== undefined &&
             room.controller.reservation !== undefined &&
             room.controller.reservation.username !== undefined &&
             _.contains(ALLY_LIST, room.controller.reservation.username)
@@ -218,7 +274,11 @@ export class RoomHelper_State {
             }
 
             let sourcesInRoom: number = 0;
-            if (Memory.rooms[rr.roomName] && Memory.rooms[rr.roomName].sources && Memory.rooms[rr.roomName].sources.data) {
+            if (
+                Memory.rooms[rr.roomName] &&
+                Memory.rooms[rr.roomName].sources &&
+                Memory.rooms[rr.roomName].sources.data
+            ) {
                 sourcesInRoom = Memory.rooms[rr.roomName].sources.data.length;
             } else {
                 sourcesInRoom = rr.sources.data;

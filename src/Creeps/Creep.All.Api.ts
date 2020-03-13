@@ -10,6 +10,7 @@ import {
     MemoryHelper_Room,
     PathfindingApi
 } from "Utils/Imports/internals";
+import { Voyager } from "Voyager/Voyager";
 
 // Api for all types of creeps (more general stuff here)
 export class CreepAllApi {
@@ -37,7 +38,7 @@ export class CreepAllApi {
     public static travelTo(creep: Creep, job: BaseJob) {
         // Update MovementData for empire if creep changed rooms
         if (PathfindingApi.CreepChangedRooms(creep)) {
-            PathfindingApi.updateRoomData(creep.room);
+            // Voyager.updateRoomData(creep.room);
         }
 
         // Perform Stuck Detection - Delete old path if stuck

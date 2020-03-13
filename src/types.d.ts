@@ -371,6 +371,14 @@ interface MilitaryDataParams {
     hostileStructures?: boolean;
 }
 
+type NON_OWNED_CREEP_MATRIX = "nonOwnedCreepMatrix";
+type OWNED_CREEP_MATRIX = "ownedCreepMatrix";
+type TOWER_DMG_MATRIX = "towerDamageMatrix";
+type STRUCTURE_MATRIX = "structureMatrix";
+type ROADS_TERRAIN_MATRIX = "roadTerrainMatrix";
+type TERRAIN_MATRIX = "terrainMatrix";
+type QUAD_SQUAD_MATRIX = "quadSquadMatrix";
+type MatrixTypes = NON_OWNED_CREEP_MATRIX | OWNED_CREEP_MATRIX | TOWER_DMG_MATRIX | STRUCTURE_MATRIX | ROADS_TERRAIN_MATRIX | TERRAIN_MATRIX | QUAD_SQUAD_MATRIX;
 // Cost matrix storage interface - used by CostMatrix.Api
 interface CostMatrixIndex {
     /**
@@ -379,10 +387,19 @@ interface CostMatrixIndex {
     [index: string]: RoomCostMatrices;
 }
 interface RoomCostMatrices {
-    creepMatrix?: StoredCostMatrix;
+    // All creeps blocked
+    nonOwnedCreepMatrix?: StoredCostMatrix;
+    // Owned creeps only, ignoring all creeps that are not working, blocking those that are working
+    ownedCreepMatrix?: StoredCostMatrix;
+    // Varying cost based on tower damage
     towerDamageMatrix?: StoredCostMatrix;
+    // All non-walkable structures blocked
     structureMatrix?: StoredCostMatrix;
+    // All normal terrain costs 
     terrainMatrix?: StoredCostMatrix;
+    // All terrain costs, scaled for use with roads
+    roadTerrainMatrix?: StoredCostMatrix;
+    // Quad Squad specific movement guide
     quadSquadMatrix?: StoredCostMatrix;
 }
 interface StoredCostMatrix {

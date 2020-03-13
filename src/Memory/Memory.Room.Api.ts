@@ -47,7 +47,7 @@ export class MemoryApi_Room {
         const links: Array<Structure<StructureConstant>> = MemoryApi_Room.getStructureOfType(room.name, STRUCTURE_LINK);
         const controller: StructureController | undefined = room.controller;
 
-        // Break early if we don't have 3 links yet
+        // Break early if we don't have 2 links yet
         if (links.length < 2) {
             return null;
         }

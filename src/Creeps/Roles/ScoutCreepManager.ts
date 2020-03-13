@@ -34,7 +34,7 @@ export class ScoutCreepManager implements ICivCreepRoleManager {
      */
     public getNewTargetRoom(creep: Creep): string {
         // Set up empire memory if not done yet
-        PathfindingApi.initializeEmpireMovementMemory();
+        // PathfindingApi.initializeEmpireMovementMemory();
 
         // get the exits for this room
         const exits = Game.map.describeExits(creep.room.name);

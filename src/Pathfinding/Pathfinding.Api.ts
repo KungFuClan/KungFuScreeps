@@ -12,71 +12,6 @@ import {
 } from "Utils/Imports/internals";
 
 export class PathfindingApi {
-    /**
-     * Call this method to ensure that Memory.empire.movementData exists in a usable state
-     */
-    public static initializeEmpireMovementMemory(): void {
-        // Memory safeguarding
-        if (!Memory.empire) {
-            Memory.empire = {
-                militaryOperations: {},
-            };
-        }
-
-        if (!Memory.empire.movementData) {
-            Memory.empire.movementData = {};
-        }
-        // End Memory Safeguarding
-    }
-
-    /**
-     * This method is used to update movementData for the empire
-     * @param room The room to get the status of
-     * @returns RoomStatusType The status of the room
-     */
-    public static getRoomStatus(room: Room): RoomStatusType {
-        let roomStatus: RoomStatusType;
-
-        if (room.controller === undefined) {
-            if (RoomHelper_State.isSourceKeeperRoom(room)) {
-                roomStatus = ROOM_STATUS_SOURCE_KEEPER;
-            } else {
-                roomStatus = ROOM_STATUS_HIGHWAY;
-            }
-        } else if (room.controller.my || RoomHelper_State.isAllyRoom(room)) {
-            roomStatus = ROOM_STATUS_ALLY;
-        } else if (!room.controller.my && room.controller.owner) {
-            roomStatus = ROOM_STATUS_HOSTILE;
-        } else if (!room.controller.my && room.controller.reservation !== undefined) {
-
-            if (room.controller.reservation.username === "Invader") {
-                roomStatus = ROOM_STATUS_INVADER_REMOTE;
-            } else {
-                roomStatus = ROOM_STATUS_HOSTILE_REMOTE;
-            }
-
-        } else {
-            roomStatus = ROOM_STATUS_NEUTRAL;
-        }
-
-        return roomStatus;
-    }
-
-    /**
-     * This is the method that creeps will call to update Memory.empire.movementData
-     * @param room The room to update the RoomMovementData for
-     */
-    public static updateRoomData(room: Room): void {
-        if (!Memory.empire || !Memory.empire.movementData) {
-            this.initializeEmpireMovementMemory();
-        }
-
-        Memory.empire.movementData![room.name] = {
-            roomName: room.name,
-            roomStatus: this.getRoomStatus(room),
-            lastSeen: Game.time
-        };
-    }
 
     /**
      * Retrieve the RoomStatus from memory
@@ -85,7 +20,7 @@ export class PathfindingApi {
      */
     public static retrieveRoomStatus(roomName: string): RoomStatusType {
         if (!Memory.empire || !Memory.empire.movementData) {
-            this.initializeEmpireMovementMemory();
+            // this.initializeEmpireMovementMemory();
         }
 
         const roomData = _.find(Memory.empire.movementData!, (data: RoomMovementData) => data.roomName === roomName);
