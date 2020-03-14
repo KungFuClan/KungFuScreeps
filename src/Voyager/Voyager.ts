@@ -15,6 +15,14 @@ import {
 } from "Utils/Imports/internals";
 
 export class Voyager {
+
+    private static structureMatrixCache: {[roomName: string]: CostMatrix } = {};
+    private static creepAndStructureMatrixCache: {[roomName: string]: CostMatrix } = {};
+
+    private static structureMatrixTick: number;
+    private static creepAndStructureMatrixTick: number;
+
+
     public static voyageTo(
         creep: Creep,
         destination: _HasRoomPosition | RoomPosition | null,
@@ -228,18 +236,17 @@ export class Voyager {
 
             roomsSearched++;
 
-            let matrix;
+            let matrix = new PathFinder.CostMatrix();
             const room = Game.rooms[roomName];
             if (room) {
                 if (options.ignoreStructures) {
-                    matrix = new PathFinder.CostMatrix();
                     if (!options.ignoreCreeps) {
-                        Voyager.addCreepsToMatrix(room, matrix);
+                        Voyager.addAllCreepsToMatrix(room, matrix);
                     }
                 } else if (options.ignoreCreeps || roomName !== origin.roomName) {
                     matrix = Voyager.getStructureMatrix(room, options.freshMatrix);
                 } else {
-                    matrix = Voyager.getCreepMatrix(room);
+                    matrix = Voyager.getCreepAndStructureMatrix(room);
                 }
 
                 if (options.obstacles) {
@@ -252,15 +259,13 @@ export class Voyager {
             }
 
             if (options.roomCallback) {
-                const outcome = options.roomCallback(roomName, combinedMatrix.clone());
+                const outcome = options.roomCallback(roomName, matrix.clone());
                 if (outcome !== undefined) {
                     return outcome;
                 }
             }
 
-            // CostMatrixApi.visualizeCostMatrix(combinedMatrix, roomName);
-
-            return combinedMatrix;
+            return matrix;
         };
 
         let ret = PathFinder.search(
@@ -281,11 +286,11 @@ export class Voyager {
                 // can happen for situations where the creep would have to take an uncommonly indirect path
                 // options.allowedRooms and options.routeCallback can also be used to handle this situation
                 if (roomDistance <= 2) {
-                    console.log(`TRAVELER: path failed without findroute, trying with options.useFindRoute = true`);
+                    console.log(`VOYAGER: path failed without findroute, trying with options.useFindRoute = true`);
                     console.log(`from: ${origin}, destination: ${destination}`);
                     options.useFindRoute = true;
                     ret = this.findVoyagePath(origin, destination, options);
-                    console.log(`TRAVELER: second attempt was ${ret.incomplete ? "not " : ""}successful`);
+                    console.log(`VOYAGER: second attempt was ${ret.incomplete ? "not " : ""}successful`);
                     return ret;
                 }
 
@@ -569,8 +574,114 @@ export class Voyager {
     private static isExit(pos: Coord | RoomPosition): boolean {
         return pos.x === 0 || pos.x === 49 || pos.y === 0 || pos.y === 49;
     }
+
+/***** Cost Matrices ********/
+
+    /**
+     * build a cost matrix based on structures in the room. Will be cached for more than one tick. Requires vision.
+     * @param room
+     * @param freshMatrix
+     * @returns {any}
+     */
+    public static getStructureMatrix(room: Room, freshMatrix?: boolean): CostMatrix {
+        if (!this.structureMatrixCache[room.name] || (freshMatrix && Game.time !== this.structureMatrixTick)) {
+            this.structureMatrixTick = Game.time;
+            const matrix = new PathFinder.CostMatrix();
+            this.structureMatrixCache[room.name] = Voyager.addStructuresToMatrix(room, matrix, 1);
+        }
+        return this.structureMatrixCache[room.name];
+    }
+
+    /**
+     * build a cost matrix based on creeps and structures in the room. Will be cached for one tick. Requires vision.
+     * @param room
+     * @returns {any}
+     */
+    public static getCreepAndStructureMatrix(room: Room) {
+        if (!this.creepAndStructureMatrixCache[room.name] || Game.time !== this.creepAndStructureMatrixTick) {
+            this.creepAndStructureMatrixTick = Game.time;
+            this.creepAndStructureMatrixCache[room.name] = Voyager.addWorkingOrUnownedCreepsToMatrix(room,
+                this.getStructureMatrix(room, true).clone());
+        }
+        return this.creepAndStructureMatrixCache[room.name];
+    }
+
+    /**
+     * add structures to matrix so that impassible structures can be avoided and roads given a lower cost
+     * @param room
+     * @param matrix
+     * @param roadCost
+     * @returns {CostMatrix}
+     */
+
+    public static addStructuresToMatrix(room: Room, matrix: CostMatrix, roadCost: number): CostMatrix {
+
+        const impassibleStructures: Structure[] = [];
+        for (const structure of room.find<Structure>(FIND_STRUCTURES)) {
+            if (structure instanceof StructureRampart) {
+                if (!structure.my && !structure.isPublic) {
+                    impassibleStructures.push(structure);
+                }
+            } else if (structure instanceof StructureRoad) {
+                matrix.set(structure.pos.x, structure.pos.y, roadCost);
+            } else if (structure instanceof StructureContainer) {
+                matrix.set(structure.pos.x, structure.pos.y, 5);
+            } else {
+                impassibleStructures.push(structure);
+            }
+        }
+
+        for (const site of room.find(FIND_MY_CONSTRUCTION_SITES)) {
+            if (site.structureType === STRUCTURE_CONTAINER || site.structureType === STRUCTURE_ROAD
+                || site.structureType === STRUCTURE_RAMPART) { continue; }
+            matrix.set(site.pos.x, site.pos.y, 0xff);
+        }
+
+        for (const structure of impassibleStructures) {
+            matrix.set(structure.pos.x, structure.pos.y, 0xff);
+        }
+
+        return matrix;
+    }
+
+    /**
+     * add creeps to matrix so that they will be avoided by other creeps
+     * @param room
+     * @param matrix
+     * @returns {CostMatrix}
+     */
+    public static addWorkingOrUnownedCreepsToMatrix(room: Room, matrix: CostMatrix): CostMatrix {
+        const creeps = room.find(FIND_CREEPS);
+
+        _.forEach(creeps, (creep: Creep) => {
+            if(!creep.my) {
+                matrix.set(creep.pos.x, creep.pos.y, 0xff);
+            }
+
+            // TODO Might add && creep.memory._voyage !== undefined to check if they are moving
+            if(creep.memory.working && creep.memory.working === true){
+                matrix.set(creep.pos.x, creep.pos.y, 0xff);
+            }
+        });
+
+        return matrix;
+    }
+
+    /**
+     * add creeps to matrix so that they will be avoided by other creeps
+     * @param room
+     * @param matrix
+     * @returns {CostMatrix}
+     */
+
+    public static addAllCreepsToMatrix(room: Room, matrix: CostMatrix): CostMatrix {
+        room.find(FIND_CREEPS).forEach((creep: Creep) => matrix.set(creep.pos.x, creep.pos.y, 0xff) );
+        return matrix;
+    }
+
 }
 
+/******* Constants Used in Voyager  *******/
 // The CPU usage threshold to print a warning message to the console, 1000 ops ~= 1 CPU
 const REPORT_CPU_THRESHOLD = 1000;
 // The max CPU used by a pathfinding call 1000 ops ~= 1 CPU
