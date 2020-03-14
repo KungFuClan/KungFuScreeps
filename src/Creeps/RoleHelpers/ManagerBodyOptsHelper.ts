@@ -31,7 +31,7 @@ export class ManagerBodyOptsHelper implements ICreepBodyOptsHelper {
      */
     public generateCreepBody(tier: TierConstant, room: Room): BodyPartConstant[] {
         // Default Values for manager
-        let body: CreepBodyDescriptor = { heal: 1, move: 1 };
+        let body: CreepBodyDescriptor = { carry: 8 };
         const opts: CreepBodyOptions = { mixType: GROUPED };
 
         switch (tier) {
