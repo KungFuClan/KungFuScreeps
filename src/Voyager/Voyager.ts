@@ -13,7 +13,6 @@ import {
     ROOM_STATUS_UNKNOWN,
     ACTION_MOVE
 } from "Utils/Imports/internals";
-import { CostMatrixApi } from "./CostMatrix.Api";
 
 export class Voyager {
     public static voyageTo(
@@ -88,7 +87,8 @@ export class Voyager {
             options.stuckValue = DEFAULT_STUCK_VALUE;
         }
         if (voyageState.stuckCount >= options.stuckValue && Math.random() > 0.5) {
-            options.costMatrices = options.costMatrices?.concat(["ownedCreepMatrix", "nonOwnedCreepMatrix"])
+            options.ignoreCreeps = false;
+            options.freshMatrix = true;
             delete voyageData.path;
         }
 
@@ -185,7 +185,6 @@ export class Voyager {
             ignoreRoads: false,
             maxOps: DEFAULT_MAXOPS,
             allowedRoomStatuses: [ROOM_STATUS_ALLY, ROOM_STATUS_ALLY_REMOTE, ROOM_STATUS_HIGHWAY, ROOM_STATUS_INVADER_REMOTE, ROOM_STATUS_NEUTRAL, ROOM_STATUS_UNKNOWN],
-            costMatrices: ["roadTerrainMatrix", "structureMatrix", "ownedCreepMatrix", "nonOwnedCreepMatrix"],
             range: 1
         });
 
@@ -211,7 +210,7 @@ export class Voyager {
 
         const callback = (roomName: string): CostMatrix | boolean => {
 
-            // TODO Handle this differently - why isn't normalizePos doing this already? Likely a scope issue
+            // TODO Why isn't normalizePos doing this already? 
             destination = destination as RoomPosition;
             origin = origin as RoomPosition;
 
@@ -229,22 +228,26 @@ export class Voyager {
 
             roomsSearched++;
 
-            // Defined either in the options passed in, or by _.defaults
-            const matrixTypes: MatrixTypes[] = options.costMatrices!;
-            const matrices = _.map(matrixTypes, (type: MatrixTypes) => {
-                const matrix = CostMatrixApi.getCostMatrix(type, roomName, options.costMatrixAdditionalparam);
-                return matrix === undefined ? new PathFinder.CostMatrix() : matrix;
-                });
-
-            let combinedMatrix = CostMatrixApi.sumCostMatrices(matrices);
-            combinedMatrix = CostMatrixApi.scaleCostMatrix(combinedMatrix, 1, 100);
-
-            if (options.obstacles) {
-                for (const obstacle of options.obstacles) {
-                    if (obstacle.pos.roomName !== roomName) {
-                        continue;
+            let matrix;
+            const room = Game.rooms[roomName];
+            if (room) {
+                if (options.ignoreStructures) {
+                    matrix = new PathFinder.CostMatrix();
+                    if (!options.ignoreCreeps) {
+                        Voyager.addCreepsToMatrix(room, matrix);
                     }
-                    combinedMatrix.set(obstacle.pos.x, obstacle.pos.y, 0xff);
+                } else if (options.ignoreCreeps || roomName !== origin.roomName) {
+                    matrix = Voyager.getStructureMatrix(room, options.freshMatrix);
+                } else {
+                    matrix = Voyager.getCreepMatrix(room);
+                }
+
+                if (options.obstacles) {
+                    matrix = matrix.clone();
+                    for (const obstacle of options.obstacles) {
+                        if (obstacle.pos.roomName !== roomName) { continue; }
+                        matrix.set(obstacle.pos.x, obstacle.pos.y, 0xff);
+                    }
                 }
             }
 

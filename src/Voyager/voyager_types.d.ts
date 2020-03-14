@@ -4,10 +4,10 @@ interface VoyageToOptions {
     ignoreRoads?: boolean;
     // Creeps will not path around other creeps
     // Default: true
-    // ignoreCreeps?: boolean;
+    ignoreCreeps?: boolean;
     // Creeps will not path around structures
     // Default: false
-    // ignoreStructures?: boolean;
+    ignoreStructures?: boolean;
     // Creeps will prefer to travel in highways
     // Default: false
     preferHighway?: boolean;
@@ -23,12 +23,9 @@ interface VoyageToOptions {
     // Array of objects with a pos property to avoid
     // Default: []
     obstacles?: {pos: RoomPosition}[];
-    // List of MatrixTypes to be used in the pathfinding operation
-    // Default: [ StructureMatrix, TerrainMatrix, OwnedCreepMatrix, NonOwnedCreepMatrix ]
-    costMatrices?: MatrixTypes[];
-    // Any additional parameters required to use the costMatrices passed in above - check CostMatrixApi.getCostMatrix for details
-    // Default: undefined
-    costMatrixAdditionalparam?: {};
+    // Whether to force a costMatrix refresh
+    // Default: false
+    freshMatrix?: boolean;
     // Callback function that accepts two arguments, roomName and costmatrix, returning a CostMatrix or a boolean.
     // If it returns false, the room will be excluded. If it returns a costMatrix, it will be used instead of the default.
     // Default: PathFinder's default CostMatrix
