@@ -85,6 +85,7 @@ export class WorkerBodyOptsHelper implements ICreepBodyOptsHelper {
                     repair: true, //
                     wallRepair: true, //
                     fillTower: true, //
+                    getFromStorage: true, //
                     getDroppedEnergy: true //
                 };
 
@@ -98,6 +99,7 @@ export class WorkerBodyOptsHelper implements ICreepBodyOptsHelper {
                     repair: true, //
                     wallRepair: true, //
                     fillTower: true, //
+                    getFromStorage: true, //
                     getFromContainer: true, //
                     getDroppedEnergy: true //
                 };
