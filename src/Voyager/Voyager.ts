@@ -182,6 +182,7 @@ export class Voyager {
         options: VoyageToOptions = {}
     ): PathfinderReturn {
         _.defaults(options, {
+            ignoreRoads: false,
             maxOps: DEFAULT_MAXOPS,
             allowedRoomStatuses: [ROOM_STATUS_ALLY, ROOM_STATUS_ALLY_REMOTE, ROOM_STATUS_HIGHWAY, ROOM_STATUS_INVADER_REMOTE, ROOM_STATUS_NEUTRAL, ROOM_STATUS_UNKNOWN],
             costMatrices: ["roadTerrainMatrix", "structureMatrix", "ownedCreepMatrix", "nonOwnedCreepMatrix"],
@@ -254,7 +255,7 @@ export class Voyager {
                 }
             }
 
-            CostMatrixApi.visualizeCostMatrix(combinedMatrix, roomName);
+            // CostMatrixApi.visualizeCostMatrix(combinedMatrix, roomName);
 
             return combinedMatrix;
         };

@@ -16,21 +16,21 @@ export class MovePartJobs implements IJobTypeHelper {
 
         CreepAllApi.nullCheck_target(creep, moveTarget);
 
-        const moveOpts = PathfindingApi.GetDefaultMoveOpts(creep);
+        let range = 0;
 
         if (job.targetType === "roomName") {
             // 23 should get us inside the room and off the exit
-            moveOpts.range = 23;
+            range = 23;
         } else if (job.targetType === "roomPosition") {
-            moveOpts.range = 0;
+            range = 0;
         }
 
-        if (creep.pos.getRangeTo(moveTarget!) <= moveOpts.range!) {
+        if (creep.pos.getRangeTo(moveTarget!) <= range) {
             creep.memory.working = true;
             return;
         }
 
-        creep.moveTo(moveTarget!, moveOpts);
+        creep.voyageTo(moveTarget!, { range });
         return;
     }
 

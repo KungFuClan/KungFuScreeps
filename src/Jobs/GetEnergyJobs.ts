@@ -82,13 +82,12 @@ export class GetEnergyJobs implements IJobTypeHelper {
         CreepAllApi.nullCheck_target(creep, moveTarget);
 
         // Move options target
-        const moveOpts: MoveToOpts = PathfindingApi.GetDefaultMoveOpts(creep);
-
+        let range = 0;
         // In this case all actions are complete with a range of 1, but keeping for structure
         if (job.actionType === "harvest" && (moveTarget instanceof Source || moveTarget instanceof Mineral)) {
-            moveOpts.range = 1;
+            range = 1;
         } else if (job.actionType === "harvest" && moveTarget instanceof StructureContainer) {
-            moveOpts.range = 0;
+            range = 0;
         } else if (
             job.actionType === "withdraw" &&
             (moveTarget instanceof Structure ||
@@ -96,17 +95,17 @@ export class GetEnergyJobs implements IJobTypeHelper {
                 moveTarget instanceof Ruin ||
                 moveTarget instanceof Tombstone)
         ) {
-            moveOpts.range = 1;
+            range = 1;
         } else if (job.actionType === "pickup" && moveTarget instanceof Resource) {
-            moveOpts.range = 1;
+            range = 1;
         }
 
-        if (creep.pos.getRangeTo(moveTarget!) <= moveOpts.range!) {
+        if (creep.pos.getRangeTo(moveTarget!) <= range) {
             creep.memory.working = true;
             return; // If we are in range to the target, then we do not need to move again, and next tick we will begin work
         }
 
-        creep.moveTo(moveTarget!, moveOpts);
+        creep.voyageTo(moveTarget!, { range });
     }
 
     /**

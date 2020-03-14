@@ -111,7 +111,7 @@ export class CreepManager {
         }
 
         if (!creep.memory.working) {
-            CreepAllApi.travelTo(creep, creep.memory.job);
+            CreepAllApi.voyageToJob(creep, creep.memory.job);
         }
 
         if (creep.memory.working) {

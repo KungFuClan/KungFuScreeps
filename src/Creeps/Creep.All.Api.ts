@@ -35,16 +35,8 @@ export class CreepAllApi {
     /**
      * Call the proper travelTo function based on job.jobType
      */
-    public static travelTo(creep: Creep, job: BaseJob) {
-        // Update MovementData for empire if creep changed rooms
-        if (PathfindingApi.CreepChangedRooms(creep)) {
-            // Voyager.updateRoomData(creep.room);
-        }
-
-        // Perform Stuck Detection - Delete old path if stuck
-        if (this.isCreepStuck(creep)) {
-            delete creep.memory._move;
-        }
+    public static voyageToJob(creep: Creep, job: BaseJob) {
+    
 
         for (const index in JobTypes) {
             if (JobTypes[index].jobType === job.jobType) {
@@ -194,7 +186,7 @@ export class CreepAllApi {
 
         // If we are not in homeRoom, but our job is to move to homeRoom, then do so
         if (creep.memory.job && creep.memory.job.targetID === homeRoom.name) {
-            this.travelTo(creep, creep.memory.job);
+            this.voyageToJob(creep, creep.memory.job);
             return;
         }
 

@@ -72,22 +72,22 @@ export class WorkPartJobs implements IJobTypeHelper {
         CreepAllApi.nullCheck_target(creep, moveTarget);
 
         // Move options for target
-        const moveOpts = PathfindingApi.GetDefaultMoveOpts(creep);
+        let range = 0;
 
         if (job.actionType === "build" && moveTarget instanceof ConstructionSite) {
-            moveOpts.range = 3;
+            range = 3;
         } else if (job.actionType === "repair" && moveTarget instanceof Structure) {
-            moveOpts.range = 3;
+            range = 3;
         } else if (job.actionType === "upgrade" && moveTarget instanceof StructureController) {
-            moveOpts.range = 3;
+            range = 3;
         }
 
-        if (creep.pos.getRangeTo(moveTarget!) <= moveOpts.range!) {
+        if (creep.pos.getRangeTo(moveTarget!) <= range) {
             creep.memory.working = true;
             return;
         }
 
-        creep.moveTo(moveTarget!, moveOpts);
+        creep.voyageTo(moveTarget!, { range});
         return;
     }
 

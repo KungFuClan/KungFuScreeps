@@ -83,16 +83,12 @@ export class ClaimPartJobs implements IJobTypeHelper {
         // Will return a roomPosition in this case, or controller if we have that targeted instead
         const moveTarget = CreepAllHelper.getMoveTarget(creep, job);
 
-        CreepAllApi.nullCheck_target(creep, moveTarget);
-
-        // Move options for target
-        const moveOpts = PathfindingApi.GetDefaultMoveOpts(creep);
-
+        let range = 0;
         // All actiontypes that affect controller have range of 1
         if (moveTarget instanceof StructureController) {
-            moveOpts.range = 1;
+            range = 1;
         } else if (moveTarget instanceof RoomPosition) {
-            moveOpts.range = 0;
+            range = 0;
         }
 
         // If target is roomPosition then we know we want the controller
@@ -119,12 +115,13 @@ export class ClaimPartJobs implements IJobTypeHelper {
             }
         }
 
-        if (creep.pos.getRangeTo(moveTarget!) <= moveOpts.range!) {
+        if (creep.pos.getRangeTo(moveTarget!) <= range) {
             creep.memory.working = true;
             return;
         }
 
-        creep.moveTo(moveTarget!, moveOpts);
+
+        creep.voyageTo(moveTarget, { range });
         return;
     }
 

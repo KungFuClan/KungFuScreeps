@@ -42,7 +42,7 @@ export class RemoteMinerCreepManager implements ICivCreepRoleManager {
                 return;
             }
 
-            CreepAllApi.travelTo(creep, creep.memory.job);
+            CreepAllApi.voyageToJob(creep, creep.memory.job);
         }
     }
 

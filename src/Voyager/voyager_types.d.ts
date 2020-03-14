@@ -1,7 +1,7 @@
 interface VoyageToOptions {
     // Creeps will not prefer roads over plains (but will still prefer them over swamps)
     // Default: false
-    // ignoreRoads?: boolean;
+    ignoreRoads?: boolean;
     // Creeps will not path around other creeps
     // Default: true
     // ignoreCreeps?: boolean;
