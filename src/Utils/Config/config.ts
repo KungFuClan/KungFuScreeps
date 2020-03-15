@@ -156,7 +156,7 @@ export const MILITARY_MANAGER_BUCKET_LIMIT = 2000;
 /**
  * List of allies
  */
-export const ALLY_LIST: string[] = ["jakesboy2", "UhmBrock", "Atanner", "Faff", "Yoner"];
+export const ALLY_LIST: string[] = ["jakesboy2", "UhmBrock", "Atanner", "Faff", "Yoner", "KittyTack"];
 
 /**
  * List of structures a tower in a bunker is allowed to repair

@@ -96,7 +96,7 @@ export class CarryPartJobs implements IJobTypeHelper {
         const lowSpawnsAndExtensions = RoomApi_Structure.getLowSpawnAndExtensions(room);
         const lowTowers = RoomApi_Structure.getTowersNeedFilled(room);
         let upgraderLink: StructureLink | null = null;
-        if(room.controller?.owner && room.controller?.my) {
+        if (room.controller?.owner && room.controller?.my) {
             upgraderLink = MemoryApi_Room.getUpgraderLink(room) as StructureLink;
         }
         if (lowSpawnsAndExtensions.length === 0 && lowTowers.length === 0 && upgraderLink === null) {
