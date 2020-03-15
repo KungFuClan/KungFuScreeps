@@ -14,6 +14,7 @@ import {
     STUCK_VISUAL_COLORS,
     RoomHelper_Structure,
 } from "Utils/Imports/internals";
+import { join } from "path";
 
 const textColor = "#bab8ba";
 const textSize = 0.8;
@@ -307,35 +308,33 @@ export class RoomVisualHelper {
     }
 
     /**
-     * Visualize the creep stuck counter
-     * @param creep Creep The creep to visualize
+     * Displays the values of a cost matrix on the room the matrix is for
+     * @param costMatrix Any cost matrix to be visualized
+     * @param highlightLowValue The lower normal limit - Items below this will be highlighted yellow
+     * @param highlightHighValue The upper normal limit - Items above this will be highlighted red
      */
-    public static visualizeStuckCreep(creep: Creep): void {
-        if (creep.memory._move === undefined || creep.memory._move.stuckCount === undefined) {
-            return; // Do nothing if no stuck count
+    public static visualizeCostMatrix(
+        costMatrix: CostMatrix,
+        roomName: string,
+    ) {
+        const roomVisual = new RoomVisual(roomName);
+
+        for (let x = 0; x < 50; x++) {
+            for (let y = 0; y < 50; y++) {
+                const visualStyle: TextStyle = {
+                    color: "#ffffff",
+                    font: 0.5,
+                    backgroundPadding: 0.09,
+                    opacity: 0.25,
+                    backgroundColor: undefined
+                };
+
+                const value: number = costMatrix.get(x, y);
+                const transparency = Math.ceil((1 - (value / 255)) * 100).toString(16);
+                roomVisual.rect(x-.5, y-.5, 1, 1, { fill: "#00FF00" + transparency, lineStyle: "solid"});
+
+                roomVisual.text(value.toString(), x, y, visualStyle);
+            }
         }
-
-        const percentStuck = creep.memory._move.stuckCount / STUCK_COUNT_LIMIT;
-
-        let circleColor;
-
-        if (percentStuck >= 1) {
-            // Creep is stuck
-            circleColor = STUCK_VISUAL_COLORS[0];
-        } else if (percentStuck >= 0.75) {
-            // Almost stuck
-            circleColor = STUCK_VISUAL_COLORS[1];
-        } else if (percentStuck >= 0.5) {
-            // Halfway to stuck
-            circleColor = STUCK_VISUAL_COLORS[2];
-        } else if (percentStuck >= 0.25) {
-            // Starting to get stuck
-            circleColor = STUCK_VISUAL_COLORS[3];
-        } else {
-            // Not very stuck - don't draw
-            return;
-        }
-
-        creep.room.visual.circle(creep.pos, { radius: 0.55, fill: circleColor, opacity: 0.1 });
     }
 }

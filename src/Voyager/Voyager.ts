@@ -11,7 +11,8 @@ import {
     ROOM_STATUS_ALLY_REMOTE,
     RoomManager,
     ROOM_STATUS_UNKNOWN,
-    ACTION_MOVE
+    ACTION_MOVE,
+    RoomVisualHelper
 } from "Utils/Imports/internals";
 
 export class Voyager {
@@ -76,15 +77,16 @@ export class Voyager {
         }
 
         const voyageData: VoyagerData = creep.memory._voyage;
-        const voyageState: VoyageState = voyageData.state;
+        const voyageState: VoyagerState = voyageData.state;
 
         if (options.enableVisuals !== false) {
-            Voyager.circle(destination, "orange");
+            // Voyager.circle(destination, "orange");
         }
 
         // check if creep is stuck
         if (this.isStuck(creep, voyageState)) {
-            voyageState.stuckCount = voyageState.stuckCount ? voyageState.stuckCount++ : 1;
+            voyageState.stuckCount = voyageState.stuckCount === undefined ? 0 : voyageState.stuckCount;
+            voyageState.stuckCount++;
             Voyager.circle(creep.pos, "magenta", voyageState.stuckCount * 0.2);
         } else {
             voyageState.stuckCount = 0;
@@ -153,6 +155,9 @@ export class Voyager {
             voyageState.stuckCount = 0;
         }
 
+        // set lastCoords
+        voyageState.lastCoord = {x: creep.pos.x, y: creep.pos.y};
+
         if (!voyageData.path || voyageData.path.length === 0) {
             return ERR_NO_PATH;
         }
@@ -191,6 +196,8 @@ export class Voyager {
     ): PathfinderReturn {
         _.defaults(options, {
             ignoreRoads: false,
+            ignoreStructures: false,
+            ignoreCreeps: true,
             maxOps: DEFAULT_MAXOPS,
             allowedRoomStatuses: [ROOM_STATUS_ALLY, ROOM_STATUS_ALLY_REMOTE, ROOM_STATUS_HIGHWAY, ROOM_STATUS_INVADER_REMOTE, ROOM_STATUS_NEUTRAL, ROOM_STATUS_UNKNOWN],
             range: 1
@@ -539,7 +546,7 @@ export class Voyager {
     /**
      * Check if the creep has moved since last tick
      */
-    private static isStuck(creep: Creep, state: VoyageState): boolean {
+    private static isStuck(creep: Creep, state: VoyagerState): boolean {
         let stuck = false;
         if (state.lastCoord !== undefined) {
             if (this.isSameCoord(creep.pos, state.lastCoord)) {
@@ -575,6 +582,7 @@ export class Voyager {
         return pos.x === 0 || pos.x === 49 || pos.y === 0 || pos.y === 49;
     }
 
+
 /***** Cost Matrices ********/
 
     /**
@@ -600,7 +608,7 @@ export class Voyager {
     public static getCreepAndStructureMatrix(room: Room) {
         if (!this.creepAndStructureMatrixCache[room.name] || Game.time !== this.creepAndStructureMatrixTick) {
             this.creepAndStructureMatrixTick = Game.time;
-            this.creepAndStructureMatrixCache[room.name] = Voyager.addWorkingOrUnownedCreepsToMatrix(room,
+            this.creepAndStructureMatrixCache[room.name] = Voyager.addAllCreepsToMatrix(room,
                 this.getStructureMatrix(room, true).clone());
         }
         return this.creepAndStructureMatrixCache[room.name];
@@ -656,11 +664,13 @@ export class Voyager {
         _.forEach(creeps, (creep: Creep) => {
             if(!creep.my) {
                 matrix.set(creep.pos.x, creep.pos.y, 0xff);
+                return;
             }
 
             // TODO Might add && creep.memory._voyage !== undefined to check if they are moving
             if(creep.memory.working && creep.memory.working === true){
                 matrix.set(creep.pos.x, creep.pos.y, 0xff);
+                return;
             }
         });
 

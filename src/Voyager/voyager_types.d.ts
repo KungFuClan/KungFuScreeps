@@ -88,16 +88,16 @@ interface PathfinderReturn {
 interface VoyageToReturnData {
     nextPos?: RoomPosition;
     pathfinderReturn?: PathfinderReturn;
-    state?: VoyageState;
+    state?: VoyagerState;
     path?: string;
 }
 
 interface VoyagerData {
-    state: VoyageState;
+    state: VoyagerState;
     path: string;
 }
 
-interface VoyageState {
+interface VoyagerState {
     stuckCount?: number;
     lastCoord?: Coord;
     destination: RoomPosition;

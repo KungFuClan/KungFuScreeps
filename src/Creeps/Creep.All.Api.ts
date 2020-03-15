@@ -54,46 +54,6 @@ export class CreepAllApi {
     }
 
     /**
-     * Prepare stuck detection each tick, return true if stuck, false if not.
-     * @param creep
-     */
-    public static isCreepStuck(creep: Creep): boolean {
-        if (!creep.memory._move) {
-            return false; // Creep has not found a path yet
-        }
-
-        const currPosition: string = creep.pos.x.toString() + creep.pos.y.toString() + creep.room.name;
-
-        if (!creep.memory._move.lastPosition) {
-            creep.memory._move.lastPosition = currPosition;
-            creep.memory._move.stuckCount = 0;
-            return false; // Creep is moving for the first time
-        }
-
-        if (creep.memory._move.lastPosition !== currPosition) {
-            creep.memory._move.lastPosition = currPosition;
-            creep.memory._move.stuckCount = 0;
-            return false; // Creep has moved since last tick
-        } else {
-            // Creep hasn't moved since last tick
-            if (creep.fatigue === 0) {
-                creep.memory._move.stuckCount++;
-            }
-
-            // Visualize if wanted
-            if (USE_STUCK_VISUAL) {
-                RoomVisualHelper.visualizeStuckCreep(creep);
-            }
-
-            if (creep.memory._move.stuckCount > STUCK_COUNT_LIMIT) {
-                return true; // Creep is stuck
-            } else {
-                return false; // Creep is not stuck yet
-            }
-        }
-    }
-
-    /**
      * Checks if the target is null and throws the appropriate error
      */
     public static nullCheck_target(creep: Creep, target: object | null) {
