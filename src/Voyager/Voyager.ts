@@ -16,13 +16,11 @@ import {
 } from "Utils/Imports/internals";
 
 export class Voyager {
-
-    private static structureMatrixCache: {[roomName: string]: CostMatrix } = {};
-    private static creepAndStructureMatrixCache: {[roomName: string]: CostMatrix } = {};
+    private static structureMatrixCache: { [roomName: string]: CostMatrix } = {};
+    private static creepAndStructureMatrixCache: { [roomName: string]: CostMatrix } = {};
 
     private static structureMatrixTick: number;
     private static creepAndStructureMatrixTick: number;
-
 
     public static voyageTo(
         creep: Creep,
@@ -38,7 +36,7 @@ export class Voyager {
             return ERR_TIRED;
         }
 
-        if(!destination) {
+        if (!destination) {
             return ERR_INVALID_TARGET;
         }
 
@@ -156,7 +154,7 @@ export class Voyager {
         }
 
         // set lastCoords
-        voyageState.lastCoord = {x: creep.pos.x, y: creep.pos.y};
+        voyageState.lastCoord = { x: creep.pos.x, y: creep.pos.y };
 
         if (!voyageData.path || voyageData.path.length === 0) {
             return ERR_NO_PATH;
@@ -199,7 +197,14 @@ export class Voyager {
             ignoreStructures: false,
             ignoreCreeps: true,
             maxOps: DEFAULT_MAXOPS,
-            allowedRoomStatuses: [ROOM_STATUS_ALLY, ROOM_STATUS_ALLY_REMOTE, ROOM_STATUS_HIGHWAY, ROOM_STATUS_INVADER_REMOTE, ROOM_STATUS_NEUTRAL, ROOM_STATUS_UNKNOWN],
+            allowedRoomStatuses: [
+                ROOM_STATUS_ALLY,
+                ROOM_STATUS_ALLY_REMOTE,
+                ROOM_STATUS_HIGHWAY,
+                ROOM_STATUS_INVADER_REMOTE,
+                ROOM_STATUS_NEUTRAL,
+                ROOM_STATUS_UNKNOWN
+            ],
             range: 1
         });
 
@@ -224,8 +229,7 @@ export class Voyager {
         let roomsSearched = 0;
 
         const callback = (roomName: string): CostMatrix | boolean => {
-
-            // TODO Why isn't normalizePos doing this already? 
+            // TODO Why isn't normalizePos doing this already?
             destination = destination as RoomPosition;
             origin = origin as RoomPosition;
 
@@ -235,7 +239,7 @@ export class Voyager {
                 }
             } else if (
                 Voyager.checkAvoid(roomName, options.allowedRoomStatuses!) &&
-                roomName !== destination.roomName  &&
+                roomName !== destination.roomName &&
                 roomName !== origin.roomName
             ) {
                 return false;
@@ -252,6 +256,7 @@ export class Voyager {
                     }
                 } else if (options.ignoreCreeps || roomName !== origin.roomName) {
                     matrix = Voyager.getStructureMatrix(room, options.freshMatrix);
+                    Voyager.addStoppedCreepsToMatrix(room, matrix);
                 } else {
                     matrix = Voyager.getCreepAndStructureMatrix(room);
                 }
@@ -259,7 +264,9 @@ export class Voyager {
                 if (options.obstacles) {
                     matrix = matrix.clone();
                     for (const obstacle of options.obstacles) {
-                        if (obstacle.pos.roomName !== roomName) { continue; }
+                        if (obstacle.pos.roomName !== roomName) {
+                            continue;
+                        }
                         matrix.set(obstacle.pos.x, obstacle.pos.y, 0xff);
                     }
                 }
@@ -348,7 +355,8 @@ export class Voyager {
                     return Number.POSITIVE_INFINITY;
                 }
 
-                if (Voyager.checkAvoid(roomName, options.allowedRoomStatuses!) &&
+                if (
+                    Voyager.checkAvoid(roomName, options.allowedRoomStatuses!) &&
                     roomName !== destination &&
                     roomName !== origin
                 ) {
@@ -458,17 +466,16 @@ export class Voyager {
      * @param roomName The room name to check the status of
      */
     private static getRoomStatusFromMemory(roomName: string): RoomStatusType {
-        
-        if(Memory.empire.movementData === undefined) {
+        if (Memory.empire.movementData === undefined) {
             Memory.empire.movementData = {};
         }
 
-        if(Memory.empire.movementData[roomName] === undefined) {
+        if (Memory.empire.movementData[roomName] === undefined) {
             return ROOM_STATUS_UNKNOWN;
         }
 
         // Dispose of stale movement data
-        if(Memory.empire.movementData[roomName].lastSeen < Game.time - MAX_RETAINED_ROOM_STATUS) {
+        if (Memory.empire.movementData[roomName].lastSeen < Game.time - MAX_RETAINED_ROOM_STATUS) {
             delete Memory.empire.movementData[roomName].lastSeen;
             return ROOM_STATUS_UNKNOWN;
         }
@@ -582,8 +589,7 @@ export class Voyager {
         return pos.x === 0 || pos.x === 49 || pos.y === 0 || pos.y === 49;
     }
 
-
-/***** Cost Matrices ********/
+    /***** Cost Matrices ********/
 
     /**
      * build a cost matrix based on structures in the room. Will be cached for more than one tick. Requires vision.
@@ -608,8 +614,10 @@ export class Voyager {
     public static getCreepAndStructureMatrix(room: Room) {
         if (!this.creepAndStructureMatrixCache[room.name] || Game.time !== this.creepAndStructureMatrixTick) {
             this.creepAndStructureMatrixTick = Game.time;
-            this.creepAndStructureMatrixCache[room.name] = Voyager.addAllCreepsToMatrix(room,
-                this.getStructureMatrix(room, true).clone());
+            this.creepAndStructureMatrixCache[room.name] = Voyager.addAllCreepsToMatrix(
+                room,
+                this.getStructureMatrix(room, true).clone()
+            );
         }
         return this.creepAndStructureMatrixCache[room.name];
     }
@@ -623,7 +631,6 @@ export class Voyager {
      */
 
     public static addStructuresToMatrix(room: Room, matrix: CostMatrix, roadCost: number): CostMatrix {
-
         const impassibleStructures: Structure[] = [];
         for (const structure of room.find<Structure>(FIND_STRUCTURES)) {
             if (structure instanceof StructureRampart) {
@@ -640,8 +647,13 @@ export class Voyager {
         }
 
         for (const site of room.find(FIND_MY_CONSTRUCTION_SITES)) {
-            if (site.structureType === STRUCTURE_CONTAINER || site.structureType === STRUCTURE_ROAD
-                || site.structureType === STRUCTURE_RAMPART) { continue; }
+            if (
+                site.structureType === STRUCTURE_CONTAINER ||
+                site.structureType === STRUCTURE_ROAD ||
+                site.structureType === STRUCTURE_RAMPART
+            ) {
+                continue;
+            }
             matrix.set(site.pos.x, site.pos.y, 0xff);
         }
 
@@ -658,17 +670,11 @@ export class Voyager {
      * @param matrix
      * @returns {CostMatrix}
      */
-    public static addWorkingOrUnownedCreepsToMatrix(room: Room, matrix: CostMatrix): CostMatrix {
+    public static addUnownedCreepsToMatrix(room: Room, matrix: CostMatrix): CostMatrix {
         const creeps = room.find(FIND_CREEPS);
 
         _.forEach(creeps, (creep: Creep) => {
-            if(!creep.my) {
-                matrix.set(creep.pos.x, creep.pos.y, 0xff);
-                return;
-            }
-
-            // TODO Might add && creep.memory._voyage !== undefined to check if they are moving
-            if(creep.memory.working && creep.memory.working === true){
+            if (!creep.my) {
                 matrix.set(creep.pos.x, creep.pos.y, 0xff);
                 return;
             }
@@ -683,12 +689,40 @@ export class Voyager {
      * @param matrix
      * @returns {CostMatrix}
      */
+    public static addStoppedCreepsToMatrix(room: Room, matrix: CostMatrix): CostMatrix {
+        const creeps = room.find(FIND_CREEPS);
 
-    public static addAllCreepsToMatrix(room: Room, matrix: CostMatrix): CostMatrix {
-        room.find(FIND_CREEPS).forEach((creep: Creep) => matrix.set(creep.pos.x, creep.pos.y, 0xff) );
+        _.forEach(creeps, (creep: Creep) => {
+            if (creep.my && creep.memory) {
+                if (
+                    creep.memory._voyage === undefined ||
+                    (creep.memory._voyage.path && creep.memory._voyage.path.length === 0)
+                ) {
+                    matrix.set(creep.pos.x, creep.pos.y, 0xff);
+                    return;
+                }
+
+                if (creep.memory.working === true) {
+                    matrix.set(creep.pos.x, creep.pos.y, 0xff);
+                    return;
+                }
+            }
+        });
+
         return matrix;
     }
 
+    /**
+     * add creeps to matrix so that they will be avoided by other creeps
+     * @param room
+     * @param matrix
+     * @returns {CostMatrix}
+     */
+
+    public static addAllCreepsToMatrix(room: Room, matrix: CostMatrix): CostMatrix {
+        room.find(FIND_CREEPS).forEach((creep: Creep) => matrix.set(creep.pos.x, creep.pos.y, 0xff));
+        return matrix;
+    }
 }
 
 /******* Constants Used in Voyager  *******/
