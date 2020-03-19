@@ -26,6 +26,10 @@ interface VoyageToOptions {
     // Whether to force a costMatrix refresh
     // Default: false
     freshMatrix?: boolean;
+    // If true, overrides the default cost matrix -- NOTE: This has the effect of overriding the ignoreCreeps, ignoreStructures and obstacles options.
+    // ignoreRoads will still apply, as well as allowedRooms and allowedRoomStatuses
+    // Default: fasle
+    overrideDefaultMatrix?: boolean;
     // Callback function that accepts two arguments, roomName and costmatrix, returning a CostMatrix or a boolean.
     // If it returns false, the room will be excluded. If it returns a costMatrix, it will be used instead of the default.
     // Default: PathFinder's default CostMatrix

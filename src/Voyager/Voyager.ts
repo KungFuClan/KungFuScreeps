@@ -249,7 +249,7 @@ export class Voyager {
 
             let matrix = new PathFinder.CostMatrix();
             const room = Game.rooms[roomName];
-            if (room) {
+            if (room && !options.overrideDefaultMatrix) {
                 if (options.ignoreStructures) {
                     if (!options.ignoreCreeps) {
                         Voyager.addAllCreepsToMatrix(room, matrix);
