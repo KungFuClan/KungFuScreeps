@@ -10,13 +10,13 @@
 // Define prototypes
 import { ErrorMapper, ManagerManager } from "Utils/Imports/internals";
 import { Mem } from "Utils/MemHack";
-
-import * as Profiler from "./Profiler"
 import { Voyager } from "Voyager/Voyager";
-global.Profiler = Profiler.init();
+
+// import * as Profiler from "./Profiler"
+// global.Profiler = Profiler.init();
 const voy = Voyager;
 
 export const loop = ErrorMapper.wrapLoop(() => {
-    Mem.loadCachedMemory();
-    ManagerManager.runManagerManager();
+  Mem.loadCachedMemory();
+  ManagerManager.runManagerManager();
 });
