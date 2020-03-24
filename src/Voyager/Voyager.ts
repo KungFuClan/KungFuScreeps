@@ -694,14 +694,6 @@ export class Voyager {
 
         _.forEach(creeps, (creep: Creep) => {
             if (creep.my && creep.memory) {
-                if (
-                    creep.memory._voyage === undefined ||
-                    (creep.memory._voyage.path && creep.memory._voyage.path.length === 0)
-                ) {
-                    matrix.set(creep.pos.x, creep.pos.y, 0xff);
-                    return;
-                }
-
                 if (creep.memory.working === true) {
                     matrix.set(creep.pos.x, creep.pos.y, 0xff);
                     return;
