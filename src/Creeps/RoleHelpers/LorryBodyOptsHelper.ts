@@ -53,15 +53,12 @@ export class LorryBodyOptsHelper implements ICreepBodyOptsHelper {
                 body = { carry: 8, move: 8 };
                 break;
 
-            case TIER_5:
-            case TIER_4: // 10 Carry, 10 Move - Total Cost: 1000
-                body = { carry: 10, move: 10 };
-                break;
-
             case TIER_8:
             case TIER_7:
-            case TIER_6: // 20 Carry, 20 Move - Total Cost: 2000
-                body = { carry: 20, move: 20 };
+            case TIER_6:
+            case TIER_5:
+            case TIER_4:
+                body = { carry: 10, move: 10 };
                 break;
         }
 
