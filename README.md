@@ -1,4 +1,4 @@
- # Kung Fu Klan
+ # Kung Fu Clan
 <p align="center">
   <img src="https://i.imgur.com/iyBoxOo.png" alt="KungFuKlanLogo"/>
 </p>
