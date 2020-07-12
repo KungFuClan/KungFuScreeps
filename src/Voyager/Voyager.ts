@@ -14,6 +14,7 @@ import {
     ACTION_MOVE,
     RoomVisualHelper
 } from "Utils/Imports/internals";
+import * as _ from 'lodash';
 
 export class Voyager {
     private static structureMatrixCache: { [roomName: string]: CostMatrix } = {};
@@ -727,6 +728,6 @@ const DEFAULT_STUCK_VALUE = 2;
 // The maximum number of ticks to consider a room status in movementData valid
 const MAX_RETAINED_ROOM_STATUS = 10000;
 
-Creep.prototype.voyageTo = function(destination: RoomPosition | _HasRoomPosition, options?: VoyageToOptions) {
+Creep.prototype.voyageTo = function (destination: RoomPosition | _HasRoomPosition, options?: VoyageToOptions) {
     return Voyager.voyageTo(this, destination, options);
 };

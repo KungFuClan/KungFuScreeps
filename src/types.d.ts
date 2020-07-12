@@ -1,3 +1,5 @@
+import { LoDashStatic } from "lodash";
+
 // constants -----
 
 // Error Constants
@@ -395,7 +397,7 @@ interface RoomCostMatrices {
     towerDamageMatrix?: StoredCostMatrix;
     // All non-walkable structures blocked
     structureMatrix?: StoredCostMatrix;
-    // All normal terrain costs 
+    // All normal terrain costs
     terrainMatrix?: StoredCostMatrix;
     // All terrain costs, scaled for use with roads
     roadTerrainMatrix?: StoredCostMatrix;
