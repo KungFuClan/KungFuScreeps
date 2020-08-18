@@ -26,6 +26,10 @@ export class ManagerManager {
             ConsoleCommands.init();
         }
 
+        if (Game.cpu.bucket >= 9000) {
+            Game.cpu.generatePixel();
+        }
+
         // clean up memory
         if (!Game.cpu["bucket"] || Game.cpu["bucket"] > MEMORY_MANAGER_BUCKET_LIMIT) {
             try {
