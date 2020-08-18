@@ -26,6 +26,7 @@ import {
 import { join } from "path";
 import { MilitaryIntents_Api } from "Military/Military.Api.Intents";
 import { MilitaryStatus_Helper } from "Military/Military.Status.Helper";
+import _ from "lodash";
 
 export class DomesticDefenderSquadManager implements ISquadManager {
     public name: SquadManagerConstant = DOMESTIC_DEFENDER_MAN;

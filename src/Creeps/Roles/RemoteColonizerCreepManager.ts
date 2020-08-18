@@ -1,5 +1,6 @@
 import { ROLE_COLONIZER, MemoryApi_Jobs, MemoryApi_Room } from "Utils/Imports/internals";
 import { CreepCivApi } from "Creeps/Creep.Civ.Api";
+import _ from "lodash";
 
 // Manager for the miner creep role
 export class RemoteColonizerCreepManager implements ICivCreepRoleManager {

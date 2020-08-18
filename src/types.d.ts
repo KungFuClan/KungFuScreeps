@@ -534,20 +534,6 @@ interface StringMap {
 }
 // ----------------------------------------
 
-// custom memory objects ------------
-
-/**
- * add memory to the structure for the compiler
- */
-interface Structure {
-    memory: StructureMemory;
-}
-
-// Define the structure memory
-interface StructureMemory {
-    processed: boolean;
-}
-
 // main memory modules --------------
 interface CreepMemory {
     /**
@@ -1496,6 +1482,3 @@ interface ETAMemory {
 type AllCreepCount = {
     [key in RoleConstant]: number;
 };
-
-type StoreStructure = StructureStorage | StructureContainer | StructureExtension | StructureFactory | StructureLab
-    | StructureLink | StructureNuker | StructurePowerSpawn | StructureSpawn | StructureTerminal | StructureTower;

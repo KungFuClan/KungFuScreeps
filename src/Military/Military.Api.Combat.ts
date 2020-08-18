@@ -11,6 +11,7 @@ import {
     militaryDataHelper
 } from "Utils/Imports/internals";
 import { stringify } from "querystring";
+import _ from "lodash";
 
 export class MilitaryCombat_Api {
     /**
@@ -84,8 +85,8 @@ export class MilitaryCombat_Api {
                     throw new UserException(
                         "Unhandle Action Type in runIntents()",
                         "Attempted to handle action of type: " +
-                            intent.action +
-                            ", but no implementation has been defined.",
+                        intent.action +
+                        ", but no implementation has been defined.",
                         ERROR_ERROR
                     );
             }
@@ -101,10 +102,10 @@ export class MilitaryCombat_Api {
      */
     public static runIntent_MOVE(intent: Move_MiliIntent, creep: Creep, roomData: StringMap): void {
 
-        if(creep.fatigue > 0) {
+        if (creep.fatigue > 0) {
             return;
         }
-        
+
         if (intent.targetType === "direction") {
             const target = this.validateTarget<number>(intent.target, intent, "runIntent_MOVE");
             creep.move(intent.target);
@@ -121,7 +122,7 @@ export class MilitaryCombat_Api {
      */
     public static runIntent_HEAL(intent: Heal_MiliIntent, creep: Creep, roomData: StringMap): void {
         if (intent.targetType === "creepName") {
-            const targetCreep  = this.validateTarget<Creep | PowerCreep>(Game.creeps[intent.target], intent, "runIntent_HEAL");
+            const targetCreep = this.validateTarget<Creep | PowerCreep>(Game.creeps[intent.target], intent, "runIntent_HEAL");
             creep.heal(targetCreep);
             return;
         }
@@ -131,7 +132,7 @@ export class MilitaryCombat_Api {
             creep.heal(targetCreep);
             return;
         }
-        
+
         throw new UserException("Unhandled type in runIntent_HEAL", "Passed unhandled type of " + intent.targetType, ERROR_ERROR);
     }
 
@@ -142,7 +143,7 @@ export class MilitaryCombat_Api {
      */
     public static runIntent_RANGED_HEAL(intent: RangedHeal_MiliIntent, creep: Creep, roomData: StringMap): void {
 
-        if(intent.targetType === "creepName") {
+        if (intent.targetType === "creepName") {
             const targetCreep = this.validateTarget<Creep | PowerCreep>(Game.creeps[intent.target], intent, "runIntent_RANGED_HEAL");
             creep.rangedHeal(targetCreep);
             return;
@@ -164,7 +165,7 @@ export class MilitaryCombat_Api {
      */
     public static runIntent_ATTACK(intent: Attack_MiliIntent, creep: Creep, roomData: StringMap): void {
 
-        if(intent.targetType === "creepName") {
+        if (intent.targetType === "creepName") {
             const targetCreep = this.validateTarget<Creep | PowerCreep>(Game.creeps[intent.target], intent, "runIntent_ATTACK");
             creep.attack(targetCreep);
             return;
@@ -176,7 +177,7 @@ export class MilitaryCombat_Api {
             return;
         }
 
-        if(intent.targetType === "structure") {
+        if (intent.targetType === "structure") {
             const targetStructure = this.validateTarget<Structure>(Game.getObjectById(intent.target), intent, "runIntent_ATTACK");
             creep.attack(targetStructure);
             return;
@@ -191,7 +192,7 @@ export class MilitaryCombat_Api {
      * @param creep The creep to process the intent for
      */
     public static runIntent_RANGED_ATTACK(intent: RangedAttack_MiliIntent, creep: Creep, roomData: StringMap): void {
-        if(intent.targetType === "creepName") {
+        if (intent.targetType === "creepName") {
             const targetCreep = this.validateTarget<Creep | PowerCreep>(Game.creeps[intent.target], intent, "runIntent_RANGED_ATTACK");
             creep.rangedAttack(targetCreep);
             return;
@@ -203,13 +204,14 @@ export class MilitaryCombat_Api {
             return;
         }
 
-        if(intent.targetType === "structure") {
+        if (intent.targetType === "structure") {
             const targetStructure = this.validateTarget<Structure>(Game.getObjectById(intent.target), intent, "runIntent_RANGED_ATTACK");
             creep.rangedAttack(targetStructure);
             return;
         }
 
-        throw new UserException("Unhandled type in runIntent_RANGED_ATTACK", "Passed unhandled type of " + intent.targetType, ERROR_ERROR);    }
+        throw new UserException("Unhandled type in runIntent_RANGED_ATTACK", "Passed unhandled type of " + intent.targetType, ERROR_ERROR);
+    }
 
     /**
      * Handles the intents of type ACTION_MASS_RANGED
@@ -217,7 +219,7 @@ export class MilitaryCombat_Api {
      * @param creep The creep to process the intent for
      */
     public static runIntent_MASS_RANGED(intent: MassRanged_MiliIntent, creep: Creep, roomData: StringMap): void {
-        
+
         // No target necessary for mass ranged
         creep.rangedMassAttack();
 

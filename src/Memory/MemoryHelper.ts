@@ -1,4 +1,5 @@
 import { MemoryApi_Creep, MemoryApi_Empire } from "Utils/Imports/internals";
+import _ from "lodash";
 
 // Accessing Memory Helpers
 export class MemoryHelper {

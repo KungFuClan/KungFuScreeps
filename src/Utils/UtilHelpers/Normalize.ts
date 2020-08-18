@@ -6,7 +6,6 @@ export class Normalize {
      */
     public static getMockRoomObject(roomName: string) {
         const mockRoom: Room = new Room(roomName);
-        mockRoom.name = roomName;
         mockRoom.visual.roomName = roomName;
         mockRoom.memory = Memory.rooms[roomName];
         mockRoom.energyAvailable = -1; // Unknown Value

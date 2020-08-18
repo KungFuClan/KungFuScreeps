@@ -1,4 +1,5 @@
 import { SQUAD_MANAGERS, UserException } from "Utils/Imports/internals";
+import _ from "lodash";
 
 export class MemoryApi_Military {
     /**

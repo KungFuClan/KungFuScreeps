@@ -16,6 +16,7 @@ import {
     MemoryApi_Room,
 } from "Utils/Imports/internals";
 import { profile } from "Profiler";
+import _ from "lodash";
 
 // room-wide manager
 @profile

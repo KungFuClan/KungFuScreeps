@@ -7,6 +7,7 @@ import {
     MemoryApi_Creep,
     RoomApi_Structure
 } from "Utils/Imports/internals";
+import _ from "lodash";
 
 export class CarryPartJobs implements IJobTypeHelper {
     public jobType: Valid_JobTypes = "carryPartJob";

@@ -1,4 +1,5 @@
 import { CreepAllApi, CreepAllHelper, PathfindingApi, RoomApi_Structure, MemoryApi_Creep, MemoryApi_Room } from "Utils/Imports/internals";
+import _ from "lodash";
 
 export class WorkPartJobs implements IJobTypeHelper {
     public jobType: Valid_JobTypes = "workPartJob";

@@ -1,5 +1,6 @@
 import { CreepAllHelper, CreepAllApi, PathfindingApi, RESERVER_MIN_TTL, UserException, RoomHelper_State, MemoryApi_Room, ALLY_LIST } from "Utils/Imports/internals";
 import { CreepCivHelper } from "Creeps/Creep.Civ.Helper";
+import _ from "lodash";
 
 export class ClaimPartJobs implements IJobTypeHelper {
     public jobType: Valid_JobTypes = "claimPartJob";

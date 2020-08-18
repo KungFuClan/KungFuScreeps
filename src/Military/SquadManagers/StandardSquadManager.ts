@@ -21,6 +21,7 @@ import {
 import { MilitaryStatus_Helper } from "Military/Military.Status.Helper";
 import { MilitaryIntents_Api } from "Military/Military.Api.Intents";
 import { MilitaryMovement_Helper } from "Military/Military.Movement.Helper";
+import _ from "lodash";
 
 export class StandardSquadManager implements ISquadManager {
     public name: SquadManagerConstant = STANDARD_MAN;

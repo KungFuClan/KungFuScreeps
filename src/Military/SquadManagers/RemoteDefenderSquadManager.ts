@@ -21,6 +21,7 @@ import {
 } from "Utils/Imports/internals";
 import { MilitaryStatus_Helper } from "Military/Military.Status.Helper";
 import { MilitaryIntents_Api } from "Military/Military.Api.Intents";
+import _ from "lodash";
 
 export class RemoteDefenderSquadManager implements ISquadManager {
     public name: SquadManagerConstant = REMOTE_DEFENDER_MAN;

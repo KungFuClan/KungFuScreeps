@@ -1,4 +1,5 @@
 import { NO_CACHING_MEMORY, FCREEP_CACHE_TTL, MemoryHelper_Room, MemoryHelper, HCREEP_CACHE_TTL } from "Utils/Imports/internals";
+import _ from "lodash";
 
 export class MemoryApi_Creep {
     /**

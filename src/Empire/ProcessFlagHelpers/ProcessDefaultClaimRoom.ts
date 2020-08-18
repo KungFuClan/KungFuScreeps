@@ -1,4 +1,5 @@
 import { EmpireHelper, UserException, MemoryApi_Room, MemoryApi_Empire } from "Utils/Imports/internals";
+import _ from "lodash";
 
 export class ProcessDefaultClaimRoom implements IFlagProcesser {
     public primaryColor: ColorConstant = COLOR_WHITE;

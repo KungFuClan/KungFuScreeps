@@ -8,6 +8,7 @@ import {
     RoomApi_State,
     ALLY_LIST,
 } from "Utils/Imports/internals";
+import _ from "lodash";
 
 /**
  * Contains all functions for initializing and updating room memory

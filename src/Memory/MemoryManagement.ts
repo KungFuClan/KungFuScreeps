@@ -1,6 +1,7 @@
 // @ts-ignore
 import { MemoryApi_All, MemoryApi_Empire, MemoryApi_Room } from "Utils/Imports/internals";
 import { profile } from "Profiler";
+import _ from "lodash";
 
 // manager for the memory of the empire
 @profile

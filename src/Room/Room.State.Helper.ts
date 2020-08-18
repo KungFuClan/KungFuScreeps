@@ -7,6 +7,7 @@ import {
     MemoryApi_Empire,
     ALLY_LIST
 } from "Utils/Imports/internals";
+import _ from "lodash";
 
 export class RoomHelper_State {
     /**

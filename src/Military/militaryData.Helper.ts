@@ -1,5 +1,6 @@
 import { UserException, MemoryApi_Creep, MemoryApi_Room, ALLY_LIST, Normalize, RoomManager } from "Utils/Imports/internals";
 import { close } from "inspector";
+import _ from "lodash";
 
 export class militaryDataHelper {
     public static movePath: { [squadUUID: string]: { [creepName: string]: PathStep[] } };
@@ -157,7 +158,7 @@ export class militaryDataHelper {
      * @param roomName The room to check
      */
     public static getHostileStructures(roomName: string): AnyOwnedStructure[] {
-        return Game.rooms[roomName].find(FIND_HOSTILE_STRUCTURES).filter((structure: AnyOwnedStructure) => !_.contains(ALLY_LIST, structure.owner.username));
+        return Game.rooms[roomName].find(FIND_HOSTILE_STRUCTURES).filter((structure: AnyOwnedStructure) => !_.contains(ALLY_LIST, structure.owner?.username));
     }
     /**
      * Gets the work part ability adjusted for boost

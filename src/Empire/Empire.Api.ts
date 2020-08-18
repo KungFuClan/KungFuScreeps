@@ -1,4 +1,5 @@
 import { EmpireHelper, PROCESS_FLAG_HELPERS, MemoryApi_Empire, MemoryApi_Room } from "Utils/Imports/internals";
+import _ from "lodash";
 
 export class EmpireApi {
     /**

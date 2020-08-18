@@ -1,3 +1,5 @@
+import _ from "lodash";
+
 const __PROFILER_ENABLED__ = true;
 /* tslint:disable:ban-types */
 export function init(): Profiler {
@@ -92,7 +94,7 @@ function wrapFunction(obj: object, key: PropertyKey, className?: string) {
 
     ///////////
 
-    Reflect.set(obj, key, function(this: any, ...args: any[]) {
+    Reflect.set(obj, key, function (this: any, ...args: any[]) {
         if (isEnabled()) {
             const start = Game.cpu.getUsed();
             const result = originalFunction.apply(this, args);

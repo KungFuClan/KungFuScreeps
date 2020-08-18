@@ -22,6 +22,7 @@ import {
     MemoryApi_Creep,
     MemoryApi_Room
 } from "Utils/Imports/internals";
+import _ from "lodash";
 
 // Api for room visuals
 export class RoomVisualApi {
@@ -93,27 +94,27 @@ export class RoomVisualApi {
             manager: _.filter(creepsInRoom, (c: Creep) => c.memory.role === ROLE_MANAGER).length,
             scout: _.filter(creepsInRoom, (c: Creep) => c.memory.role === ROLE_SCOUT).length
         };
-        
+
         const lines: string[] = [];
         lines.push("");
         lines.push("Creep Info");
         lines.push("");
-        
+
         const spawningCreepInfo: Spawning[] = [];
 
         _.forEach(Game.spawns, (spawn: StructureSpawn) => {
-            if(spawn.room.name === room.name && spawn.spawning) {
+            if (spawn.room.name === room.name && spawn.spawning) {
                 spawningCreepInfo.push(spawn.spawning)
             }
         });
-        
+
         lines.push("Spawning:");
         for (const spawning of spawningCreepInfo) {
             const spawningRole = Game.creeps[spawning.name].memory.role;
             lines.push("   [ " + spawningRole + " ] (" + (spawning.needTime - spawning.remainingTime) + "/" + spawning.needTime + ")");
         }
 
-        if(spawningCreepInfo.length === 0) {
+        if (spawningCreepInfo.length === 0) {
             lines.push("   [ None ]");
         }
 

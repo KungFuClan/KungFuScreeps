@@ -29,6 +29,7 @@ import {
     ROLE_SCOUT
 } from "Utils/Imports/internals";
 import { profile } from "Profiler";
+import _ from "lodash";
 
 /**
  * The API used by the spawn manager

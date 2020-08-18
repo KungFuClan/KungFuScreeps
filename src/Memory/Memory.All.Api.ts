@@ -32,6 +32,7 @@ import {
     RUINS_CACHE_TTL,
     LOOT_JOB_CACHE_TTL
 } from "Utils/Imports/internals";
+import _ from "lodash";
 
 // the api for the memory class
 export class MemoryApi_All {

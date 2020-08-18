@@ -6,6 +6,7 @@ import {
     MemoryApi_Empire
 } from "Utils/Imports/internals";
 import { profile } from "Profiler";
+import _ from "lodash";
 
 // Manager for room visuals
 @profile

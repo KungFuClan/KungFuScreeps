@@ -12,6 +12,7 @@ import {
     militaryDataHelper,
     ERROR_ERROR,
 } from "Utils/Imports/internals";
+import _ from "lodash";
 
 export class RoomHelper_Structure {
 

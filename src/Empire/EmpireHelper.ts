@@ -8,6 +8,7 @@ import {
     MemoryApi_Empire,
     MemoryApi_Room,
 } from "Utils/Imports/internals";
+import _ from "lodash";
 
 export class EmpireHelper {
     /**

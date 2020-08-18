@@ -13,6 +13,7 @@ import {
     MemoryApi_Room,
     MemoryApi_Creep
 } from "Utils/Imports/internals";
+import _ from "lodash";
 
 export class GetEnergyJobs implements IJobTypeHelper {
     public jobType: Valid_JobTypes = "getEnergyJob";

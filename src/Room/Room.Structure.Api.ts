@@ -8,7 +8,9 @@ import {
     WALL_LIMIT,
     ROLE_MINER,
     MemoryApi_Room,
+    TowerDrainerTankBodyOptsHelper,
 } from "Utils/Imports/internals";
+import _ from "lodash";
 
 export class RoomApi_Structure {
     /**
@@ -222,11 +224,9 @@ export class RoomApi_Structure {
      * checks if a structure or creep store is full
      * @param target the structure or creep we are checking
      */
-    public static isFull(target: StoreStructure | Creep, resource?: ResourceConstant): boolean {
-        if (!resource) {
-            return target.store.getFreeCapacity() === 0;
-        }
-        return target.store.getFreeCapacity(resource) === 0;
+    public static isFull(target: AnyStoreStructure | Creep, resource: ResourceConstant | undefined = undefined): boolean {
+        const store: GenericStore = target.store;
+        return store.getFreeCapacity(resource) === 0;
     }
 
     /**

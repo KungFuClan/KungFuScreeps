@@ -19,6 +19,7 @@ import {
     RoomHelper_State,
     Normalize
 } from "Utils/Imports/internals";
+import _ from "lodash";
 
 export class MemoryApi_Room {
     /**
@@ -57,9 +58,9 @@ export class MemoryApi_Room {
             throw new UserException(
                 "Tried to getUpgraderLink of a room with no controller",
                 "Get Upgrader Link was called for room [" +
-                    room.name +
-                    "]" +
-                    ", but theres no controller in this room.",
+                room.name +
+                "]" +
+                ", but theres no controller in this room.",
                 ERROR_WARN
             );
         }
@@ -666,11 +667,11 @@ export class MemoryApi_Room {
         filterFunction?: (object: RemoteRoomMemory) => boolean,
         targetRoom?: string
     ): RemoteRoomMemory[] {
-        
+
         if (Memory.rooms[room.name] === undefined || Memory.rooms[room.name]!.remoteRooms === undefined) {
             return [];
         }
-        
+
         let remoteRooms: RemoteRoomMemory[] = Memory.rooms[room.name].remoteRooms!;
 
         // TargetRoom parameter provided
@@ -678,9 +679,9 @@ export class MemoryApi_Room {
             remoteRooms = _.filter(
                 remoteRooms,
                 (roomMemory: RemoteRoomMemory) => roomMemory.roomName === targetRoom);
-        } 
+        }
 
-        if(filterFunction !== undefined) {
+        if (filterFunction !== undefined) {
             // No target room provided, just return them all
             remoteRooms = _.filter(remoteRooms, filterFunction);
         }
@@ -710,7 +711,7 @@ export class MemoryApi_Room {
 
         if (targetRoom !== undefined) {
             claimRooms = _.filter(claimRooms, (roomMemory: ClaimRoomMemory) => roomMemory.roomName === targetRoom);
-        } 
+        }
 
         if (filterFunction !== undefined) {
             // No target room provided, just return them all

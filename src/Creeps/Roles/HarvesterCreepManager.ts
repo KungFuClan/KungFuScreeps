@@ -1,5 +1,6 @@
 import { ROLE_HARVESTER, MemoryApi_Jobs, CreepAllApi, MemoryHelper, CreepAllHelper } from "Utils/Imports/internals";
 import { CreepCivApi } from "Creeps/Creep.Civ.Api";
+import _ from "lodash";
 
 // Manager for the miner creep role
 export class HarvesterCreepManager implements ICivCreepRoleManager {
