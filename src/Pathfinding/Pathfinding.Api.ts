@@ -10,6 +10,7 @@ import {
     ROOM_STATUS_INVADER_REMOTE,
     ROOM_STATUS_ALLY_REMOTE
 } from "Utils/Imports/internals";
+import _ from "lodash";
 
 export class PathfindingApi {
     /**

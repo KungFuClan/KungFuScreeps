@@ -14,6 +14,7 @@ import {
     CreepManager
 } from "Utils/Imports/internals";
 import { MilitaryMovement_Helper } from "./Military.Movement.Helper";
+import _ from "lodash";
 
 export class MilitaryIntents_Api {
     /**

@@ -1,4 +1,5 @@
 import { RoomHelper_Structure, RoomHelper_State } from "Utils/Imports/internals";
+import _ from "lodash";
 
 export class MemoryApi_Empire {
     /**
