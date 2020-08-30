@@ -31,6 +31,7 @@ export class IntermediateStateCreepLimits implements ICreepSpawnLimits {
             miner: 0,
             harvester: 0,
             worker: 0,
+            mineralMiner: 0,
             powerUpgrader: 0,
             lorry: 0,
             scout: 0,

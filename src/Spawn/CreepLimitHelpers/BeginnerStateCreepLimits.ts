@@ -27,6 +27,7 @@ export class BeginnerStateCreepLimits implements ICreepSpawnLimits {
             worker: 0,
             powerUpgrader: 0,
             lorry: 0,
+            mineralMiner: 0,
             scout: 0,
             manager: 0
         };

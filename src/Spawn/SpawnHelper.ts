@@ -504,4 +504,13 @@ export class SpawnHelper {
         const differenceCheck: number = Game.time - lastTickScoutSpawned
         return (differenceCheck > SCOUT_SPAWN_TICKS || lastTickScoutSpawned === -1) ? 1 : 0;
     }
+
+    /**
+     * Get the number of mineral miners we want in the room
+     * @param room the room we are in
+     */
+    public static getMineralMinerSpawnLimit(room: Room): number {
+        const extractors: StructureExtractor[] = MemoryApi_Room.getStructureOfType(room.name, STRUCTURE_EXTRACTOR) as StructureExtractor[];
+        return extractors.length;
+    }
 }

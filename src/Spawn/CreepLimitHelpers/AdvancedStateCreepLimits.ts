@@ -52,6 +52,7 @@ export class AdvancedStateCreepLimits implements ICreepSpawnLimits {
             powerUpgrader: 0,
             lorry: 0,
             scout: 0,
+            mineralMiner: 0,
             manager: 0
         };
 

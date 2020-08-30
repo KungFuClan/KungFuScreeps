@@ -1277,6 +1277,10 @@ interface DomesticCreepLimits {
      * limit for scout
      */
     scout: number;
+    /**
+     * lmit for mineral miner
+     */
+    mineralMiner: number;
 }
 
 /**
