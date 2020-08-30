@@ -513,4 +513,14 @@ export class SpawnHelper {
         const extractors: StructureExtractor[] = MemoryApi_Room.getStructureOfType(room.name, STRUCTURE_EXTRACTOR) as StructureExtractor[];
         return extractors.length;
     }
+
+    /**
+     * Get the number of additional harvesters we need for the room
+     * These handle things like mineral mining or extra spawn pressure
+     * @param room the room we are operating from
+     */
+    public static getNumExtraHarvesters(room: Room): number {
+        // check for mining container, early return if not
+        // return amount in mining container < 1500
+    }
 }

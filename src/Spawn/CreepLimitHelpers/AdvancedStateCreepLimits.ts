@@ -61,6 +61,7 @@ export class AdvancedStateCreepLimits implements ICreepSpawnLimits {
         const numRemoteRooms: number = RoomHelper_State.numRemoteRooms(room);
         const minerLimits: number = MemoryApi_Room.getSources(room.name).length;
         let numWorkers: number = Math.min(3 + numRemoteRooms, 5);
+        const numHarvesters = 2 + SpawnHelper.getNumExtraHarvesters(room);
 
         // If we have more than 100k energy in storage, we want another worker to help whittle it down
         if (room.storage && room.storage!.store[RESOURCE_ENERGY] > STORAGE_ADDITIONAL_WORKER_THRESHOLD) {
@@ -70,7 +71,7 @@ export class AdvancedStateCreepLimits implements ICreepSpawnLimits {
 
         // Generate Limits --------
         domesticLimits[ROLE_MINER] = minerLimits;
-        domesticLimits[ROLE_HARVESTER] = this.getNumHarvesters(room);
+        domesticLimits[ROLE_HARVESTER] = numHarvesters;
         domesticLimits[ROLE_WORKER] = numWorkers;
         domesticLimits[ROLE_POWER_UPGRADER] = 0;
         domesticLimits[ROLE_MINERAL_MINER] = SpawnHelper.getMineralMinerSpawnLimit(room);
@@ -118,25 +119,5 @@ export class AdvancedStateCreepLimits implements ICreepSpawnLimits {
             numCurrentlyUnclaimedClaimRooms * SpawnHelper.getLimitPerClaimRoomForRole(ROLE_CLAIMER);
 
         return remoteLimits;
-    }
-
-    /**
-     * Get the number of harvesters we need for the room
-     * @param room the room we are checking for
-     * @returns the number of harvesters we need
-     */
-    private getNumHarvesters(room: Room): number {
-        // [Special Case], if we recovered a room and only have 1 harvester (they would be too small to keep up with room)
-        if (RoomHelper_Structure.excecuteEveryTicks(40)) {
-            const harvester: Creep | undefined = _.find(
-                MemoryApi_Creep.getMyCreeps(room.name, (c: Creep) => c.memory.role === ROLE_HARVESTER)
-            );
-            if (harvester) {
-                if (SpawnApi.getEnergyCostOfBody(Normalize.convertCreepBodyToBodyPartConstant(harvester.body)) <= 600) {
-                    return 2;
-                }
-            }
-        }
-        return 2;
     }
 }

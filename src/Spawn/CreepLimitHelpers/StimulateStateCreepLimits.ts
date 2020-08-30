@@ -44,10 +44,11 @@ export class StimulateStateCreepLimits implements ICreepSpawnLimits {
 
         const numLorries: number = SpawnHelper.getLorryLimitForRoom(room, room.memory.roomState!);
         const minerLimits: number = MemoryApi_Room.getSources(room.name).length;
+        const numHarvesters = 2 + SpawnHelper.getNumExtraHarvesters(room);
 
         // Generate Limits -------
         domesticLimits[ROLE_MINER] = minerLimits;
-        domesticLimits[ROLE_HARVESTER] = 2;
+        domesticLimits[ROLE_HARVESTER] = numHarvesters;
         domesticLimits[ROLE_MINERAL_MINER] = SpawnHelper.getMineralMinerSpawnLimit(room);
         domesticLimits[ROLE_WORKER] = 2;
         domesticLimits[ROLE_POWER_UPGRADER] = 1;

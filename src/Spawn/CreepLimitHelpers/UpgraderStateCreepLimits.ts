@@ -51,6 +51,7 @@ export class UpgraderStateCreepLimits implements ICreepSpawnLimits {
         const minerLimits: number = MemoryApi_Room.getSources(room.name).length;
         let numWorkers: number = 1;
         let numPowerUpgraders: number = 1;
+        const numHarvesters = 2 + SpawnHelper.getNumExtraHarvesters(room);
 
         // Get the number of work parts for the worker to decide if we need an extra worker in the room
         const roomTier: TierConstant = SpawnApi.getTier(room, ROLE_WORKER);
@@ -77,7 +78,7 @@ export class UpgraderStateCreepLimits implements ICreepSpawnLimits {
         // Generate Limits --------
         domesticLimits[ROLE_MINER] = minerLimits;
         domesticLimits[ROLE_MINERAL_MINER] = SpawnHelper.getMineralMinerSpawnLimit(room);;
-        domesticLimits[ROLE_HARVESTER] = 2;
+        domesticLimits[ROLE_HARVESTER] = numHarvesters;
         domesticLimits[ROLE_WORKER] = numWorkers;
         domesticLimits[ROLE_POWER_UPGRADER] = numPowerUpgraders;
         domesticLimits[ROLE_LORRY] = numLorries;
