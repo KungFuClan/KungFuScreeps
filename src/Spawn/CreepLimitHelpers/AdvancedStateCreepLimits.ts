@@ -18,7 +18,8 @@ import {
     MemoryApi_Room,
     MemoryApi_Creep,
     RoomHelper_State,
-    RoomHelper_Structure
+    RoomHelper_Structure,
+    ROLE_MINERAL_MINER
 } from "Utils/Imports/internals";
 import _ from "lodash";
 
@@ -66,11 +67,13 @@ export class AdvancedStateCreepLimits implements ICreepSpawnLimits {
             numWorkers++;
         }
 
+
         // Generate Limits --------
         domesticLimits[ROLE_MINER] = minerLimits;
         domesticLimits[ROLE_HARVESTER] = this.getNumHarvesters(room);
         domesticLimits[ROLE_WORKER] = numWorkers;
         domesticLimits[ROLE_POWER_UPGRADER] = 0;
+        domesticLimits[ROLE_MINERAL_MINER] = SpawnHelper.getMineralMinerSpawnLimit(room);
         domesticLimits[ROLE_LORRY] = numLorries;
         domesticLimits[ROLE_SCOUT] = SpawnHelper.getScoutSpawnLimit(room);
 

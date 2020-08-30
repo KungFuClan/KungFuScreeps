@@ -74,11 +74,9 @@ export class UpgraderStateCreepLimits implements ICreepSpawnLimits {
         // If we have a fair amount of construction sites in the room, pump out some extra workers
         numWorkers = SpawnHelper.getWorkerLimitForConstructionHelper(numWorkers, room);
 
-        const mineralMinerLimit = SpawnHelper.getMineralMinerSpawnLimit(room);
-
         // Generate Limits --------
         domesticLimits[ROLE_MINER] = minerLimits;
-        domesticLimits[ROLE_MINERAL_MINER] = mineralMinerLimit;
+        domesticLimits[ROLE_MINERAL_MINER] = SpawnHelper.getMineralMinerSpawnLimit(room);;
         domesticLimits[ROLE_HARVESTER] = 2;
         domesticLimits[ROLE_WORKER] = numWorkers;
         domesticLimits[ROLE_POWER_UPGRADER] = numPowerUpgraders;

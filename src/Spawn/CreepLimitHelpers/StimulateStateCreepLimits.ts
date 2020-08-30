@@ -12,7 +12,9 @@ import {
     ROOM_STATE_STIMULATE,
     SpawnHelper,
     MemoryApi_Room,
-    RoomHelper_State
+    RoomHelper_State,
+    ROLE_MANAGER,
+    ROLE_MINERAL_MINER
 } from "Utils/Imports/internals";
 
 export class StimulateStateCreepLimits implements ICreepSpawnLimits {
@@ -46,6 +48,7 @@ export class StimulateStateCreepLimits implements ICreepSpawnLimits {
         // Generate Limits -------
         domesticLimits[ROLE_MINER] = minerLimits;
         domesticLimits[ROLE_HARVESTER] = 2;
+        domesticLimits[ROLE_MINERAL_MINER] = SpawnHelper.getMineralMinerSpawnLimit(room);
         domesticLimits[ROLE_WORKER] = 2;
         domesticLimits[ROLE_POWER_UPGRADER] = 1;
         domesticLimits[ROLE_LORRY] = numLorries;
