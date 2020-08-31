@@ -520,7 +520,25 @@ export class SpawnHelper {
      * @param room the room we are operating from
      */
     public static getNumExtraHarvesters(room: Room): number {
+        let numExtraHarvesters: number = 0;
         // check for mining container, early return if not
-        // return amount in mining container < 1500
+        const extractors: StructureExtractor[] = MemoryApi_Room.getStructureOfType(room.name, STRUCTURE_EXTRACTOR) as StructureExtractor[];
+
+        // Attempt to find a mineral mining container
+        extractors.forEach((extractor) => {
+            if (!extractor) return;
+            const containers: StructureContainer[] = MemoryApi_Room.getStructureOfType(room.name, STRUCTURE_CONTAINER) as StructureContainer[];
+            const closestContainer: StructureContainer | null = extractor.pos.findClosestByRange(containers, {
+                filter: (container: StructureContainer) => {
+                    return container.pos.isNearTo(extractor);
+                }
+            });
+
+            if (closestContainer) {
+                numExtraHarvesters++;
+            }
+        });
+
+        return numExtraHarvesters;
     }
 }
