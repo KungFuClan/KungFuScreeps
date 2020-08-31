@@ -255,4 +255,14 @@ export class CarryPartJobs implements IJobTypeHelper {
         }
         return storeJobs;
     }
+
+    /**
+     * Gets a list of mineral depositing minerals/boosts for the room
+     * @param room The room to get the jobs for
+     * [No-Restore] New job every time
+     */
+    public static createNonEnergyCarryJobs(room: Room): CarryPartJob[] {
+        const carryJobs: CarryPartJob[] = [];
+        return carryJobs;
+    }
 }

@@ -588,6 +588,7 @@ interface JobListing {
     claimPartJobs?: ClaimPartJobListing;
     workPartJobs?: WorkPartJobListing;
     carryPartJobs?: CarryPartJobListing;
+    getNonEnergyJobs?: GetNonEnergyJobListing;
 }
 
 /**
@@ -615,10 +616,20 @@ type GetEnergy_ValidTargets =
     | "droppedResource"
     | "mineral"
     | ResourceContainingStructureConstant;
+
 /**
  * Valid actions for GetEnergyJob actionType
  */
 type GetEnergy_ValidActions = "withdraw" | "harvest" | "pickup";
+
+/**
+ * Valid types for the GetNonEnergyJob target type
+ */
+type GetNonEnergy_ValidTargets = "droppedResource" | ResourceContainingStructureConstant;
+/**
+ * Valid actions for GetNonEnergy action type
+ */
+type GetNonEnergy_ValidActions = "transfer" | "drop" | "pickup";
 
 /**
  * Valid types for the WorkPartJob targetType
@@ -679,7 +690,7 @@ type Any_ValidActions =
 /**
  * Valid jobType for BaseJob
  */
-type Valid_JobTypes = "getEnergyJob" | "claimPartJob" | "carryPartJob" | "workPartJob" | "movePartJob";
+type Valid_JobTypes = "getEnergyJob" | "claimPartJob" | "carryPartJob" | "workPartJob" | "movePartJob" | "getNonEnergyJob";
 /**
  * Basic Job Interface
  */
@@ -725,6 +736,28 @@ interface GetEnergyJob extends BaseJob {
      * RESOURCE_ENERGY is always defined and equals to 0 when empty, other resources are undefined when empty.
      */
     resources: StoreDefinition | Store<ResourceConstant, true>;
+}
+
+/**
+ * JobObject for the GetNonEnergyJobListing
+ * Overrides targetType to only GetNonEnergy_ValidTargets
+ */
+interface GetNonEnergyJob extends BaseJob {
+    /**
+     * The type of the target object
+     */
+    targetType: GetNonEnergy_ValidTargets;
+    /**
+     * The action to perform on the target object
+     */
+    actionType: GetNonEnergy_ValidActions;
+    /**
+     * The resources in the object in the format of Structure.Store
+     *
+     * Each object key is one of the RESOURCE_* constants, values are resources amounts.
+     * RESOURCE_ENERGY is always defined and equals to 0 when empty, other resources are undefined when empty.
+     */
+    resources: StoreDefinition | Store<ResourceConstant, true> | Store<ResourceConstant, false>;
 }
 
 /**
@@ -823,6 +856,29 @@ interface GetEnergyJobListing {
      * Jobs that target tombstones
      */
     lootJobs?: Cache;
+}
+
+interface GetNonEnergyJobListing {
+    /**
+     * Jobs that target resources on the ground
+     */
+    pickupJobs?: Cache;
+    /**'
+     * Jobs that target containers with resources
+     */
+    containerJobs?: Cache;
+    /**
+     * Jobs that target storage with resources
+     */
+    storageJobs?: Cache
+    /**
+     * Jobs that target the terminal with resources
+     */
+    terminalJobs?: Cache
+    /**
+     * Jobs that target labs with resources
+     */
+    labJobs?: Cache
 }
 
 /**
