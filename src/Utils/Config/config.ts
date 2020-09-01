@@ -212,3 +212,8 @@ export const MINI_UPGRADER_WORK_PARTS: number = 5;
  * currently set to one creep life, so if a scout dies it won't spawn another one to replace it until it would have naturally died
  */
 export const SCOUT_SPAWN_TICKS: number = 3000;
+
+/**
+ * The number that the mineral mining container must be below to allow mineral miner to spawn
+ */
+export const MINERAL_MINER_CONTAINER_LIMIT: number = 1600;

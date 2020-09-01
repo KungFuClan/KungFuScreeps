@@ -18,6 +18,7 @@ import {
     MemoryApi_Creep,
     RoomHelper_Structure,
     RoomHelper_State,
+    MINERAL_MINER_CONTAINER_LIMIT,
 } from "Utils/Imports/internals";
 import _ from "lodash";
 
@@ -511,7 +512,34 @@ export class SpawnHelper {
      */
     public static getMineralMinerSpawnLimit(room: Room): number {
         const extractors: StructureExtractor[] = MemoryApi_Room.getStructureOfType(room.name, STRUCTURE_EXTRACTOR) as StructureExtractor[];
-        return extractors.length;
+        let numMineralMiners = 0;
+        extractors.forEach((extractor: StructureExtractor) => {
+
+            // Get the closest mineral and check for cooldown
+            if (extractor.cooldown > 0) return;
+            const minerals: Mineral[] = MemoryApi_Room.getMinerals(room.name);
+            if (minerals.length === 0) return;
+            const closestMineral: Mineral | undefined = _.find(minerals, (mineral: Mineral) => {
+                if (!mineral) return false;
+                return extractor.pos.isEqualTo(mineral);
+            });
+            if (!closestMineral) return;
+            if (closestMineral.mineralAmount === 0) return;
+
+            // Check the container in range for fill amount
+            const containers: StructureContainer[] = MemoryApi_Room.getStructureOfType(room.name, STRUCTURE_CONTAINER) as StructureContainer[];
+            if (containers.length === 0) return;
+            const closestContainer: StructureContainer | undefined = _.find(containers, (container: StructureContainer) => {
+                if (!container) return false;
+                return extractor.pos.isNearTo(container);
+            });
+            if (!closestContainer) return;
+            if (closestContainer.store.getUsedCapacity() > MINERAL_MINER_CONTAINER_LIMIT) return;
+
+            // If we make it here, we can spawn a mineral miner
+            numMineralMiners++;
+        });
+        return numMineralMiners;
     }
 
     /**
