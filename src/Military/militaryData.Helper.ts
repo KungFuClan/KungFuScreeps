@@ -94,7 +94,7 @@ export class militaryDataHelper {
         if (!Game.rooms[roomName]) {
             return { allHostiles: [], attack: [], rangedAttack: [], heal: [] };
         }
-        const allHostiles: Creep[] = Game.rooms[roomName].find(FIND_HOSTILE_CREEPS).filter((c: Creep) => !_.contains(ALLY_LIST, c.owner.username));
+        const allHostiles: Creep[] = Game.rooms[roomName].find(FIND_HOSTILE_CREEPS).filter((c: Creep) => !ALLY_LIST.includes(c.owner.username));
         const attackCreeps: Creep[] = [];
         const rangedAttackCreeps: Creep[] = [];
         const healCreeps: Creep[] = [];
@@ -158,7 +158,12 @@ export class militaryDataHelper {
      * @param roomName The room to check
      */
     public static getHostileStructures(roomName: string): AnyOwnedStructure[] {
-        return Game.rooms[roomName].find(FIND_HOSTILE_STRUCTURES).filter((structure: AnyOwnedStructure) => !_.contains(ALLY_LIST, structure.owner?.username));
+        return Game.rooms[roomName].find(FIND_HOSTILE_STRUCTURES).filter((structure: AnyOwnedStructure) => {
+            if (!structure.owner) {
+                return false;
+            }
+            return !ALLY_LIST.includes(structure.owner?.username)
+        });
     }
     /**
      * Gets the work part ability adjusted for boost

@@ -54,7 +54,7 @@ export class MemoryHelper_Room {
         }
 
         const enemies = Game.rooms[roomName].find(FIND_HOSTILE_CREEPS).filter((creep: Creep) => {
-            return !_.contains(ALLY_LIST, creep.owner.username)
+            return !ALLY_LIST.includes(creep.owner.username)
         });
 
         // Sort creeps into categories

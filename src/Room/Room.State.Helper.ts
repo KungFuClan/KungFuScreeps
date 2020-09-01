@@ -55,7 +55,7 @@ export class RoomHelper_State {
             return false;
         }
 
-        if (room.controller.owner !== undefined && _.contains(ALLY_LIST, room.controller.owner.username)) {
+        if (room.controller.owner !== undefined && ALLY_LIST.includes(room.controller.owner.username)) {
             return true;
         }
 
@@ -77,7 +77,7 @@ export class RoomHelper_State {
         return (
             room.controller.reservation !== undefined &&
             room.controller.reservation.username !== undefined &&
-            _.contains(ALLY_LIST, room.controller.reservation.username)
+            ALLY_LIST.includes(room.controller.reservation.username)
         );
     }
 

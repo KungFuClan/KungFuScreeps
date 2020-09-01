@@ -165,7 +165,8 @@ export class ClaimPartJobs implements IJobTypeHelper {
     public static createReserveJobs(room: Room): ClaimPartJob[] {
         // Consider the room if we are under our reserve threshold, or if it belongs to someone not on the ally list
         const reserveRooms: RemoteRoomMemory[] = MemoryApi_Room.getRemoteRooms(room, (roomMemory: RemoteRoomMemory) => {
-            return (roomMemory.reserveTTL < RESERVER_MIN_TTL) || !_.contains(ALLY_LIST, roomMemory.reserveUsername);
+            if (!roomMemory.reserveUsername) return false;
+            return ((roomMemory.reserveTTL < RESERVER_MIN_TTL) || !ALLY_LIST.includes(roomMemory.reserveUsername));
         });
 
         if (reserveRooms.length === 0) {
