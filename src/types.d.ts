@@ -690,7 +690,7 @@ type Any_ValidActions =
 /**
  * Valid jobType for BaseJob
  */
-type Valid_JobTypes = "getEnergyJob" | "claimPartJob" | "carryPartJob" | "workPartJob" | "movePartJob" | "getNonEnergyJob";
+type Valid_JobTypes = "getEnergyJob" | "claimPartJob" | "carryPartJob" | "workPartJob" | "movePartJob" | "getNonEnergyJob" | "nonEnergyCarryPartJob";
 /**
  * Basic Job Interface
  */
@@ -808,6 +808,10 @@ interface CarryPartJob extends BaseJob {
      * The amount of energy to be filled
      */
     remaining: number;
+    /**
+     * The resource type of the thing we're carrying
+     */
+    resourceType: ResourceConstant | undefined;
 }
 
 /**

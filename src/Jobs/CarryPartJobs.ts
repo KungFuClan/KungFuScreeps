@@ -125,6 +125,7 @@ export class CarryPartJobs implements IJobTypeHelper {
                 targetID: structure.id as string,
                 targetType: structure.structureType,
                 remaining: storageSpace,
+                resourceType: RESOURCE_ENERGY,
                 actionType: "transfer",
                 isTaken: storageSpace <= 0
             };
@@ -152,6 +153,7 @@ export class CarryPartJobs implements IJobTypeHelper {
                 targetID: structure.id as string,
                 targetType: structure.structureType,
                 remaining: storageSpace,
+                resourceType: RESOURCE_ENERGY,
                 actionType: "transfer",
                 isTaken: storageSpace <= 0
             };
@@ -187,6 +189,7 @@ export class CarryPartJobs implements IJobTypeHelper {
                 targetID: structure.id as string,
                 targetType: structure.structureType,
                 remaining: storageSpace,
+                resourceType: RESOURCE_ENERGY,
                 actionType: "transfer",
                 isTaken: storageSpace <= 0
             };
@@ -211,6 +214,7 @@ export class CarryPartJobs implements IJobTypeHelper {
                 targetID: room.storage.id as string,
                 targetType: STRUCTURE_STORAGE,
                 remaining: room.storage.store.getFreeCapacity(),
+                resourceType: RESOURCE_ENERGY,
                 actionType: "transfer",
                 isTaken: false
             };
@@ -224,6 +228,7 @@ export class CarryPartJobs implements IJobTypeHelper {
                 targetID: room.terminal.id as string,
                 targetType: STRUCTURE_TERMINAL,
                 remaining: room.terminal.store.getFreeCapacity(),
+                resourceType: RESOURCE_ENERGY,
                 actionType: "transfer",
                 isTaken: false
             };
@@ -246,6 +251,7 @@ export class CarryPartJobs implements IJobTypeHelper {
                     targetID: link.id as string,
                     targetType: STRUCTURE_LINK,
                     remaining: link.energyCapacity - link.energy,
+                    resourceType: RESOURCE_ENERGY,
                     actionType: "transfer",
                     isTaken: false
                 };
@@ -261,8 +267,39 @@ export class CarryPartJobs implements IJobTypeHelper {
      * @param room The room to get the jobs for
      * [No-Restore] New job every time
      */
-    public static createNonEnergyCarryJobs(room: Room): CarryPartJob[] {
+    public static createNonEnergyDumpJobs(room: Room): CarryPartJob[] {
         const carryJobs: CarryPartJob[] = [];
+
+        // Resource type is undefined, but it will get changed at the level of the creep taking the job
+
+        if (room.storage !== undefined) {
+            const storageJob: CarryPartJob = {
+                jobType: "nonEnergyCarryPartJob",
+                targetID: room.storage.id as string,
+                targetType: STRUCTURE_STORAGE,
+                remaining: room.storage.store.getFreeCapacity(),
+                resourceType: undefined,
+                actionType: "transfer",
+                isTaken: false
+            };
+
+            carryJobs.push(storageJob);
+        }
+
+        if (room.terminal !== undefined) {
+            const terminalJob: CarryPartJob = {
+                jobType: "nonEnergyCarryPartJob",
+                targetID: room.terminal.id as string,
+                targetType: STRUCTURE_TERMINAL,
+                remaining: room.terminal.store.getFreeCapacity(),
+                resourceType: undefined,
+                actionType: "transfer",
+                isTaken: false
+            };
+
+            carryJobs.push(terminalJob);
+        }
+
         return carryJobs;
     }
 }
