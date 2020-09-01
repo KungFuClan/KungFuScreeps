@@ -424,6 +424,11 @@ export class GetEnergyJobs implements IJobTypeHelper {
         const dropJobList: GetEnergyJob[] = [];
 
         _.forEach(drops, (drop: Resource) => {
+            // Limit these to energy pickups only
+            if (drop.resourceType !== RESOURCE_ENERGY) {
+                return;
+            }
+
             const dropStore: StoreDefinition = { energy: 0 } as StoreDefinition;
             dropStore[drop.resourceType] = drop.amount;
 

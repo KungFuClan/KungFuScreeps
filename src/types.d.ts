@@ -629,7 +629,7 @@ type GetNonEnergy_ValidTargets = "droppedResource" | ResourceContainingStructure
 /**
  * Valid actions for GetNonEnergy action type
  */
-type GetNonEnergy_ValidActions = "transfer" | "drop" | "pickup";
+type GetNonEnergy_ValidActions = "pickup" | "withdraw";
 
 /**
  * Valid types for the WorkPartJob targetType
