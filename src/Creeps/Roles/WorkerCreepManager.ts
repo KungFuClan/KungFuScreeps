@@ -35,7 +35,7 @@ export class WorkerCreepManager implements ICivCreepRoleManager {
         const creepOptions: CreepOptionsCiv = creep.memory.options as CreepOptionsCiv;
         if (creepOptions.getFromContainer) {
             // All container jobs with enough energy to fill creep.carry, and not taken
-            const containerJobs = MemoryApi_Jobs.getContainerJobs(
+            const containerJobs = MemoryApi_Jobs.getEnergyContainerJobs(
                 room,
                 (cJob: GetEnergyJob) => !cJob.isTaken && cJob.resources.energy >= creep.store.getCapacity()
             );

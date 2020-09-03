@@ -1,4 +1,27 @@
-import { NO_CACHING_MEMORY, STORE_JOB_CACHE_TTL, MemoryHelper_Room, SOURCE_JOB_CACHE_TTL, ALL_STRUCTURE_TYPES, UserException, CONTAINER_JOB_CACHE_TTL, LINK_JOB_CACHE_TTL, BACKUP_JOB_CACHE_TTL, ERROR_ERROR, PICKUP_JOB_CACHE_TTL, LOOT_JOB_CACHE_TTL, CLAIM_JOB_CACHE_TTL, RESERVE_JOB_CACHE_TTL, SIGN_JOB_CACHE_TTL, ATTACK_JOB_CACHE_TTL, REPAIR_JOB_CACHE_TTL, PRIORITY_REPAIR_THRESHOLD, BUILD_JOB_CACHE_TTL, UPGRADE_JOB_CACHE_TTL, FILL_JOB_CACHE_TTL, RoomApi_Structure } from "Utils/Imports/internals";
+import {
+    NO_CACHING_MEMORY,
+    STORE_JOB_CACHE_TTL,
+    MemoryHelper_Room,
+    SOURCE_JOB_CACHE_TTL,
+    ALL_STRUCTURE_TYPES,
+    UserException,
+    CONTAINER_JOB_CACHE_TTL,
+    LINK_JOB_CACHE_TTL,
+    BACKUP_JOB_CACHE_TTL,
+    ERROR_ERROR,
+    PICKUP_JOB_CACHE_TTL,
+    LOOT_JOB_CACHE_TTL,
+    CLAIM_JOB_CACHE_TTL,
+    RESERVE_JOB_CACHE_TTL,
+    SIGN_JOB_CACHE_TTL,
+    ATTACK_JOB_CACHE_TTL,
+    REPAIR_JOB_CACHE_TTL,
+    PRIORITY_REPAIR_THRESHOLD,
+    BUILD_JOB_CACHE_TTL,
+    UPGRADE_JOB_CACHE_TTL,
+    FILL_JOB_CACHE_TTL,
+    RoomApi_Structure
+} from "Utils/Imports/internals";
 import _ from "lodash";
 
 export class MemoryApi_Jobs {
@@ -16,12 +39,29 @@ export class MemoryApi_Jobs {
         const allGetEnergyJobs: GetEnergyJob[] = [];
 
         _.forEach(this.getSourceJobs(room, filterFunction, forceUpdate), job => allGetEnergyJobs.push(job));
-        _.forEach(this.getMineralJobs(room, filterFunction, forceUpdate), job => allGetEnergyJobs.push(job));
-        _.forEach(this.getContainerJobs(room, filterFunction, forceUpdate), job => allGetEnergyJobs.push(job));
+        _.forEach(this.getEnergyContainerJobs(room, filterFunction, forceUpdate), job => allGetEnergyJobs.push(job));
         _.forEach(this.getLinkJobs(room, filterFunction, forceUpdate), job => allGetEnergyJobs.push(job));
         _.forEach(this.getBackupStructuresJobs(room, filterFunction, forceUpdate), job => allGetEnergyJobs.push(job));
 
         return allGetEnergyJobs;
+    }
+
+    /**
+     * Get all jobs (in a flatted list) of GetEnergyJobs.xxx
+     * @param room The room to get the jobs from
+     * @param filterFunction [Optional] A function to filter the GetEnergyJob list
+     * @param forceUpdate [Optional] Forcibly invalidate the caches
+     */
+    public static getAllNonEnergyJobs(
+        room: Room,
+        filterFunction?: (object: GetEnergyJob) => boolean,
+        forceUpdate?: boolean
+    ): GetEnergyJob[] {
+        const allNonGetEnergyJobs: GetEnergyJob[] = [];
+
+        _.forEach(this.getMineralJobs(room, filterFunction, forceUpdate), job => allNonGetEnergyJobs.push(job));
+
+        return allNonGetEnergyJobs;
     }
 
     /**
@@ -102,7 +142,7 @@ export class MemoryApi_Jobs {
             !Memory.rooms[room.name].jobs!.getEnergyJobs!.mineralJobs ||
             Memory.rooms[room.name].jobs!.getEnergyJobs!.mineralJobs!.cache < Game.time - SOURCE_JOB_CACHE_TTL
         ) {
-            MemoryHelper_Room.updateGetEnergy_mineralJobs(room);
+            MemoryHelper_Room.updateGetNonEnergy_mineralJobs(room);
         }
 
         let mineralJobs: GetEnergyJob[] = Memory.rooms[room.name].jobs!.getEnergyJobs!.mineralJobs!.data;
@@ -120,7 +160,37 @@ export class MemoryApi_Jobs {
      * @param filterFunction [Optional] A function to filter the getEnergyjob list
      * @param forceUpdate [Optional] Forcibly invalidate the cache
      */
-    public static getContainerJobs(
+    public static getEnergyContainerJobs(
+        room: Room,
+        filterFunction?: (object: GetEnergyJob) => boolean,
+        forceUpdate?: boolean
+    ): GetEnergyJob[] {
+        if (
+            NO_CACHING_MEMORY ||
+            forceUpdate ||
+            !Memory.rooms[room.name].jobs!.getEnergyJobs ||
+            !Memory.rooms[room.name].jobs!.getEnergyJobs!.containerJobs ||
+            Memory.rooms[room.name].jobs!.getEnergyJobs!.containerJobs!.cache < Game.time - CONTAINER_JOB_CACHE_TTL
+        ) {
+            MemoryHelper_Room.updateGetEnergy_containerJobs(room);
+        }
+
+        let containerJobs: GetEnergyJob[] = Memory.rooms[room.name].jobs!.getEnergyJobs!.containerJobs!.data;
+
+        if (filterFunction !== undefined) {
+            containerJobs = _.filter(containerJobs, filterFunction);
+        }
+
+        return containerJobs;
+    }
+
+    /**
+     * Get the list of GetEnergyJobs.containerJobs
+     * @param room The room to get the jobs from
+     * @param filterFunction [Optional] A function to filter the getEnergyjob list
+     * @param forceUpdate [Optional] Forcibly invalidate the cache
+     */
+    public static getNonEnergyContainerJobs(
         room: Room,
         filterFunction?: (object: GetEnergyJob) => boolean,
         forceUpdate?: boolean
@@ -636,7 +706,6 @@ export class MemoryApi_Jobs {
 
         return storeJobs;
     }
-
 
     /**
      * Updates the job value in memory to deprecate resources or mark the job as taken

@@ -58,9 +58,9 @@ export class MemoryApi_Room {
             throw new UserException(
                 "Tried to getUpgraderLink of a room with no controller",
                 "Get Upgrader Link was called for room [" +
-                room.name +
-                "]" +
-                ", but theres no controller in this room.",
+                    room.name +
+                    "]" +
+                    ", but theres no controller in this room.",
                 ERROR_WARN
             );
         }
@@ -140,7 +140,8 @@ export class MemoryApi_Room {
                         powerUpgrader: 0,
                         lorry: 0,
                         scout: 0,
-                        manager: 0
+                        manager: 0,
+                        mineralMiner: 0
                     },
                     remoteLimits: {
                         remoteMiner: 0,
@@ -210,6 +211,7 @@ export class MemoryApi_Room {
             MemoryApi_Room.getSources(room.name, undefined, forceUpdate);
             MemoryApi_Room.getStructures(room.name, undefined, forceUpdate);
             MemoryApi_Jobs.getAllGetEnergyJobs(room, undefined, forceUpdate);
+            MemoryApi_Jobs.getAllNonEnergyJobs(room, undefined, forceUpdate);
             MemoryApi_Jobs.getAllClaimPartJobs(room, undefined, forceUpdate);
             MemoryApi_Jobs.getAllWorkPartJobs(room, undefined, forceUpdate);
             MemoryApi_Room.getBunkerCenter(room, forceUpdate);
@@ -667,7 +669,6 @@ export class MemoryApi_Room {
         filterFunction?: (object: RemoteRoomMemory) => boolean,
         targetRoom?: string
     ): RemoteRoomMemory[] {
-
         if (Memory.rooms[room.name] === undefined || Memory.rooms[room.name]!.remoteRooms === undefined) {
             return [];
         }
@@ -676,9 +677,7 @@ export class MemoryApi_Room {
 
         // TargetRoom parameter provided
         if (targetRoom !== undefined) {
-            remoteRooms = _.filter(
-                remoteRooms,
-                (roomMemory: RemoteRoomMemory) => roomMemory.roomName === targetRoom);
+            remoteRooms = _.filter(remoteRooms, (roomMemory: RemoteRoomMemory) => roomMemory.roomName === targetRoom);
         }
 
         if (filterFunction !== undefined) {
@@ -702,7 +701,6 @@ export class MemoryApi_Room {
         filterFunction?: (object: ClaimRoomMemory) => boolean,
         targetRoom?: string
     ): ClaimRoomMemory[] {
-
         if (Memory.rooms[room.name] === undefined || Memory.rooms[room.name].claimRooms === undefined) {
             return [];
         }
@@ -781,7 +779,8 @@ export class MemoryApi_Room {
                 powerUpgrader: 0,
                 lorry: 0,
                 scout: 0,
-                manager: 0
+                manager: 0,
+                mineralMiner: 0
             },
             remoteLimits: {
                 remoteMiner: 0,

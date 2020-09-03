@@ -19,14 +19,14 @@ export class CreepCivApi {
     public static newWorkPartJob(creep: Creep, room: Room): WorkPartJob | undefined {
         const creepOptions: CreepOptionsCiv = creep.memory.options as CreepOptionsCiv;
         const upgradeJobs = MemoryApi_Jobs.getUpgradeJobs(room, (job: WorkPartJob) => !job.isTaken);
-        const isPowerUpgrader: boolean = !!(room.memory.creepLimit && room.memory.creepLimit.domesticLimits[ROLE_POWER_UPGRADER] > 0);
-        const isSpawnInRoom: boolean = (MemoryApi_Room.getStructureOfType(room.name, STRUCTURE_SPAWN)).length > 0;
+        const isPowerUpgrader: boolean = !!(
+            room.memory.creepLimit && room.memory.creepLimit.domesticLimits[ROLE_POWER_UPGRADER] > 0
+        );
+        const isSpawnInRoom: boolean = MemoryApi_Room.getStructureOfType(room.name, STRUCTURE_SPAWN).length > 0;
         const isCurrentUpgrader: boolean = _.some(
             MemoryApi_Creep.getMyCreeps(room.name),
-            (c: Creep) => (
-                c.memory.job &&
-                c.memory.job!.actionType === "upgrade") ||
-                c.memory.role === ROLE_POWER_UPGRADER
+            (c: Creep) =>
+                (c.memory.job && c.memory.job!.actionType === "upgrade") || c.memory.role === ROLE_POWER_UPGRADER
         );
 
         // Assign upgrade job is one isn't currently being worked
@@ -174,11 +174,14 @@ export class CreepCivApi {
     public static newGetEnergyJob(creep: Creep, room: Room): GetEnergyJob | undefined {
         const creepOptions: CreepOptionsCiv = creep.memory.options as CreepOptionsCiv;
         // Indicates if the room is safe to travel freely out of the bunker
-        const isEmergecyProtocol: boolean = (MemoryApi_Room.getDefconLevel(room) >= 2) && room.memory.roomState ? room.memory.roomState >= ROOM_STATE_ADVANCED : false;
+        const isEmergecyProtocol: boolean =
+            MemoryApi_Room.getDefconLevel(room) >= 2 && room.memory.roomState
+                ? room.memory.roomState >= ROOM_STATE_ADVANCED
+                : false;
 
         if (creepOptions.getFromContainer && !isEmergecyProtocol) {
             // get a container job based on the filter function returned from the helper
-            const containerJobs = MemoryApi_Jobs.getContainerJobs(
+            const containerJobs = MemoryApi_Jobs.getEnergyContainerJobs(
                 room,
                 CreepCivHelper.getContainerJobFilterFunction(room, creep)
             );

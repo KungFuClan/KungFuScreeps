@@ -6,9 +6,10 @@ import {
     CarryPartJobs,
     RoomHelper_Structure,
     RoomApi_State,
-    ALLY_LIST,
+    ALLY_LIST
 } from "Utils/Imports/internals";
 import _ from "lodash";
+import { GetNonEnergyJobs } from "Jobs/GetNonEnergyJobs";
 
 /**
  * Contains all functions for initializing and updating room memory
@@ -54,7 +55,7 @@ export class MemoryHelper_Room {
         }
 
         const enemies = Game.rooms[roomName].find(FIND_HOSTILE_CREEPS).filter((creep: Creep) => {
-            return !ALLY_LIST.includes(creep.owner.username)
+            return !ALLY_LIST.includes(creep.owner.username);
         });
 
         // Sort creeps into categories
@@ -280,6 +281,31 @@ export class MemoryHelper_Room {
      * @param room The room to update the memory of
      * @param jobList The object to store in `Memory.rooms[room.name].jobs.getEnergyJobs`
      */
+    public static updateGetNonEnergy_allJobs(room: Room) {
+        this.updateGetNonEnergy_mineralJobs(room);
+    }
+
+    /**
+     *
+     * @param room update the room's getEnergyJobListing_mineralJobs
+     * @param room the room to update the memory of
+     */
+    public static updateGetNonEnergy_mineralJobs(room: Room) {
+        if (Memory.rooms[room.name].jobs!.getNonEnergyJobs === undefined) {
+            Memory.rooms[room.name].jobs!.getNonEnergyJobs = {};
+        }
+
+        Memory.rooms[room.name].jobs!.getNonEnergyJobs!.mineralJobs = {
+            data: GetNonEnergyJobs.createMineralJobs(room),
+            cache: Game.time
+        };
+    }
+
+    /**
+     * Update the room's GetEnergyJobListing
+     * @param room The room to update the memory of
+     * @param jobList The object to store in `Memory.rooms[room.name].jobs.getEnergyJobs`
+     */
     public static updateGetEnergy_allJobs(room: Room) {
         this.updateGetEnergy_sourceJobs(room);
         this.updateGetEnergy_containerJobs(room);
@@ -299,22 +325,6 @@ export class MemoryHelper_Room {
 
         Memory.rooms[room.name].jobs!.getEnergyJobs!.sourceJobs = {
             data: GetEnergyJobs.createSourceJobs(room),
-            cache: Game.time
-        };
-    }
-
-    /**
-     *
-     * @param room update the room's getEnergyJobListing_mineralJobs
-     * @param room the room to update the memory of
-     */
-    public static updateGetEnergy_mineralJobs(room: Room) {
-        if (Memory.rooms[room.name].jobs!.getEnergyJobs === undefined) {
-            Memory.rooms[room.name].jobs!.getEnergyJobs = {};
-        }
-
-        Memory.rooms[room.name].jobs!.getEnergyJobs!.mineralJobs = {
-            data: GetEnergyJobs.createMineralJobs(room),
             cache: Game.time
         };
     }

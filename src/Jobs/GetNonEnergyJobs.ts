@@ -84,6 +84,45 @@ export class GetNonEnergyJobs implements IJobTypeHelper {
     }
 
     /**
+     * Get a list of the getenergyjobs for minerals in the room
+     * @param room the room we are creating the job list for
+     */
+    public static createMineralJobs(room: Room): GetEnergyJob[] {
+        // List of all sources that are under optimal work capacity
+        const openMinerals = MemoryApi_Room.getMinerals(room.name);
+
+        if (openMinerals.length === 0) {
+            return [];
+        }
+
+        const mineralJobList: GetEnergyJob[] = [];
+
+        _.forEach(openMinerals, (mineral: Mineral) => {
+            const mineralEnergyRemaining = mineral.mineralAmount;
+            const mineralType = mineral.mineralType;
+
+            // Create the StoreDefinition for the source
+            // TODO Change this to actually match the resource type, removing the -> unknown -> StoreDefinition
+            const mineralResources = { [mineralType]: mineralEnergyRemaining };
+
+            // Create the GetEnergyJob object for the source
+            const sourceJob: GetEnergyJob = {
+                jobType: "getNonEnergyJob",
+                targetID: mineral.id as string,
+                targetType: "mineral",
+                actionType: "harvest",
+                resources: (mineralResources as unknown) as StoreDefinition,
+                isTaken: mineralEnergyRemaining <= 0 // Taken if no energy remaining
+            };
+
+            // Append the GetEnergyJob to the main array
+            mineralJobList.push(sourceJob);
+        });
+
+        return mineralJobList;
+    }
+
+    /**
      * Gets a list of GetNonEnergyJobs for the dropped non-energy resources of a room
      * @param room The room to create the job for
      * [Accurate-Restore] Adjusts for creeps targeting it
@@ -143,14 +182,18 @@ export class GetNonEnergyJobs implements IJobTypeHelper {
      */
     public static createNonEnergyContainerJobs(room: Room): GetNonEnergyJob[] {
         // List of all containers next to an extractor
-        const extractors: StructureExtractor[] = MemoryApi_Room.getStructureOfType(room.name, STRUCTURE_EXTRACTOR) as StructureExtractor[];
+        const extractors: StructureExtractor[] = MemoryApi_Room.getStructureOfType(
+            room.name,
+            STRUCTURE_EXTRACTOR
+        ) as StructureExtractor[];
         const containers = MemoryApi_Room.getStructureOfType(
             room.name,
             STRUCTURE_CONTAINER,
-            (container: StructureContainer) => _.some(extractors, (extractor: StructureExtractor) => {
-                if (!extractor) return false;
-                return extractor.pos.isNearTo(container);
-            })
+            (container: StructureContainer) =>
+                _.some(extractors, (extractor: StructureExtractor) => {
+                    if (!extractor) return false;
+                    return extractor.pos.isNearTo(container);
+                })
         );
 
         if (containers.length === 0) {

@@ -244,27 +244,17 @@ type MilitaryActionConstants =
     | ACTION_HEAL
     | ACTION_RANGED_HEAL;
 
-type MilitaryTargetConstants_Move =
-    | DirectionConstant;
+type MilitaryTargetConstants_Move = DirectionConstant;
 
-type MilitaryTargetConstants_Heal =
-    | Id<Creep | PowerCreep>
-    | string; // Creep name
+type MilitaryTargetConstants_Heal = Id<Creep | PowerCreep> | string; // Creep name
 
-type MilitaryTargetConstants_RangedHeal =
-    | Id<Creep | PowerCreep>
-    | string; // Creep name
+type MilitaryTargetConstants_RangedHeal = Id<Creep | PowerCreep> | string; // Creep name
 
-type MilitaryTargetConstants_Attack =
-    | Id<Creep | PowerCreep | Structure>
-    | string; // Creep name
+type MilitaryTargetConstants_Attack = Id<Creep | PowerCreep | Structure> | string; // Creep name
 
-type MilitaryTargetConstants_RangedAttack =
-    | Id<Creep | PowerCreep | Structure>
-    | string; // Creep name
+type MilitaryTargetConstants_RangedAttack = Id<Creep | PowerCreep | Structure> | string; // Creep name
 
-type MilitaryTargetConstants_MassRanged =
-    | null;
+type MilitaryTargetConstants_MassRanged = null;
 
 type MilitaryTargetConstants =
     | MilitaryTargetConstants_Move
@@ -274,36 +264,17 @@ type MilitaryTargetConstants =
     | MilitaryTargetConstants_RangedAttack
     | MilitaryTargetConstants_MassRanged;
 
-type MilitaryTargetTypeConstants_Move =
-    | "direction";
+type MilitaryTargetTypeConstants_Move = "direction";
 
-type MilitaryTargetTypeConstants_Heal =
-    | "creepID"
-    | "creepName"
-    | "powerCreep";
+type MilitaryTargetTypeConstants_Heal = "creepID" | "creepName" | "powerCreep";
 
-type MilitaryTargetTypeConstants_RangedHeal =
-    | "creepID"
-    | "creepName"
-    | "powerCreep";
+type MilitaryTargetTypeConstants_RangedHeal = "creepID" | "creepName" | "powerCreep";
 
-type MilitaryTargetTypeConstants_Attack =
-    | "creepID"
-    | "creepName"
-    | "powerCreep"
-    | "structure";
+type MilitaryTargetTypeConstants_Attack = "creepID" | "creepName" | "powerCreep" | "structure";
 
-type MilitaryTargetTypeConstants_RangedAttack =
-    | "creepID"
-    | "creepName"
-    | "powerCreep"
-    | "structure";
+type MilitaryTargetTypeConstants_RangedAttack = "creepID" | "creepName" | "powerCreep" | "structure";
 
-type MilitaryTargetTypeConstants_MassRanged =
-    | "creepID"
-    | "creepName"
-    | "powerCreep"
-    | "structure";
+type MilitaryTargetTypeConstants_MassRanged = "creepID" | "creepName" | "powerCreep" | "structure";
 
 type MilitaryTargetTypeConstants =
     | MilitaryTargetTypeConstants_Move
@@ -311,7 +282,7 @@ type MilitaryTargetTypeConstants =
     | MilitaryTargetTypeConstants_RangedHeal
     | MilitaryTargetTypeConstants_Attack
     | MilitaryTargetTypeConstants_RangedAttack
-    | MilitaryTargetTypeConstants_MassRanged
+    | MilitaryTargetTypeConstants_MassRanged;
 
 interface Base_MiliIntent {
     action: MilitaryActionConstants;
@@ -690,7 +661,14 @@ type Any_ValidActions =
 /**
  * Valid jobType for BaseJob
  */
-type Valid_JobTypes = "getEnergyJob" | "claimPartJob" | "carryPartJob" | "workPartJob" | "movePartJob" | "getNonEnergyJob" | "nonEnergyCarryPartJob";
+type Valid_JobTypes =
+    | "getEnergyJob"
+    | "claimPartJob"
+    | "carryPartJob"
+    | "workPartJob"
+    | "movePartJob"
+    | "getNonEnergyJob"
+    | "nonEnergyCarryPartJob";
 /**
  * Basic Job Interface
  */
@@ -864,6 +842,10 @@ interface GetEnergyJobListing {
 
 interface GetNonEnergyJobListing {
     /**
+     * Jobs that target the mineral source
+     */
+    mineralJobs?: Cache;
+    /**
      * Jobs that target resources on the ground
      */
     pickupJobs?: Cache;
@@ -874,15 +856,15 @@ interface GetNonEnergyJobListing {
     /**
      * Jobs that target storage with resources
      */
-    storageJobs?: Cache
+    storageJobs?: Cache;
     /**
      * Jobs that target the terminal with resources
      */
-    terminalJobs?: Cache
+    terminalJobs?: Cache;
     /**
      * Jobs that target labs with resources
      */
-    labJobs?: Cache
+    labJobs?: Cache;
 }
 
 /**
