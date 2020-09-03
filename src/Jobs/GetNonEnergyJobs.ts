@@ -34,6 +34,8 @@ export class GetNonEnergyJobs implements IJobTypeHelper {
 
         if (job.actionType === "pickup" && target instanceof Resource) {
             returnCode = creep.pickup(target);
+        } else if (job.actionType === "harvest" && target instanceof Mineral) {
+            returnCode = creep.harvest(target);
         } else if (
             job.actionType === "withdraw" &&
             (target instanceof Structure || target instanceof Ruin || target instanceof Tombstone)

@@ -138,14 +138,14 @@ export class MemoryApi_Jobs {
         if (
             NO_CACHING_MEMORY ||
             forceUpdate ||
-            !Memory.rooms[room.name].jobs!.getEnergyJobs ||
-            !Memory.rooms[room.name].jobs!.getEnergyJobs!.mineralJobs ||
-            Memory.rooms[room.name].jobs!.getEnergyJobs!.mineralJobs!.cache < Game.time - SOURCE_JOB_CACHE_TTL
+            !Memory.rooms[room.name].jobs!.getNonEnergyJobs ||
+            !Memory.rooms[room.name].jobs!.getNonEnergyJobs!.mineralJobs ||
+            Memory.rooms[room.name].jobs!.getNonEnergyJobs!.mineralJobs!.cache < Game.time - SOURCE_JOB_CACHE_TTL
         ) {
             MemoryHelper_Room.updateGetNonEnergy_mineralJobs(room);
         }
 
-        let mineralJobs: GetEnergyJob[] = Memory.rooms[room.name].jobs!.getEnergyJobs!.mineralJobs!.data;
+        let mineralJobs: GetEnergyJob[] = Memory.rooms[room.name].jobs!.getNonEnergyJobs!.mineralJobs!.data;
 
         if (filterFunction !== undefined) {
             mineralJobs = _.filter(mineralJobs, filterFunction);

@@ -51,8 +51,9 @@ import {
     TowerDrainerSquadManager,
     StandardSquadManager,
     RemoteDefenderSquadManager,
-    DomesticDefenderSquadManager,
+    DomesticDefenderSquadManager
 } from "Utils/Imports/internals";
+import { GetNonEnergyJobs } from "Jobs/GetNonEnergyJobs";
 
 // tslint:disable-next-line: interface-name
 export interface ICreepSpawnLimits {
@@ -66,6 +67,7 @@ export const JobTypes: IJobTypeHelper[] = [
     new CarryPartJobs(),
     new ClaimPartJobs(),
     new GetEnergyJobs(),
+    new GetNonEnergyJobs(),
     new MovePartJobs(),
     new WorkPartJobs()
 ];
