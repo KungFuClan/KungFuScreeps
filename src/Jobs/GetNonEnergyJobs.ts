@@ -48,8 +48,10 @@ export class GetNonEnergyJobs implements IJobTypeHelper {
         // Can handle the return code here - e.g. display an error if we expect creep to be in range but it's not
         switch (returnCode) {
             case OK:
-                delete creep.memory.job;
-                creep.memory.working = false;
+                if (job.actionType !== "harvest") {
+                    delete creep.memory.job;
+                    creep.memory.working = false;
+                }
                 break;
             case ERR_NOT_IN_RANGE:
                 creep.memory.working = false;
