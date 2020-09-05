@@ -22,7 +22,7 @@ import {
     FILL_JOB_CACHE_TTL,
     RoomApi_Structure
 } from "Utils/Imports/internals";
-import _ from "lodash";
+import _, { filter } from "lodash";
 
 export class MemoryApi_Jobs {
     /**
@@ -682,6 +682,66 @@ export class MemoryApi_Jobs {
     }
 
     /**
+     * Get all jobs for filling non energy structures
+     * @param room The room to get the jobs from
+     * @param filterFunction [Optional] A function to filter the job list
+     * @param forceUpdate [Optional] Forcibly invalidate the cache
+     */
+    public static getNonEnergyFillJobs(
+        room: Room,
+        filterFunction?: (object: CarryPartJob) => boolean,
+        forceUpdate?: boolean
+    ): CarryPartJob[] {
+        if (
+            NO_CACHING_MEMORY ||
+            forceUpdate ||
+            !Memory.rooms[room.name].jobs!.carryPartJobs ||
+            !Memory.rooms[room.name].jobs!.carryPartJobs!.nonEnergyFillJobs ||
+            Memory.rooms[room.name].jobs!.carryPartJobs!.nonEnergyFillJobs!.cache < Game.time - FILL_JOB_CACHE_TTL
+        ) {
+            MemoryHelper_Room.updateCarryPart_nonEnergyFillJobs(room);
+        }
+
+        let fillJobs: CarryPartJob[] = Memory.rooms[room.name].jobs!.carryPartJobs!.nonEnergyFillJobs!.data;
+
+        if (filterFunction !== undefined) {
+            fillJobs = _.filter(fillJobs, filterFunction);
+        }
+
+        return fillJobs;
+    }
+
+    /**
+     * Get all jobs for filling non energy structures
+     * @param room The room to get the jobs from
+     * @param filterFunction [Optional] A function to filter the job list
+     * @param forceUpdate [Optional] Forcibly invalidate the cache
+     */
+    public static getNonEnergyStoreJobs(
+        room: Room,
+        filterFunction?: (object: CarryPartJob) => boolean,
+        forceUpdate?: boolean
+    ): CarryPartJob[] {
+        if (
+            NO_CACHING_MEMORY ||
+            forceUpdate ||
+            !Memory.rooms[room.name].jobs!.carryPartJobs ||
+            !Memory.rooms[room.name].jobs!.carryPartJobs!.nonEnergyStoreJobs ||
+            Memory.rooms[room.name].jobs!.carryPartJobs!.nonEnergyStoreJobs!.cache < Game.time - FILL_JOB_CACHE_TTL
+        ) {
+            MemoryHelper_Room.updateCarryPart_nonEnergyStoreJobs(room);
+        }
+
+        let fillJobs: CarryPartJob[] = Memory.rooms[room.name].jobs!.carryPartJobs!.nonEnergyStoreJobs!.data;
+
+        if (filterFunction !== undefined) {
+            fillJobs = _.filter(fillJobs, filterFunction);
+        }
+
+        return fillJobs;
+    }
+
+    /**
      * Get the list of CarryPartJobs.fillJobs
      * @param room The room to get the jobs from
      * @param filterFunction [Optional] A function to filter the CarryPartJobs list
@@ -775,6 +835,9 @@ export class MemoryApi_Jobs {
                 break;
             case "getEnergyJob":
                 roomJob = this.searchGetEnergyJobs(creepJob as GetEnergyJob, room);
+                break;
+            case "getNonEnergyJob":
+                roomJob = this.searchGetNonEnergyJobs(creepJob as GetNonEnergyJob, room);
                 break;
             case "workPartJob":
                 roomJob = this.searchWorkPartJobs(creepJob as WorkPartJob, room);
@@ -924,6 +987,43 @@ export class MemoryApi_Jobs {
 
         if (roomJob === undefined && jobListing.repairJobs) {
             roomJob = _.find(jobListing.repairJobs.data, (rJob: WorkPartJob) => job.targetID === rJob.targetID);
+        }
+
+        return roomJob;
+    }
+
+    /**
+     * Searches through getNonEnergyJobs to find a specified job
+     * @param job The job to search for
+     * @param room The room to search in
+     */
+    public static searchGetNonEnergyJobs(job: GetNonEnergyJob, room: Room): GetNonEnergyJob | undefined {
+        if (room.memory.jobs!.getNonEnergyJobs === undefined) {
+            throw new UserException(
+                "Error in searchGetEnergyJobs",
+                "The room memory does not have a getNonEnergyJobs property",
+                ERROR_ERROR
+            );
+        }
+
+        const jobListing = room.memory.jobs!.getNonEnergyJobs!;
+
+        let roomJob: GetNonEnergyJob | undefined;
+
+        if (jobListing.containerJobs) {
+            roomJob = _.find(jobListing.containerJobs.data, (cJob: GetNonEnergyJob) => cJob.targetID === job.targetID);
+        }
+
+        if (roomJob === undefined && jobListing.pickupJobs) {
+            roomJob = _.find(jobListing.pickupJobs.data, (pJob: GetNonEnergyJob) => pJob.targetID === pJob.targetID);
+        }
+
+        if (roomJob === undefined && jobListing.storageJobs) {
+            roomJob = _.find(jobListing.storageJobs.data, (sJob: GetNonEnergyJob) => sJob.targetID === job.targetID);
+        }
+
+        if (roomJob === undefined && jobListing.mineralJobs) {
+            roomJob = _.find(jobListing.mineralJobs.data, (mJob: GetNonEnergyJob) => mJob.targetID === job.targetID);
         }
 
         return roomJob;

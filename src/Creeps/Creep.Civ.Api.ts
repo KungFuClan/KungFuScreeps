@@ -167,9 +167,48 @@ export class CreepCivApi {
     }
 
     /**
+     * Get a GetNonEnergyJob for the creep
+     * @param creep The creep we are getting the job for
+     * @param room The room object we are getting the job in
+     */
+    public static newGetNonEnergyJob(creep: Creep, room: Room): GetNonEnergyJob | undefined {
+        const creepOptions: CreepOptionsCiv = creep.memory.options as CreepOptionsCiv;
+
+        // Indicates if the room is safe to travel freely out of the bunker
+        const isEmergencyProtocol: boolean =
+            MemoryApi_Room.getDefconLevel(room) >= 2 && room.memory.roomState
+                ? room.memory.roomState >= ROOM_STATE_ADVANCED
+                : false;
+
+        if (creepOptions.getFromContainer && !isEmergencyProtocol) {
+            const containerJobs = MemoryApi_Jobs.getNonEnergyContainerJobs(room, (job: GetNonEnergyJob) => {
+                return !job.isTaken && job.resourceAmount >= creep.store.getFreeCapacity();
+            });
+
+            if (containerJobs.length > 0) {
+                return containerJobs[0];
+            }
+        }
+
+        if (creepOptions.getDroppedEnergy && !isEmergencyProtocol) {
+            // All dropped resources with enough energy to fill at least 60% of carry
+            const dropJobs = MemoryApi_Jobs.getNonEnergyPickupJobs(
+                room,
+                (dJob: GetNonEnergyJob) => !dJob.isTaken && dJob.resourceAmount >= creep.store.getCapacity() * 0.6
+            );
+
+            if (dropJobs.length > 0) {
+                return dropJobs[0];
+            }
+        }
+
+        return undefined;
+    }
+
+    /**
      * Get a GetEnergyJob for the creep
      * @param creep the creep we are getting the job for
-     * @param roomName the room name we are getting the job in
+     * @param roomName the room object we are getting the job in
      */
     public static newGetEnergyJob(creep: Creep, room: Room): GetEnergyJob | undefined {
         const creepOptions: CreepOptionsCiv = creep.memory.options as CreepOptionsCiv;

@@ -40,7 +40,8 @@ export class GetNonEnergyJobs implements IJobTypeHelper {
             job.actionType === "withdraw" &&
             (target instanceof Structure || target instanceof Ruin || target instanceof Tombstone)
         ) {
-            returnCode = creep.withdraw(target, RESOURCE_ENERGY);
+            returnCode = creep.withdraw(target, (job as GetNonEnergyJob).resourceType);
+            console.log(creep.name + " " + (job as GetNonEnergyJob).resourceType + " " + returnCode);
         } else {
             throw CreepAllApi.badTarget_Error(creep, job);
         }
@@ -57,6 +58,10 @@ export class GetNonEnergyJobs implements IJobTypeHelper {
                 creep.memory.working = false;
                 break;
             case ERR_NOT_FOUND:
+                break;
+            case ERR_NOT_ENOUGH_ENERGY:
+                creep.memory.working = false;
+                delete creep.memory.job;
                 break;
             case ERR_FULL:
                 delete creep.memory.job;
@@ -115,7 +120,7 @@ export class GetNonEnergyJobs implements IJobTypeHelper {
                 actionType: "harvest",
                 targetType: "mineral",
                 resourceType: mineral.mineralType,
-                resourceAmount: mineral.mineralAmount,
+                resourceAmount: mineral.mineralAmount || 0,
                 isTaken: mineralEnergyRemaining <= 0 // Taken if no energy remaining
             };
 
@@ -168,7 +173,7 @@ export class GetNonEnergyJobs implements IJobTypeHelper {
                 targetID: drop.id as string,
                 targetType: "droppedResource",
                 resourceType: drop.resourceType,
-                resourceAmount: adjustedDropAmount,
+                resourceAmount: adjustedDropAmount || 0,
                 actionType: "pickup",
                 isTaken: false
             };
@@ -229,7 +234,7 @@ export class GetNonEnergyJobs implements IJobTypeHelper {
                     targetType: STRUCTURE_CONTAINER,
                     actionType: "withdraw",
                     resourceType: resourceConstant,
-                    resourceAmount: adjustedResourceAmount,
+                    resourceAmount: adjustedResourceAmount || 0,
                     isTaken: adjustedResourceAmount <= 0 // Taken if empty
                 };
 

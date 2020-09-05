@@ -925,6 +925,14 @@ interface CarryPartJobListing {
      * Jobs to store away or sell excess resources (Storage, Terminal, Containers)
      */
     storeJobs?: Cache;
+    /**
+     * Jobs to fill objects that need non-energy resources to function (Labs, nukers, factories)0
+     */
+    nonEnergyFillJobs?: Cache;
+    /**
+     * Jobs to store away or sell excess non-energy resources (STorage, terminal, containers)
+     */
+    nonEnergyStoreJobs?: Cache;
 }
 
 interface RoomMemory {

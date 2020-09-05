@@ -33,8 +33,20 @@ export class CarryPartJobs implements IJobTypeHelper {
         let deleteOnSuccess: boolean = false;
 
         if (job.actionType === "transfer" && (target instanceof Structure || target instanceof Creep)) {
-            deleteOnSuccess = true;
-            returnCode = creep.transfer(target, RESOURCE_ENERGY);
+            let targetResource: ResourceConstant | undefined = RESOURCE_ENERGY;
+
+            for (let resource in creep.store) {
+                let amount = creep.store[<ResourceConstant>resource];
+
+                if (amount > 0) {
+                    if (creep.store.getUsedCapacity() === amount) deleteOnSuccess = true;
+                    targetResource = resource as ResourceConstant;
+                }
+
+                console.log(creep.name + " " + job.targetType + " " + targetResource + " " + amount);
+            }
+
+            returnCode = creep.transfer(target, targetResource);
         } else {
             throw CreepAllApi.badTarget_Error(creep, job);
         }
@@ -263,32 +275,29 @@ export class CarryPartJobs implements IJobTypeHelper {
     }
 
     /**
+     * Gets a list of structures that need filled, and the type of resource they need
+     * @param room The room to get the jobs for
+     * [No-Restore] New job every time
+     */
+    public static createNonEnergyFillJobs(room: Room): CarryPartJob[] {
+        // TODO handle filling labs, nukers, factories, terminals for order
+
+        return [];
+    }
+
+    /**
      * Gets a list of mineral depositing minerals/boosts for the room
      * @param room The room to get the jobs for
      * [No-Restore] New job every time
      */
-    public static createNonEnergyDumpJobs(room: Room): CarryPartJob[] {
+    public static createNonEnergyStoreJobs(room: Room): CarryPartJob[] {
         const carryJobs: CarryPartJob[] = [];
 
         // Resource type is undefined, but it will get changed at the level of the creep taking the job
 
-        if (room.storage !== undefined) {
-            const storageJob: CarryPartJob = {
-                jobType: "nonEnergyCarryPartJob",
-                targetID: room.storage.id as string,
-                targetType: STRUCTURE_STORAGE,
-                remaining: room.storage.store.getFreeCapacity(),
-                resourceType: undefined,
-                actionType: "transfer",
-                isTaken: false
-            };
-
-            carryJobs.push(storageJob);
-        }
-
         if (room.terminal !== undefined) {
             const terminalJob: CarryPartJob = {
-                jobType: "nonEnergyCarryPartJob",
+                jobType: "carryPartJob",
                 targetID: room.terminal.id as string,
                 targetType: STRUCTURE_TERMINAL,
                 remaining: room.terminal.store.getFreeCapacity(),
@@ -298,6 +307,20 @@ export class CarryPartJobs implements IJobTypeHelper {
             };
 
             carryJobs.push(terminalJob);
+        }
+
+        if (room.storage !== undefined) {
+            const storageJob: CarryPartJob = {
+                jobType: "carryPartJob",
+                targetID: room.storage.id as string,
+                targetType: STRUCTURE_STORAGE,
+                remaining: room.storage.store.getFreeCapacity(),
+                resourceType: undefined,
+                actionType: "transfer",
+                isTaken: false
+            };
+
+            carryJobs.push(storageJob);
         }
 
         return carryJobs;

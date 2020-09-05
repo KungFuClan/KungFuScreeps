@@ -1,4 +1,11 @@
-import { ROLE_HARVESTER, MemoryApi_Jobs, CreepAllApi, MemoryHelper, CreepAllHelper } from "Utils/Imports/internals";
+import {
+    ROLE_HARVESTER,
+    MemoryApi_Jobs,
+    CreepAllApi,
+    MemoryHelper,
+    CreepAllHelper,
+    JobTypes
+} from "Utils/Imports/internals";
 import { CreepCivApi } from "Creeps/Creep.Civ.Api";
 import _ from "lodash";
 
@@ -19,16 +26,23 @@ export class HarvesterCreepManager implements ICivCreepRoleManager {
      * @returns BaseJob of the new job we recieved (undefined if none)
      */
     public getNewJob(creep: Creep, room: Room): BaseJob | undefined {
+        let job: BaseJob | undefined;
+
         // if creep is empty, get a GetEnergyJob
-        if (creep.store.energy === 0) {
-            return CreepCivApi.newGetEnergyJob(creep, room);
+        if (creep.store.getUsedCapacity() === 0) {
+            job = CreepCivApi.newGetEnergyJob(creep, room);
+
+            if (job === undefined) {
+                job = CreepCivApi.newGetNonEnergyJob(creep, room);
+            }
         } else {
-            let job: BaseJob | undefined = this.newCarryPartJob(creep, room);
+            job = this.newCarryPartJob(creep, room);
             if (job === undefined && CreepAllHelper.bodyPartExists(creep, WORK)) {
                 job = this.newWorkPartJob(creep, room);
             }
-            return job;
         }
+
+        return job;
     }
 
     /**
@@ -36,6 +50,15 @@ export class HarvesterCreepManager implements ICivCreepRoleManager {
      */
     public newCarryPartJob(creep: Creep, room: Room): CarryPartJob | undefined {
         const creepOptions: CreepOptionsCiv = creep.memory.options as CreepOptionsCiv;
+
+        const hasNonEnergy: boolean = creep.store.getUsedCapacity() - creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0;
+
+        if (hasNonEnergy) {
+            const nonEnergy_storeJobs = MemoryApi_Jobs.getNonEnergyStoreJobs(room);
+
+            // TODO Better selection, implement filling structures using MemoryApi_Jobs.getNonEnergyFillJobs
+            return nonEnergy_storeJobs[0];
+        }
 
         if (creepOptions.fillTower || creepOptions.fillSpawn || creepOptions.fillExtension) {
             const fillJobs = MemoryApi_Jobs.getFillJobs(

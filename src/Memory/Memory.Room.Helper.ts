@@ -585,6 +585,38 @@ export class MemoryHelper_Room {
     public static updateCarryPart_allJobs(room: Room) {
         this.updateCarryPart_fillJobs(room);
         this.updateCarryPart_storeJobs(room);
+        this.updateCarryPart_nonEnergyStoreJobs(room);
+        this.updateCarryPart_nonEnergyFillJobs(room);
+    }
+
+    /**
+     * Update the room's CarryPartJobListing_fillJobs
+     * @param room  The room to update the memory of
+     */
+    public static updateCarryPart_nonEnergyFillJobs(room: Room) {
+        if (Memory.rooms[room.name].jobs!.carryPartJobs === undefined) {
+            Memory.rooms[room.name].jobs!.carryPartJobs = {};
+        }
+
+        Memory.rooms[room.name].jobs!.carryPartJobs!.nonEnergyFillJobs = {
+            data: CarryPartJobs.createNonEnergyFillJobs(room),
+            cache: Game.time
+        };
+    }
+
+    /**
+     * Update the room's CarryPartJobListing_fillJobs
+     * @param room  The room to update the memory of
+     */
+    public static updateCarryPart_nonEnergyStoreJobs(room: Room) {
+        if (Memory.rooms[room.name].jobs!.carryPartJobs === undefined) {
+            Memory.rooms[room.name].jobs!.carryPartJobs = {};
+        }
+
+        Memory.rooms[room.name].jobs!.carryPartJobs!.nonEnergyStoreJobs = {
+            data: CarryPartJobs.createNonEnergyStoreJobs(room),
+            cache: Game.time
+        };
     }
 
     /**
