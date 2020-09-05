@@ -596,11 +596,11 @@ type GetEnergy_ValidActions = "withdraw" | "harvest" | "pickup";
 /**
  * Valid types for the GetNonEnergyJob target type
  */
-type GetNonEnergy_ValidTargets = "droppedResource" | ResourceContainingStructureConstant;
+type GetNonEnergy_ValidTargets = "mineral" | "droppedResource" | ResourceContainingStructureConstant;
 /**
  * Valid actions for GetNonEnergy action type
  */
-type GetNonEnergy_ValidActions = "pickup" | "withdraw";
+type GetNonEnergy_ValidActions = "pickup" | "withdraw" | "harvest";
 
 /**
  * Valid types for the WorkPartJob targetType
@@ -730,12 +730,14 @@ interface GetNonEnergyJob extends BaseJob {
      */
     actionType: GetNonEnergy_ValidActions;
     /**
-     * The resources in the object in the format of Structure.Store
-     *
-     * Each object key is one of the RESOURCE_* constants, values are resources amounts.
-     * RESOURCE_ENERGY is always defined and equals to 0 when empty, other resources are undefined when empty.
+     * The type of resource in the target object
+     * A container with multiple resource types will have multiple jobs assigned  to it
      */
-    resources: StoreDefinition | Store<ResourceConstant, true> | Store<ResourceConstant, false>;
+    resourceType: Exclude<ResourceConstant, RESOURCE_ENERGY>;
+    /**
+     * Amount of the resource remaining
+     */
+    resourceAmount: number;
 }
 
 /**

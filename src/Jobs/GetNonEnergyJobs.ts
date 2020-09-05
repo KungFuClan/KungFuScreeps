@@ -91,7 +91,7 @@ export class GetNonEnergyJobs implements IJobTypeHelper {
      * Get a list of the getenergyjobs for minerals in the room
      * @param room the room we are creating the job list for
      */
-    public static createMineralJobs(room: Room): GetEnergyJob[] {
+    public static createMineralJobs(room: Room): GetNonEnergyJob[] {
         // List of all sources that are under optimal work capacity
         const openMinerals = MemoryApi_Room.getMinerals(room.name);
 
@@ -99,28 +99,28 @@ export class GetNonEnergyJobs implements IJobTypeHelper {
             return [];
         }
 
-        const mineralJobList: GetEnergyJob[] = [];
+        const mineralJobList: GetNonEnergyJob[] = [];
 
         _.forEach(openMinerals, (mineral: Mineral) => {
             const mineralEnergyRemaining = mineral.mineralAmount;
-            const mineralType = mineral.mineralType;
 
             // Create the StoreDefinition for the source
-            // TODO Change this to actually match the resource type, removing the -> unknown -> StoreDefinition
-            const mineralResources = { [mineralType]: mineralEnergyRemaining };
+            const mineralResources: StoreDefinition = { energy: 0 } as StoreDefinition;
+            mineralResources[mineral.mineralType] = mineral.mineralAmount;
 
             // Create the GetEnergyJob object for the source
-            const sourceJob: GetEnergyJob = {
+            const mineralJob: GetNonEnergyJob = {
                 jobType: "getNonEnergyJob",
                 targetID: mineral.id as string,
-                targetType: "mineral",
                 actionType: "harvest",
-                resources: (mineralResources as unknown) as StoreDefinition,
+                targetType: "mineral",
+                resourceType: mineral.mineralType,
+                resourceAmount: mineral.mineralAmount,
                 isTaken: mineralEnergyRemaining <= 0 // Taken if no energy remaining
             };
 
             // Append the GetEnergyJob to the main array
-            mineralJobList.push(sourceJob);
+            mineralJobList.push(mineralJob);
         });
 
         return mineralJobList;
@@ -131,7 +131,7 @@ export class GetNonEnergyJobs implements IJobTypeHelper {
      * @param room The room to create the job for
      * [Accurate-Restore] Adjusts for creeps targeting it
      */
-    public static createNonEnergyPickUpJobs(room: Room): GetNonEnergyJob[] {
+    public static createPickUpJobs(room: Room): GetNonEnergyJob[] {
         // All dropped energy in the room
         const drops = MemoryApi_Room.getDroppedResources(room);
 
@@ -147,9 +147,6 @@ export class GetNonEnergyJobs implements IJobTypeHelper {
                 return;
             }
 
-            const dropStore: StoreDefinition = { energy: 0 } as StoreDefinition;
-            dropStore[drop.resourceType] = drop.amount;
-
             const creepsUsingDrop = MemoryApi_Creep.getMyCreeps(room.name, (creep: Creep) => {
                 if (
                     creep.memory.job &&
@@ -161,14 +158,17 @@ export class GetNonEnergyJobs implements IJobTypeHelper {
                 return false;
             });
 
+            let adjustedDropAmount = drop.amount;
+
             // Subtract creep's carryspace from drop amount
-            dropStore[drop.resourceType]! -= _.sum(creepsUsingDrop, creep => creep.store.getFreeCapacity());
+            adjustedDropAmount -= _.sum(creepsUsingDrop, creep => creep.store.getFreeCapacity());
 
             const dropJob: GetNonEnergyJob = {
                 jobType: "getNonEnergyJob",
                 targetID: drop.id as string,
                 targetType: "droppedResource",
-                resources: dropStore,
+                resourceType: drop.resourceType,
+                resourceAmount: adjustedDropAmount,
                 actionType: "pickup",
                 isTaken: false
             };
@@ -184,20 +184,16 @@ export class GetNonEnergyJobs implements IJobTypeHelper {
      * @param room The room to create the job for
      * [Accurate-Restore] Adjusts for creeps targeting it
      */
-    public static createNonEnergyContainerJobs(room: Room): GetNonEnergyJob[] {
-        // List of all containers next to an extractor
-        const extractors: StructureExtractor[] = MemoryApi_Room.getStructureOfType(
-            room.name,
-            STRUCTURE_EXTRACTOR
-        ) as StructureExtractor[];
-        const containers = MemoryApi_Room.getStructureOfType(
+    public static createContainerJobs(room: Room): GetNonEnergyJob[] {
+        // Filter containers for those with non energy in them
+        const containers = MemoryApi_Room.getStructure<StructureContainer>(
             room.name,
             STRUCTURE_CONTAINER,
-            (container: StructureContainer) =>
-                _.some(extractors, (extractor: StructureExtractor) => {
-                    if (!extractor) return false;
-                    return extractor.pos.isNearTo(container);
-                })
+            container => {
+                let energyAmount = container.store.getUsedCapacity(RESOURCE_ENERGY);
+                let otherAmount = container.store.getUsedCapacity() - energyAmount;
+                return otherAmount > 0;
+            }
         );
 
         if (containers.length === 0) {
@@ -207,40 +203,38 @@ export class GetNonEnergyJobs implements IJobTypeHelper {
         const containerJobList: GetNonEnergyJob[] = [];
 
         _.forEach(containers, (container: StructureContainer) => {
-            // Get all creeps that are targeting this container to withdraw from it
-            const creepsUsingContainer = MemoryApi_Creep.getMyCreeps(room.name, (creep: Creep) => {
-                if (
-                    creep.memory.job &&
-                    creep.memory.job.targetID === container.id &&
-                    creep.memory.job.actionType === "withdraw"
-                ) {
-                    return true;
-                }
-                return false;
-            });
+            for (let resourceKey in container.store) {
+                let resourceConstant = resourceKey as Exclude<ResourceConstant, RESOURCE_ENERGY>;
 
-            // The container.store we will use instead of the true value
-            const adjustedContainerStore: StoreDefinition = container.store;
-            const targetMineral: Mineral | null = container.pos.findClosestByRange(FIND_MINERALS);
-            if (!targetMineral) return;
-            const targetResource: MineralConstant = targetMineral.mineralType;
+                const creepsUsingContainer = MemoryApi_Creep.getMyCreeps(room.name, (creep: Creep) => {
+                    if (
+                        creep.memory.job &&
+                        creep.memory.job.targetID === container.id &&
+                        creep.memory.job.jobType === "getNonEnergyJob" &&
+                        (creep.memory.job as GetNonEnergyJob).resourceType === resourceConstant &&
+                        creep.memory.job.actionType === "withdraw"
+                    ) {
+                        return true;
+                    }
+                    return false;
+                });
 
-            // Subtract the empty carry of creeps targeting this container to withdraw
-            _.forEach(creepsUsingContainer, (creep: Creep) => {
-                adjustedContainerStore[targetResource] -= creep.store.getFreeCapacity();
-            });
+                let adjustedResourceAmount = container.store[resourceKey as ResourceConstant];
+                adjustedResourceAmount -= _.sum(creepsUsingContainer, creep => creep.store.getFreeCapacity());
 
-            // Create the containerJob
-            const containerJob: GetNonEnergyJob = {
-                jobType: "getNonEnergyJob",
-                targetID: container.id as string,
-                targetType: STRUCTURE_CONTAINER,
-                actionType: "withdraw",
-                resources: adjustedContainerStore,
-                isTaken: adjustedContainerStore.getUsedCapacity(targetResource) <= 0 // Taken if empty
-            };
-            // Append to the main array
-            containerJobList.push(containerJob);
+                // Create the containerJob
+                const containerJob: GetNonEnergyJob = {
+                    jobType: "getNonEnergyJob",
+                    targetID: container.id as string,
+                    targetType: STRUCTURE_CONTAINER,
+                    actionType: "withdraw",
+                    resourceType: resourceConstant,
+                    resourceAmount: adjustedResourceAmount,
+                    isTaken: adjustedResourceAmount <= 0 // Taken if empty
+                };
+
+                containerJobList.push(containerJob);
+            }
         });
 
         return containerJobList;

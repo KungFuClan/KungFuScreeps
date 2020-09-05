@@ -54,12 +54,16 @@ export class MemoryApi_Jobs {
      */
     public static getAllNonEnergyJobs(
         room: Room,
-        filterFunction?: (object: GetEnergyJob) => boolean,
+        filterFunction?: (object: GetNonEnergyJob) => boolean,
         forceUpdate?: boolean
-    ): GetEnergyJob[] {
-        const allNonGetEnergyJobs: GetEnergyJob[] = [];
+    ): GetNonEnergyJob[] {
+        const allNonGetEnergyJobs: GetNonEnergyJob[] = [];
 
         _.forEach(this.getMineralJobs(room, filterFunction, forceUpdate), job => allNonGetEnergyJobs.push(job));
+        _.forEach(this.getNonEnergyContainerJobs(room, filterFunction, forceUpdate), job =>
+            allNonGetEnergyJobs.push(job)
+        );
+        _.forEach(this.getNonEnergyPickupJobs(room, filterFunction, forceUpdate), job => allNonGetEnergyJobs.push(job));
 
         return allNonGetEnergyJobs;
     }
@@ -132,9 +136,9 @@ export class MemoryApi_Jobs {
      */
     public static getMineralJobs(
         room: Room,
-        filterFunction?: (object: GetEnergyJob) => boolean,
+        filterFunction?: (object: GetNonEnergyJob) => boolean,
         forceUpdate?: boolean
-    ): GetEnergyJob[] {
+    ): GetNonEnergyJob[] {
         if (
             NO_CACHING_MEMORY ||
             forceUpdate ||
@@ -145,7 +149,7 @@ export class MemoryApi_Jobs {
             MemoryHelper_Room.updateGetNonEnergy_mineralJobs(room);
         }
 
-        let mineralJobs: GetEnergyJob[] = Memory.rooms[room.name].jobs!.getNonEnergyJobs!.mineralJobs!.data;
+        let mineralJobs: GetNonEnergyJob[] = Memory.rooms[room.name].jobs!.getNonEnergyJobs!.mineralJobs!.data;
 
         if (filterFunction !== undefined) {
             mineralJobs = _.filter(mineralJobs, filterFunction);
@@ -185,33 +189,63 @@ export class MemoryApi_Jobs {
     }
 
     /**
-     * Get the list of GetEnergyJobs.containerJobs
+     * Get the list of GetNonEnergyJobs.containerJobs
      * @param room The room to get the jobs from
-     * @param filterFunction [Optional] A function to filter the getEnergyjob list
+     * @param filterFunction [Optional] A function to filter the getNonEnergyjob list
      * @param forceUpdate [Optional] Forcibly invalidate the cache
      */
     public static getNonEnergyContainerJobs(
         room: Room,
-        filterFunction?: (object: GetEnergyJob) => boolean,
+        filterFunction?: (object: GetNonEnergyJob) => boolean,
         forceUpdate?: boolean
-    ): GetEnergyJob[] {
+    ): GetNonEnergyJob[] {
         if (
             NO_CACHING_MEMORY ||
             forceUpdate ||
-            !Memory.rooms[room.name].jobs!.getEnergyJobs ||
-            !Memory.rooms[room.name].jobs!.getEnergyJobs!.containerJobs ||
-            Memory.rooms[room.name].jobs!.getEnergyJobs!.containerJobs!.cache < Game.time - CONTAINER_JOB_CACHE_TTL
+            !Memory.rooms[room.name].jobs!.getNonEnergyJobs ||
+            !Memory.rooms[room.name].jobs!.getNonEnergyJobs!.containerJobs ||
+            Memory.rooms[room.name].jobs!.getNonEnergyJobs!.containerJobs!.cache < Game.time - CONTAINER_JOB_CACHE_TTL
         ) {
-            MemoryHelper_Room.updateGetEnergy_containerJobs(room);
+            MemoryHelper_Room.updateGetNonEnergy_containerJobs(room);
         }
 
-        let containerJobs: GetEnergyJob[] = Memory.rooms[room.name].jobs!.getEnergyJobs!.containerJobs!.data;
+        let containerJobs: GetNonEnergyJob[] = Memory.rooms[room.name].jobs!.getNonEnergyJobs!.containerJobs!.data;
 
         if (filterFunction !== undefined) {
             containerJobs = _.filter(containerJobs, filterFunction);
         }
 
         return containerJobs;
+    }
+
+    /**
+     * Get the list of GetNonEnergyJobs.pickupJobs
+     * @param room The room to get the jobs from
+     * @param filterFunction [Optional] A function to filter the getNonEnergyjob list
+     * @param forceUpdate [Optional] Forcibly invalidate the cache
+     */
+    public static getNonEnergyPickupJobs(
+        room: Room,
+        filterFunction?: (object: GetNonEnergyJob) => boolean,
+        forceUpdate?: boolean
+    ): GetNonEnergyJob[] {
+        if (
+            NO_CACHING_MEMORY ||
+            forceUpdate ||
+            !Memory.rooms[room.name].jobs!.getNonEnergyJobs ||
+            !Memory.rooms[room.name].jobs!.getNonEnergyJobs!.pickupJobs ||
+            Memory.rooms[room.name].jobs!.getNonEnergyJobs!.pickupJobs!.cache < Game.time - PICKUP_JOB_CACHE_TTL
+        ) {
+            MemoryHelper_Room.updateGetNonEnergy_pickupJobs(room);
+        }
+
+        let pickupJobs: GetNonEnergyJob[] = Memory.rooms[room.name].jobs!.getNonEnergyJobs!.pickupJobs!.data;
+
+        if (filterFunction !== undefined) {
+            pickupJobs = _.filter(pickupJobs, filterFunction);
+        }
+
+        return pickupJobs;
     }
 
     /**

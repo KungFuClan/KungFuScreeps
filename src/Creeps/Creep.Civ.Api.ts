@@ -152,12 +152,12 @@ export class CreepCivApi {
      * @param creep the creep we are getting the job for
      * @param roomName the room we are getting the job in
      */
-    public static getNewMineralJob(creep: Creep, room: Room): GetEnergyJob | undefined {
+    public static getNewMineralJob(creep: Creep, room: Room): GetNonEnergyJob | undefined {
         const creepOptions = creep.memory.options as CreepOptionsCiv;
 
         if (creepOptions.harvestMinerals) {
             // forceUpdate to get accurate job listing
-            const mineralJobs = MemoryApi_Jobs.getMineralJobs(room, (sJob: GetEnergyJob) => !sJob.isTaken, true);
+            const mineralJobs = MemoryApi_Jobs.getMineralJobs(room, (sJob: GetNonEnergyJob) => !sJob.isTaken, true);
 
             if (mineralJobs.length > 0) {
                 return mineralJobs[0];

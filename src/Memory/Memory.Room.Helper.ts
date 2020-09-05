@@ -283,6 +283,8 @@ export class MemoryHelper_Room {
      */
     public static updateGetNonEnergy_allJobs(room: Room) {
         this.updateGetNonEnergy_mineralJobs(room);
+        this.updateGetNonEnergy_containerJobs(room);
+        this.updateGetNonEnergy_pickupJobs(room);
     }
 
     /**
@@ -297,6 +299,36 @@ export class MemoryHelper_Room {
 
         Memory.rooms[room.name].jobs!.getNonEnergyJobs!.mineralJobs = {
             data: GetNonEnergyJobs.createMineralJobs(room),
+            cache: Game.time
+        };
+    }
+
+    /**
+     * Update the room's GetNonEnergyJobListing_containerJobs
+     * @param room The room to update the memory fo
+     */
+    public static updateGetNonEnergy_containerJobs(room: Room) {
+        if (Memory.rooms[room.name].jobs!.getNonEnergyJobs === undefined) {
+            Memory.rooms[room.name].jobs!.getNonEnergyJobs = {};
+        }
+
+        Memory.rooms[room.name].jobs!.getNonEnergyJobs!.containerJobs = {
+            data: GetNonEnergyJobs.createContainerJobs(room),
+            cache: Game.time
+        };
+    }
+
+    /**
+     * Update the room's GetNonEnergyJobListing_containerJobs
+     * @param room The room to update the memory fo
+     */
+    public static updateGetNonEnergy_pickupJobs(room: Room) {
+        if (Memory.rooms[room.name].jobs!.getNonEnergyJobs === undefined) {
+            Memory.rooms[room.name].jobs!.getNonEnergyJobs = {};
+        }
+
+        Memory.rooms[room.name].jobs!.getNonEnergyJobs!.pickupJobs = {
+            data: GetNonEnergyJobs.createPickUpJobs(room),
             cache: Game.time
         };
     }
