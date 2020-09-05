@@ -882,6 +882,9 @@ export class MemoryApi_Jobs {
             case "getEnergyJob":
                 this.updateGetEnergyJob(roomJob as GetEnergyJob, creep);
                 break;
+            case "getNonEnergyJob":
+                this.updateGetNonEnergyJob(roomJob as GetNonEnergyJob, creep);
+                break;
             case "workPartJob":
                 this.updateWorkPartJob(roomJob as WorkPartJob, creep);
                 break;
@@ -1105,6 +1108,35 @@ export class MemoryApi_Jobs {
             return;
         }
     }
+
+    /**
+     * Updates the GetNonEnergyJob
+     * @param job The job to update
+     */
+    public static updateGetNonEnergyJob(job: GetNonEnergyJob, creep: Creep): void {
+        if (job.targetType === "mineral") {
+            // As of now we do nothing since only one miner goes to a mineral
+            return;
+        }
+
+        if (
+            job.targetType === "container" ||
+            job.targetType === "droppedResource" ||
+            job.targetType === "storage" ||
+            job.targetType === "terminal" ||
+            job.targetType === "ruin" ||
+            job.targetType === "tombstone"
+        ) {
+            job.resourceAmount -= creep.store.getFreeCapacity();
+
+            if (job.resourceAmount <= 0) {
+                job.isTaken = true;
+            }
+
+            return;
+        }
+    }
+
     /**
      * Updates the getEnergyJob
      * @param job The Job to update

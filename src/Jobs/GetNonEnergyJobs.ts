@@ -33,13 +33,18 @@ export class GetNonEnergyJobs implements IJobTypeHelper {
         let returnCode: number;
 
         if (job.actionType === "pickup" && target instanceof Resource) {
+            //
             returnCode = creep.pickup(target);
+            //
         } else if (job.actionType === "harvest" && target instanceof Mineral) {
+            //
             returnCode = creep.harvest(target);
+            //
         } else if (
             job.actionType === "withdraw" &&
             (target instanceof Structure || target instanceof Ruin || target instanceof Tombstone)
         ) {
+            //
             returnCode = creep.withdraw(target, (job as GetNonEnergyJob).resourceType);
             console.log(creep.name + " " + (job as GetNonEnergyJob).resourceType + " " + returnCode);
         } else {
@@ -83,6 +88,9 @@ export class GetNonEnergyJobs implements IJobTypeHelper {
         // Move options target
         const moveOpts: MoveToOpts = PathfindingApi.GetDefaultMoveOpts(creep);
         moveOpts.range = 1;
+        if (creep.memory.supplementary && creep.memory.supplementary.moveTargetID) {
+            moveOpts.range = 0;
+        }
 
         if (creep.pos.getRangeTo(moveTarget!) <= moveOpts.range!) {
             creep.memory.working = true;

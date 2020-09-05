@@ -213,12 +213,12 @@ export class CreepCivApi {
     public static newGetEnergyJob(creep: Creep, room: Room): GetEnergyJob | undefined {
         const creepOptions: CreepOptionsCiv = creep.memory.options as CreepOptionsCiv;
         // Indicates if the room is safe to travel freely out of the bunker
-        const isEmergecyProtocol: boolean =
+        const isEmergencyProtocol: boolean =
             MemoryApi_Room.getDefconLevel(room) >= 2 && room.memory.roomState
                 ? room.memory.roomState >= ROOM_STATE_ADVANCED
                 : false;
 
-        if (creepOptions.getFromContainer && !isEmergecyProtocol) {
+        if (creepOptions.getFromContainer && !isEmergencyProtocol) {
             // get a container job based on the filter function returned from the helper
             const containerJobs = MemoryApi_Jobs.getEnergyContainerJobs(
                 room,
@@ -230,7 +230,7 @@ export class CreepCivApi {
             }
         }
 
-        if (creepOptions.getDroppedEnergy && !isEmergecyProtocol) {
+        if (creepOptions.getDroppedEnergy && !isEmergencyProtocol) {
             // All dropped resources with enough energy to fill at least 60% of carry
             const dropJobs = MemoryApi_Jobs.getPickupJobs(
                 room,
@@ -242,7 +242,7 @@ export class CreepCivApi {
             }
         }
 
-        if (creepOptions.getLootJobs && !isEmergecyProtocol) {
+        if (creepOptions.getLootJobs && !isEmergencyProtocol) {
             // All tombstones / ruins with enough energy to fill at least 60% of carry
             const lootJobs = MemoryApi_Jobs.getLootJobs(
                 room,

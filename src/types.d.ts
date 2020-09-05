@@ -596,7 +596,12 @@ type GetEnergy_ValidActions = "withdraw" | "harvest" | "pickup";
 /**
  * Valid types for the GetNonEnergyJob target type
  */
-type GetNonEnergy_ValidTargets = "mineral" | "droppedResource" | ResourceContainingStructureConstant;
+type GetNonEnergy_ValidTargets =
+    | "mineral"
+    | "droppedResource"
+    | "ruin"
+    | "tombstone"
+    | ResourceContainingStructureConstant;
 /**
  * Valid actions for GetNonEnergy action type
  */
