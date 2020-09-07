@@ -18,7 +18,7 @@ import {
     MemoryApi_Creep,
     RoomHelper_Structure,
     RoomHelper_State,
-    MINERAL_MINER_CONTAINER_LIMIT,
+    MINERAL_MINER_CONTAINER_LIMIT
 } from "Utils/Imports/internals";
 import _ from "lodash";
 
@@ -363,8 +363,7 @@ export class SpawnHelper {
             // We have to make sure the limit remains for an existing reserver as well
             if (this.reserverExistsForRoomCurrently(room, remoteRoom)) {
                 numReserversNeeded++;
-            }
-            else if (remoteRoom.reserveTTL <= RESERVER_MIN_TTL || this.isRemoteRoomEnemyReserved(remoteRoom)) {
+            } else if (remoteRoom.reserveTTL <= RESERVER_MIN_TTL || this.isRemoteRoomEnemyReserved(remoteRoom)) {
                 numReserversNeeded++;
             }
         }
@@ -379,9 +378,10 @@ export class SpawnHelper {
      * @returns the bool result on if there is a remote reserver set to this room arleady
      */
     public static reserverExistsForRoomCurrently(room: Room, remoteRoom: RemoteRoomMemory): boolean {
-        const creepsInRemoteRoom: Creep[] = MemoryApi_Creep.getMyCreeps(room.name,
-            (c: Creep) => c.memory.role === ROLE_REMOTE_RESERVER
-                && c.memory.targetRoom === remoteRoom.roomName);
+        const creepsInRemoteRoom: Creep[] = MemoryApi_Creep.getMyCreeps(
+            room.name,
+            (c: Creep) => c.memory.role === ROLE_REMOTE_RESERVER && c.memory.targetRoom === remoteRoom.roomName
+        );
         return creepsInRemoteRoom.length > 0;
     }
 
@@ -417,15 +417,23 @@ export class SpawnHelper {
      * get a remote room that needs a remote reserver
      */
     public static getRemoteRoomNeedingRemoteReserver(room: Room): RemoteRoomMemory | undefined {
-        const reserversInRoom: Creep[] = MemoryApi_Creep.getMyCreeps(room.name, (c: Creep) => c.memory.role === ROLE_REMOTE_RESERVER);
-        const remoteRooms: RemoteRoomMemory[] = MemoryApi_Room.getRemoteRooms(room, (rr: RemoteRoomMemory) => rr.reserveTTL < RESERVER_MIN_TTL || this.isRemoteRoomEnemyReserved(rr));
-        return _.min(remoteRooms, (rr: RemoteRoomMemory) => _.sum(reserversInRoom, (c: Creep) => {
-            if (c.memory.targetRoom === rr.roomName) {
-                return 1;
-            } else {
-                return 0;
-            }
-        }));
+        const reserversInRoom: Creep[] = MemoryApi_Creep.getMyCreeps(
+            room.name,
+            (c: Creep) => c.memory.role === ROLE_REMOTE_RESERVER
+        );
+        const remoteRooms: RemoteRoomMemory[] = MemoryApi_Room.getRemoteRooms(
+            room,
+            (rr: RemoteRoomMemory) => rr.reserveTTL < RESERVER_MIN_TTL || this.isRemoteRoomEnemyReserved(rr)
+        );
+        return _.min(remoteRooms, (rr: RemoteRoomMemory) =>
+            _.sum(reserversInRoom, (c: Creep) => {
+                if (c.memory.targetRoom === rr.roomName) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            })
+        );
     }
 
     /**
@@ -465,14 +473,17 @@ export class SpawnHelper {
         }
 
         // Each work part repairs 100, assumes they'll be repairing for 90% of their lifespan. Precision isn't important
-        const creepRepairPerLife: number = (numWorkParts * 100 * 1500) * .90;
-        const ramparts: StructureRampart[] = MemoryApi_Room.getStructureOfType(room.name, STRUCTURE_RAMPART) as StructureRampart[];
+        const creepRepairPerLife: number = numWorkParts * 100 * 1500 * 0.9;
+        const ramparts: StructureRampart[] = MemoryApi_Room.getStructureOfType(
+            room.name,
+            STRUCTURE_RAMPART
+        ) as StructureRampart[];
         const totalRampartHits: number = _.sum(ramparts, (r: StructureRampart) => r.hits);
         const maxRampartHits: number = WALL_LIMIT[room.controller.level] * ramparts.length;
         const neededLifetimes: number = Math.ceil((maxRampartHits - totalRampartHits) / creepRepairPerLife);
 
         // Break early if we're over the max hits already
-        if ((maxRampartHits - totalRampartHits) <= 0) {
+        if (maxRampartHits - totalRampartHits <= 0) {
             return false;
         }
 
@@ -488,11 +499,19 @@ export class SpawnHelper {
      * @param room the room we are checking for
      */
     public static getWorkerLimitForConstructionHelper(currentWorkers: number, room: Room): number {
-        const constructionSitesInRoom: ConstructionSite[] = _.filter(Game.constructionSites, (s: ConstructionSite) => s.room && s.room.name === room.name);
-        const hitsNeededToBuild: number = _.sum(constructionSitesInRoom, (s: ConstructionSite) => s.progressTotal - s.progress);
+        const constructionSitesInRoom: ConstructionSite[] = _.filter(
+            Game.constructionSites,
+            (s: ConstructionSite) => s.room && s.room.name === room.name
+        );
+        const hitsNeededToBuild: number = _.sum(
+            constructionSitesInRoom,
+            (s: ConstructionSite) => s.progressTotal - s.progress
+        );
         // Spawn 1 extra worker
         const numNewWorkers: number = Math.floor(hitsNeededToBuild / 15000);
-        return (currentWorkers + numNewWorkers) <= MAX_WORKERS_UPGRADER_STATE ? currentWorkers + numNewWorkers : MAX_WORKERS_UPGRADER_STATE;
+        return currentWorkers + numNewWorkers <= MAX_WORKERS_UPGRADER_STATE
+            ? currentWorkers + numNewWorkers
+            : MAX_WORKERS_UPGRADER_STATE;
     }
 
     /**
@@ -502,8 +521,8 @@ export class SpawnHelper {
     public static getScoutSpawnLimit(room: Room): number {
         // Returns -1 if one has never been spawned, so check for that case as well in the if
         const lastTickScoutSpawned: number = MemoryApi_Room.getLastTickScoutSpawned(room);
-        const differenceCheck: number = Game.time - lastTickScoutSpawned
-        return (differenceCheck > SCOUT_SPAWN_TICKS || lastTickScoutSpawned === -1) ? 1 : 0;
+        const differenceCheck: number = Game.time - lastTickScoutSpawned;
+        return differenceCheck > SCOUT_SPAWN_TICKS || lastTickScoutSpawned === -1 ? 1 : 0;
     }
 
     /**
@@ -511,14 +530,16 @@ export class SpawnHelper {
      * @param room the room we are in
      */
     public static getMineralMinerSpawnLimit(room: Room): number {
-        const extractors: StructureExtractor[] = MemoryApi_Room.getStructureOfType(room.name, STRUCTURE_EXTRACTOR) as StructureExtractor[];
+        const extractors: StructureExtractor[] = MemoryApi_Room.getStructureOfType(
+            room.name,
+            STRUCTURE_EXTRACTOR
+        ) as StructureExtractor[];
         let numMineralMiners = 0;
         extractors.forEach((extractor: StructureExtractor) => {
-
             // Get the closest mineral and check for cooldown
-            if (extractor.cooldown > 0) return;
             const minerals: Mineral[] = MemoryApi_Room.getMinerals(room.name);
             if (minerals.length === 0) return;
+
             const closestMineral: Mineral | undefined = _.find(minerals, (mineral: Mineral) => {
                 if (!mineral) return false;
                 return extractor.pos.isEqualTo(mineral);
@@ -527,12 +548,18 @@ export class SpawnHelper {
             if (closestMineral.mineralAmount === 0) return;
 
             // Check the container in range for fill amount
-            const containers: StructureContainer[] = MemoryApi_Room.getStructureOfType(room.name, STRUCTURE_CONTAINER) as StructureContainer[];
+            const containers: StructureContainer[] = MemoryApi_Room.getStructureOfType(
+                room.name,
+                STRUCTURE_CONTAINER
+            ) as StructureContainer[];
             if (containers.length === 0) return;
-            const closestContainer: StructureContainer | undefined = _.find(containers, (container: StructureContainer) => {
-                if (!container) return false;
-                return extractor.pos.isNearTo(container);
-            });
+            const closestContainer: StructureContainer | undefined = _.find(
+                containers,
+                (container: StructureContainer) => {
+                    if (!container) return false;
+                    return extractor.pos.isNearTo(container);
+                }
+            );
             if (!closestContainer) return;
             if (closestContainer.store.getUsedCapacity() > MINERAL_MINER_CONTAINER_LIMIT) return;
 
@@ -550,12 +577,27 @@ export class SpawnHelper {
     public static getNumExtraHarvesters(room: Room): number {
         let numExtraHarvesters: number = 0;
         // check for mining container, early return if not
-        const extractors: StructureExtractor[] = MemoryApi_Room.getStructureOfType(room.name, STRUCTURE_EXTRACTOR) as StructureExtractor[];
+        const extractors: StructureExtractor[] = MemoryApi_Room.getStructureOfType(
+            room.name,
+            STRUCTURE_EXTRACTOR
+        ) as StructureExtractor[];
 
         // Attempt to find a mineral mining container
-        extractors.forEach((extractor) => {
+        extractors.forEach(extractor => {
             if (!extractor) return;
-            const containers: StructureContainer[] = MemoryApi_Room.getStructureOfType(room.name, STRUCTURE_CONTAINER) as StructureContainer[];
+
+            const minerals: Mineral[] = MemoryApi_Room.getMinerals(room.name);
+            const closestMineral: Mineral | undefined = _.find(minerals, (mineral: Mineral) => {
+                if (!mineral) return false;
+                return extractor.pos.isEqualTo(mineral);
+            });
+            if (!closestMineral) return;
+            if (closestMineral.mineralAmount === 0) return;
+
+            const containers: StructureContainer[] = MemoryApi_Room.getStructureOfType(
+                room.name,
+                STRUCTURE_CONTAINER
+            ) as StructureContainer[];
             const closestContainer: StructureContainer | null = extractor.pos.findClosestByRange(containers, {
                 filter: (container: StructureContainer) => {
                     return container.pos.isNearTo(extractor);
