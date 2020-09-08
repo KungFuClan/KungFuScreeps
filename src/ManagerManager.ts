@@ -17,8 +17,10 @@ import {
     EmpireManager,
     RoomHelper_Structure,
     MILITARY_MANAGER_BUCKET_LIMIT,
-    MilitaryManager
+    MilitaryManager,
+    MAP_OVERLAY_BUCKET_LIMIT
 } from "Utils/Imports/internals";
+import { MapVisualManager } from "MapVisuals/MapVisualManager";
 
 export class ManagerManager {
     public static runManagerManager(): void {
@@ -64,6 +66,14 @@ export class ManagerManager {
         if (!Game.cpu["bucket"] || Game.cpu["bucket"] > CREEP_MANAGER_BUCKET_LIMIT) {
             try {
                 CreepManager.runCreepManager();
+            } catch (e) {
+                UtilHelper.printError(e);
+            }
+        }
+
+        if (!Game.cpu["bucket"] || (Game.cpu["bucket"] > MAP_OVERLAY_BUCKET_LIMIT && ROOM_VISUALS_ON)) {
+            try {
+                MapVisualManager.runMapVisualManager();
             } catch (e) {
                 UtilHelper.printError(e);
             }
