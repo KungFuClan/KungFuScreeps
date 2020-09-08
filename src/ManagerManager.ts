@@ -26,7 +26,7 @@ export class ManagerManager {
             ConsoleCommands.init();
         }
 
-        if (Game.cpu.bucket >= 9000) {
+        if (Game.cpu.bucket >= 10000) {
             Game.cpu.generatePixel();
         }
 
@@ -76,12 +76,10 @@ export class ManagerManager {
             } catch (e) {
                 UtilHelper.printError(e);
             }
-        }
-        else {
+        } else {
             try {
                 RoomVisualManager.runRoomVisualManagerSlim();
-            }
-            catch (e) {
+            } catch (e) {
                 UtilHelper.printError(e);
             }
         }
