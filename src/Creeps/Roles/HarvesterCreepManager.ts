@@ -32,7 +32,7 @@ export class HarvesterCreepManager implements ICivCreepRoleManager {
         if (creep.store.getUsedCapacity() === 0) {
             job = CreepCivApi.newGetEnergyJob(creep, room);
 
-            if (job === undefined) {
+            if (job === undefined && CreepCivApi.allowGetNonEnergyJob(room)) {
                 job = CreepCivApi.newGetNonEnergyJob(creep, room);
             }
         } else {

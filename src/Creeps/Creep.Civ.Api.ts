@@ -290,4 +290,16 @@ export class CreepCivApi {
 
         return newJob;
     }
+
+    /**
+     * Check if we're allowed to get a non energy job
+     * @param room the room we are checking for
+     */
+    public static allowGetNonEnergyJob(room: Room): boolean {
+        // check if theres something to DO with non energy
+        // likely ask if there are non energy carry part jobs
+        const carryPartStoreJobs: CarryPartJob[] = MemoryApi_Jobs.getNonEnergyStoreJobs(room);
+        const carryPartFillJobs: CarryPartJob[] = MemoryApi_Jobs.getNonEnergyFillJobs(room);
+        return [...carryPartFillJobs, ...carryPartStoreJobs].length > 0;
+    }
 }
