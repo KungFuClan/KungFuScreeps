@@ -508,7 +508,7 @@ export class SpawnHelper {
             (s: ConstructionSite) => s.progressTotal - s.progress
         );
         // Spawn 1 extra worker
-        const numNewWorkers: number = Math.floor(hitsNeededToBuild / 15000);
+        const numNewWorkers: number = Math.floor(hitsNeededToBuild / 150000);
         return currentWorkers + numNewWorkers <= MAX_WORKERS_UPGRADER_STATE
             ? currentWorkers + numNewWorkers
             : MAX_WORKERS_UPGRADER_STATE;

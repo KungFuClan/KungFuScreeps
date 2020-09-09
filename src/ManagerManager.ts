@@ -17,8 +17,10 @@ import {
     EmpireManager,
     RoomHelper_Structure,
     MILITARY_MANAGER_BUCKET_LIMIT,
-    MilitaryManager
+    MilitaryManager,
+    MAP_OVERLAY_BUCKET_LIMIT
 } from "Utils/Imports/internals";
+import { MapVisualManager } from "MapVisuals/MapVisualManager";
 
 export class ManagerManager {
     public static runManagerManager(): void {
@@ -26,7 +28,7 @@ export class ManagerManager {
             ConsoleCommands.init();
         }
 
-        if (Game.cpu.bucket >= 9000) {
+        if (Game.cpu.bucket >= 10000) {
             Game.cpu.generatePixel();
         }
 
@@ -69,6 +71,14 @@ export class ManagerManager {
             }
         }
 
+        if (!Game.cpu["bucket"] || (Game.cpu["bucket"] > MAP_OVERLAY_BUCKET_LIMIT && ROOM_VISUALS_ON)) {
+            try {
+                MapVisualManager.runMapVisualManager();
+            } catch (e) {
+                UtilHelper.printError(e);
+            }
+        }
+
         // Display room visuals if we have a fat enough bucket and config option allows it
         if (!Game.cpu["bucket"] || (Game.cpu["bucket"] > ROOM_OVERLAY_BUCKET_LIMIT && ROOM_VISUALS_ON)) {
             try {
@@ -76,12 +86,10 @@ export class ManagerManager {
             } catch (e) {
                 UtilHelper.printError(e);
             }
-        }
-        else {
+        } else {
             try {
                 RoomVisualManager.runRoomVisualManagerSlim();
-            }
-            catch (e) {
+            } catch (e) {
                 UtilHelper.printError(e);
             }
         }
