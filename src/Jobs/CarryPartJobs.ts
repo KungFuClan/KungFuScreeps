@@ -42,8 +42,6 @@ export class CarryPartJobs implements IJobTypeHelper {
                     if (creep.store.getUsedCapacity() === amount) deleteOnSuccess = true;
                     targetResource = resource as ResourceConstant;
                 }
-
-                console.log(creep.name + " " + job.targetType + " " + targetResource + " " + amount);
             }
 
             returnCode = creep.transfer(target, targetResource);

@@ -18,6 +18,4 @@ global.Profiler = Profiler.init();
 export const loop = ErrorMapper.wrapLoop(() => {
     Mem.loadCachedMemory();
     ManagerManager.runManagerManager();
-
-    MemoryHelper_Room.updateGetNonEnergy_allJobs(Game.rooms["W9N7"]);
 });

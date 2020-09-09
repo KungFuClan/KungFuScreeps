@@ -36,8 +36,6 @@ export class MineralMinerCreepManager implements ICivCreepRoleManager {
             isSource
         );
 
-        console.log(creep.name + " " + JSON.stringify(miningContainer));
-
         if (miningContainer === undefined) {
             // Returning here to prevent supplementary id from being formed,
             // so in that case creep will just walk up to the source

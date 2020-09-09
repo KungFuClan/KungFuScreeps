@@ -46,7 +46,6 @@ export class GetNonEnergyJobs implements IJobTypeHelper {
         ) {
             //
             returnCode = creep.withdraw(target, (job as GetNonEnergyJob).resourceType);
-            console.log(creep.name + " " + (job as GetNonEnergyJob).resourceType + " " + returnCode);
         } else {
             throw CreepAllApi.badTarget_Error(creep, job);
         }

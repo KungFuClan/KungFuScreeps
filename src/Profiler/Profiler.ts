@@ -221,16 +221,3 @@ function outputProfilerData() {
     output += `\t\t\t${totalCpu.toFixed(2)} average CPU profiled per tick`;
     console.log(output);
 }
-
-// debugging
-// function printObject(obj: object) {
-//   const name = obj.constructor ? obj.constructor.name : (obj as any).name;
-//   console.log("  Keys of :", name, ":");
-//   Reflect.ownKeys(obj).forEach((k) => {
-//     try {
-//       console.log(`    ${k}: ${Reflect.get(obj, k)}`);
-//     } catch (e) {
-//       // nothing
-//     }
-//   });
-// }
