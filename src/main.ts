@@ -11,8 +11,8 @@
 import { ErrorMapper, ManagerManager } from "Utils/Imports/internals";
 import { Mem } from "Utils/MemHack";
 
-import * as Profiler from "./Profiler";
-global.Profiler = Profiler.init();
+// import * as Profiler from "./Profiler";
+// global.Profiler = Profiler.init();
 
 export const loop = ErrorMapper.wrapLoop(() => {
     Mem.loadCachedMemory();

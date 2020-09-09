@@ -6,7 +6,7 @@ import {
     STIMULATE_FLAG,
     UserException,
     MemoryApi_Empire,
-    MemoryApi_Room,
+    MemoryApi_Room
 } from "Utils/Imports/internals";
 import _ from "lodash";
 
@@ -53,7 +53,6 @@ export class EmpireHelper {
      */
     public static findDependentRoomAuto(targetRoom: string): string {
         const ownedRooms = MemoryApi_Empire.getOwnedRooms((r: Room) => r.controller?.level! > 4);
-        console.log(JSON.stringify(ownedRooms));
         let shortestPathRoom: Room | undefined;
 
         // Loop over owned rooms, finding the shortest path
@@ -102,8 +101,8 @@ export class EmpireHelper {
             throw new UserException(
                 "Manual Dependent Room Finding Error",
                 "Flag [" +
-                overrideFlag.name +
-                "]. We have no vision in the room you attempted to manually set as override dependent room.",
+                    overrideFlag.name +
+                    "]. We have no vision in the room you attempted to manually set as override dependent room.",
                 ERROR_ERROR
             );
         }
@@ -172,13 +171,15 @@ export class EmpireHelper {
 
             // If the room is built, complete all the flags associated with it
             if (this.claimRoomBuildComplete(claimRoom)) {
-
                 for (const flag in claimRoom!.flags) {
                     const currentFlagName: string = claimRoom.flags[flag].flagName;
                     if (!Game.flags[currentFlagName]) {
                         continue;
                     }
-                    MemoryApi_Empire.createEmpireAlertNode("Completing flag for claim room [" + claimRoom.roomName + "].", 10);
+                    MemoryApi_Empire.createEmpireAlertNode(
+                        "Completing flag for claim room [" + claimRoom.roomName + "].",
+                        10
+                    );
                     Game.flags[currentFlagName].memory.complete = true;
                 }
 
@@ -206,8 +207,12 @@ export class EmpireHelper {
             return false;
         }
 
-        const spawns = MemoryApi_Room.getStructureOfType(room.name, STRUCTURE_SPAWN, (struct: StructureSpawn) => struct.my);
-        return (spawns.length > 0);
+        const spawns = MemoryApi_Room.getStructureOfType(
+            room.name,
+            STRUCTURE_SPAWN,
+            (struct: StructureSpawn) => struct.my
+        );
+        return spawns.length > 0;
     }
 
     /**

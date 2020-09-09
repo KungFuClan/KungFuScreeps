@@ -29,7 +29,7 @@
     "homepage": "https://github.com/jakesboy2/screeps-typescript-starter#readme",
     "devDependencies": {
         "@types/lodash": "^3.10.2",
-        "@types/node": "^10.17.5",
+        "@types/node": "^10.17.30",
         "lodash": "^4.17.11",
         "prettier": "^1.18.2",
         "rollup": "^0.63.5",
@@ -46,10 +46,10 @@
         "tslint-config-prettier": "^1.18.0",
         "tslint-plugin-prettier": "^1.3.0",
         "typedoc": "^0.15.5",
-        "typescript": "^3.7.5"
+        "typescript": "^3.7.5",
+        "@types/screeps": "^3.2.0"
     },
     "dependencies": {
-        "@types/screeps": "^3.1.3",
         "npm": "^6.13.6",
         "source-map": "~0.6.1"
     }

@@ -42,8 +42,8 @@ export class IntermediateStateCreepLimits implements ICreepSpawnLimits {
 
         // Generate Limits -------
         domesticLimits[ROLE_MINER] = minerLimits;
-        domesticLimits[ROLE_HARVESTER] = 4;
-        domesticLimits[ROLE_WORKER] = 8;
+        domesticLimits[ROLE_HARVESTER] = 3;
+        domesticLimits[ROLE_WORKER] = 5;
 
         return domesticLimits;
     }

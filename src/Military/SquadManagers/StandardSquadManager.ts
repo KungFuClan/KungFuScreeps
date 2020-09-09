@@ -102,7 +102,6 @@ export class StandardSquadManager implements ISquadManager {
         // Handle initial rally status
         if (!instance.initialRallyComplete) {
             if (MilitaryMovement_Api.isQuadSquadInRallyPos(instance)) {
-                console.log(JSON.stringify(instance));
                 instance.initialRallyComplete = true;
                 return SQUAD_STATUS_OK;
             }
@@ -198,7 +197,6 @@ export class StandardSquadManager implements ISquadManager {
                     return;
                 }
             });
-
         },
 
         decideAttackIntents(instance: ISquadManager, status: SquadStatusConstant, roomData: MilitaryDataAll) {
