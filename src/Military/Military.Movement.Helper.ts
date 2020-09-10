@@ -23,6 +23,13 @@ export class MilitaryMovement_Helper {
      * @returns RoomPosition The position to path to when rallying
      */
     public static chooseRallyLocation(fromRoomName: string, targetRoomName: string, rallyOpts: RallyOpts): RoomPosition {
+
+        // Bugfix with domestic defenders
+        // If from room and target room are the same, default to trivial room position as it won't be used (likely better way to handle this)
+        if (fromRoomName === targetRoomName) {
+            return new RoomPosition(25, 25, fromRoomName);
+        }
+
         const routeToRoom = Game.map.findRoute(fromRoomName, targetRoomName, {
             routeCallback(roomName, fromRoomName) {
                 const roomStatus = PathfindingApi.retrieveRoomStatus(roomName);
