@@ -5,7 +5,7 @@ export class MapVisualManager {
      * Run the map visual manager
      */
     public static runMapVisualManager(): void {
-        this.highlightSeenRooms(1000);
+        // this.highlightSeenRooms(1000);
     }
 
     /**

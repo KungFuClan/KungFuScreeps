@@ -1,4 +1,4 @@
-import { ROLE_MANAGER, MemoryApi_Jobs, CreepAllApi, MemoryHelper } from "Utils/Imports/internals";
+import { ROLE_MANAGER, MemoryApi_Jobs, CreepAllApi, MemoryHelper, TERMINAL_MIN_ENERGY } from "Utils/Imports/internals";
 import _ from "lodash";
 
 // Manager for the miner creep role
@@ -18,11 +18,9 @@ export class ManagerCreepManager implements ICivCreepRoleManager {
      * @returns BaseJob of the new job we recieved (undefined if none)
      */
     public getNewJob(creep: Creep, room: Room): BaseJob | undefined {
-
         if (creep.store.energy === 0) {
             return this.getEnergyJob(creep, room);
-        }
-        else {
+        } else {
             return this.getCarryJob(creep, room);
         }
     }
@@ -35,7 +33,7 @@ export class ManagerCreepManager implements ICivCreepRoleManager {
      */
     private isNonStorageJob(creep: Creep, room: Room): boolean {
         const job: CarryPartJob | undefined = this.getCarryJob(creep, room);
-        return (job !== undefined && job.targetType !== STRUCTURE_STORAGE);
+        return job !== undefined && job.targetType !== STRUCTURE_STORAGE;
     }
 
     /**
@@ -51,12 +49,13 @@ export class ManagerCreepManager implements ICivCreepRoleManager {
             const backupStructures = MemoryApi_Jobs.getBackupStructuresJobs(
                 room,
                 (job: GetEnergyJob) =>
-                    !job.isTaken && job.resources.energy >= creep.store.getCapacity() &&
-                    job.targetType === STRUCTURE_TERMINAL
+                    !job.isTaken && job.resources.energy >= TERMINAL_MIN_ENERGY && job.targetType === STRUCTURE_TERMINAL
             );
 
             if (backupStructures.length > 0) {
-                const terminal: StructureTerminal = Game.getObjectById(backupStructures[0].targetID) as StructureTerminal;
+                const terminal: StructureTerminal = Game.getObjectById(
+                    backupStructures[0].targetID
+                ) as StructureTerminal;
                 if (creep.pos.isNearTo(terminal)) {
                     return backupStructures[0];
                 }
@@ -70,7 +69,8 @@ export class ManagerCreepManager implements ICivCreepRoleManager {
             const backupStructures = MemoryApi_Jobs.getBackupStructuresJobs(
                 room,
                 (job: GetEnergyJob) =>
-                    !job.isTaken && job.resources.energy >= creep.store.getCapacity() &&
+                    !job.isTaken &&
+                    job.resources.energy >= creep.store.getCapacity() &&
                     job.targetType === STRUCTURE_STORAGE
             );
 
@@ -179,25 +179,34 @@ export class ManagerCreepManager implements ICivCreepRoleManager {
             }
         }
 
+        if (creepOptions.fillTerminal) {
+            const terminalJobs = MemoryApi_Jobs.getStoreJobs(
+                room,
+                (sJob: CarryPartJob) => !sJob.isTaken && sJob.targetType === STRUCTURE_TERMINAL
+            );
+
+            if (terminalJobs.length > 0) {
+                let closestJob = terminalJobs[0];
+
+                const terminalObject: StructureTerminal = Game.getObjectById(closestJob!.targetID) as StructureTerminal;
+
+                if (
+                    creep.pos.isNearTo(terminalObject) &&
+                    terminalObject.store.getUsedCapacity(RESOURCE_ENERGY) < TERMINAL_MIN_ENERGY
+                ) {
+                    return closestJob;
+                }
+            }
+        }
+
         if (creepOptions.fillStorage) {
-            const storeJobs = MemoryApi_Jobs.getStoreJobs(room, (bsJob: CarryPartJob) =>
-                !bsJob.isTaken && bsJob.targetType === STRUCTURE_STORAGE
+            const storeJobs = MemoryApi_Jobs.getStoreJobs(
+                room,
+                (bsJob: CarryPartJob) => !bsJob.isTaken && bsJob.targetType === STRUCTURE_STORAGE
             );
 
             if (storeJobs.length > 0) {
-                const jobObjects: Structure[] = MemoryHelper.getOnlyObjectsFromIDs(
-                    _.map(storeJobs, job => job.targetID)
-                );
-
-                const closestTarget = creep.pos.findClosestByRange(jobObjects);
-                let closestJob;
-
-                if (closestTarget !== null) {
-                    closestJob = _.find(storeJobs, (job: CarryPartJob) => job.targetID === closestTarget.id);
-                } else {
-                    // if findCLosest nulls out, just choose first
-                    closestJob = storeJobs[0];
-                }
+                let closestJob = storeJobs[0];
 
                 const storageObject: StructureStorage = Game.getObjectById(closestJob!.targetID) as StructureStorage;
                 if (creep.pos.isNearTo(storageObject)) {

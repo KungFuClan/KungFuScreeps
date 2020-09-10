@@ -144,15 +144,21 @@ export const RESERVER_MIN_TTL = 2000;
  * bucket limits for manager
  * decides the min the bucket must be to run this manager
  */
-export const CREEP_MANAGER_BUCKET_LIMIT = 1000;
-export const SPAWN_MANAGER_BUCKET_LIMIT = 50;
-export const EMPIRE_MANAGER_BUCKET_LIMIT = 4000;
-export const ROOM_MANAGER_BUCKET_LIMIT = 500;
 export const MEMORY_MANAGER_BUCKET_LIMIT = 1;
+export const SPAWN_MANAGER_BUCKET_LIMIT = 50;
+export const ROOM_MANAGER_BUCKET_LIMIT = 500;
+export const CREEP_MANAGER_BUCKET_LIMIT = 1000;
+export const MILITARY_MANAGER_BUCKET_LIMIT = 2000;
+export const EMPIRE_MANAGER_BUCKET_LIMIT = 4000;
 export const EVENT_MANAGER_BUCKET_LIMIT = 4000;
 export const ROOM_OVERLAY_BUCKET_LIMIT = 4000;
 export const MAP_OVERLAY_BUCKET_LIMIT = 4000;
-export const MILITARY_MANAGER_BUCKET_LIMIT = 2000;
+export const MARKET_MANAGER_BUCKET_LIMIT = 4000;
+
+/**
+ * Market Constnats
+ */
+export const TERMINAL_MIN_ENERGY = 20000;
 
 /**
  * List of allies

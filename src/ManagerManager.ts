@@ -18,9 +18,11 @@ import {
     RoomHelper_Structure,
     MILITARY_MANAGER_BUCKET_LIMIT,
     MilitaryManager,
-    MAP_OVERLAY_BUCKET_LIMIT
+    MAP_OVERLAY_BUCKET_LIMIT,
+    MARKET_MANAGER_BUCKET_LIMIT
 } from "Utils/Imports/internals";
 import { MapVisualManager } from "MapVisuals/MapVisualManager";
+import { MarketManager } from "Market/MarketManager";
 
 export class ManagerManager {
     public static runManagerManager(): void {
@@ -33,7 +35,7 @@ export class ManagerManager {
         }
 
         // clean up memory
-        if (!Game.cpu["bucket"] || Game.cpu["bucket"] > MEMORY_MANAGER_BUCKET_LIMIT) {
+        if (Game.cpu.bucket > MEMORY_MANAGER_BUCKET_LIMIT) {
             try {
                 MemoryManager.runMemoryManager();
             } catch (e) {
@@ -42,7 +44,7 @@ export class ManagerManager {
         }
 
         // run rooms
-        if (!Game.cpu["bucket"] || Game.cpu["bucket"] > ROOM_MANAGER_BUCKET_LIMIT) {
+        if (Game.cpu.bucket > ROOM_MANAGER_BUCKET_LIMIT) {
             try {
                 RoomManager.runRoomManager();
             } catch (e) {
@@ -51,10 +53,7 @@ export class ManagerManager {
         }
 
         // run spawning
-        if (
-            !Game.cpu["bucket"] ||
-            (Game.cpu["bucket"] > SPAWN_MANAGER_BUCKET_LIMIT && RoomHelper_Structure.excecuteEveryTicks(3))
-        ) {
+        if (Game.cpu.bucket > SPAWN_MANAGER_BUCKET_LIMIT && RoomHelper_Structure.excecuteEveryTicks(3)) {
             try {
                 SpawnManager.runSpawnManager();
             } catch (e) {
@@ -63,7 +62,7 @@ export class ManagerManager {
         }
 
         // run creeps
-        if (!Game.cpu["bucket"] || Game.cpu["bucket"] > CREEP_MANAGER_BUCKET_LIMIT) {
+        if (Game.cpu.bucket > CREEP_MANAGER_BUCKET_LIMIT) {
             try {
                 CreepManager.runCreepManager();
             } catch (e) {
@@ -71,7 +70,7 @@ export class ManagerManager {
             }
         }
 
-        if (!Game.cpu["bucket"] || (Game.cpu["bucket"] > MAP_OVERLAY_BUCKET_LIMIT && ROOM_VISUALS_ON)) {
+        if (Game.cpu.bucket > MAP_OVERLAY_BUCKET_LIMIT && ROOM_VISUALS_ON) {
             try {
                 MapVisualManager.runMapVisualManager();
             } catch (e) {
@@ -80,7 +79,7 @@ export class ManagerManager {
         }
 
         // Display room visuals if we have a fat enough bucket and config option allows it
-        if (!Game.cpu["bucket"] || (Game.cpu["bucket"] > ROOM_OVERLAY_BUCKET_LIMIT && ROOM_VISUALS_ON)) {
+        if (Game.cpu.bucket > ROOM_OVERLAY_BUCKET_LIMIT && ROOM_VISUALS_ON) {
             try {
                 RoomVisualManager.runRoomVisualManager();
             } catch (e) {
@@ -95,7 +94,7 @@ export class ManagerManager {
         }
 
         // run the empire
-        if (!Game.cpu["bucket"] || Game.cpu["bucket"] > EMPIRE_MANAGER_BUCKET_LIMIT) {
+        if (Game.cpu.bucket > EMPIRE_MANAGER_BUCKET_LIMIT) {
             try {
                 EmpireManager.runEmpireManager();
             } catch (e) {
@@ -103,8 +102,16 @@ export class ManagerManager {
             }
         }
 
+        if (Game.cpu.bucket > MARKET_MANAGER_BUCKET_LIMIT) {
+            try {
+                MarketManager.runMarketManager();
+            } catch (e) {
+                UtilHelper.printError(e);
+            }
+        }
+
         // run the military
-        if (!Game.cpu["bucket"] || Game.cpu["bucket"] > MILITARY_MANAGER_BUCKET_LIMIT) {
+        if (Game.cpu.bucket > MILITARY_MANAGER_BUCKET_LIMIT) {
             try {
                 MilitaryManager.runOperations();
             } catch (e) {
