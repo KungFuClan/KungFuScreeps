@@ -1,4 +1,4 @@
-import { UserException, EmpireHelper, MemoryApi_Room, MemoryApi_Empire } from "Utils/Imports/internals";
+import { UserException, EmpireHelper, MemoryApi_Room, MemoryApi_Empire, EmpireApi } from "Utils/Imports/internals";
 import _ from "lodash";
 
 export class ProcessDefaultRemoteRoom implements IFlagProcesser {
@@ -24,6 +24,18 @@ export class ProcessDefaultRemoteRoom implements IFlagProcesser {
         Memory.flags[flag.name].timePlaced = Game.time;
         Memory.flags[flag.name].flagType = flagTypeConst;
         Memory.flags[flag.name].flagName = flag.name;
+
+        switch (flag.secondaryColor) {
+            // Create an energy focused remote room
+            case COLOR_YELLOW:
+                EmpireApi.createRemoteRoomInstance(roomName);
+                break;
+
+            // Clear an existing remote room
+            case COLOR_RED:
+                EmpireApi.removeRemoteRoom(roomName);
+                break;
+        }
 
         // Create the RemoteFlagMemory object for this flag
         const remoteFlagMemory: RemoteFlagMemory = {
