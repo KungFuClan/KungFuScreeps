@@ -13,13 +13,11 @@ import {
     MemoryApi_Creep,
     MemoryApi_Room,
     MemoryApi_Empire,
-    TIER_6,
-
+    TIER_6
 } from "Utils/Imports/internals";
 import _ from "lodash";
 
 export class RoomApi_State {
-
     /**
      * check if there are hostile creeps in the room
      * @param room the room we are checking
@@ -49,7 +47,7 @@ export class RoomApi_State {
 
         // check if we are in nuke inbound room state
         // nuke is coming in and we need to gtfo, but they take like 20k ticks, so only check every 1000 or so
-        if (RoomHelper_Structure.excecuteEveryTicks(1000)) {
+        if (RoomHelper_Structure.executeEveryTicks(1000)) {
             const incomingNukes = room.find(FIND_NUKES);
             if (incomingNukes.length > 0) {
                 MemoryApi_Room.updateRoomState(ROOM_STATE_NUKE_INBOUND, room);
@@ -76,8 +74,8 @@ export class RoomApi_State {
             if (
                 RoomHelper_State.isContainerMining(room, sources, containers) &&
                 RoomHelper_State.isUpgraderLink(room) &&
-                storage !== undefined
-                && room.energyCapacityAvailable >= TIER_6
+                storage !== undefined &&
+                room.energyCapacityAvailable >= TIER_6
             ) {
                 if (RoomHelper_State.isStimulateRoom(room)) {
                     MemoryApi_Room.updateRoomState(ROOM_STATE_STIMULATE, room);
@@ -132,7 +130,10 @@ export class RoomApi_State {
      */
     public static setDefconLevel(room: Room): void {
         const hostileCreeps = MemoryApi_Creep.getHostileCreeps(room.name);
-        const hostileStructures = MemoryApi_Room.getHostileStuctures(room.name, s => s.structureType === STRUCTURE_INVADER_CORE)
+        const hostileStructures = MemoryApi_Room.getHostileStuctures(
+            room.name,
+            s => s.structureType === STRUCTURE_INVADER_CORE
+        );
 
         // check level 0 first to reduce cpu drain as it will be the most common scenario
         // level 0 -- no danger

@@ -1,11 +1,24 @@
 import { fill } from "lodash";
+import { RoomHelper_Structure } from "Utils/Imports/internals";
 
 export class MapVisualManager {
     /**
      * Run the map visual manager
      */
     public static runMapVisualManager(): void {
-        // this.highlightSeenRooms(1000);
+        // How often to regenerate map visuals
+        const visualPersistTime = 100;
+        // How often to render the map visuals
+        const visualRenderTime = 1;
+
+        if (Game.time % visualPersistTime === 0) {
+            this.highlightSeenRooms(1000);
+            Memory.mapVisualData = Game.map.visual.export();
+        }
+
+        if (Game.time % visualRenderTime === 0 && Memory.mapVisualData !== undefined) {
+            Game.map.visual.import(Memory.mapVisualData);
+        }
     }
 
     /**

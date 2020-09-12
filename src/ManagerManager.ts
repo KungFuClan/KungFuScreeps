@@ -26,7 +26,7 @@ import { MarketManager } from "Market/MarketManager";
 
 export class ManagerManager {
     public static runManagerManager(): void {
-        if (RoomHelper_Structure.excecuteEveryTicks(1000)) {
+        if (RoomHelper_Structure.executeEveryTicks(1000)) {
             ConsoleCommands.init();
         }
 
@@ -53,7 +53,7 @@ export class ManagerManager {
         }
 
         // run spawning
-        if (Game.cpu.bucket > SPAWN_MANAGER_BUCKET_LIMIT && RoomHelper_Structure.excecuteEveryTicks(3)) {
+        if (Game.cpu.bucket > SPAWN_MANAGER_BUCKET_LIMIT && RoomHelper_Structure.executeEveryTicks(3)) {
             try {
                 SpawnManager.runSpawnManager();
             } catch (e) {

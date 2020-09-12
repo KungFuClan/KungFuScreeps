@@ -13,7 +13,7 @@ import {
     RoomApi_State,
     RoomApi_Structure,
     MemoryApi_Empire,
-    MemoryApi_Room,
+    MemoryApi_Room
 } from "Utils/Imports/internals";
 import { profile } from "Profiler";
 import _ from "lodash";
@@ -44,11 +44,11 @@ export class RoomManager {
      */
     private static runSingleRoom(room: Room): void {
         // Set Defcon and Room State (roomState relies on defcon being set first)
-        if (RoomHelper_Structure.excecuteEveryTicks(RUN_DEFCON_TIMER)) {
+        if (RoomHelper_Structure.executeEveryTicks(RUN_DEFCON_TIMER)) {
             RoomApi_State.setDefconLevel(room);
         }
 
-        if (RoomHelper_Structure.excecuteEveryTicks(RUN_ROOM_STATE_TIMER)) {
+        if (RoomHelper_Structure.executeEveryTicks(RUN_ROOM_STATE_TIMER)) {
             RoomApi_State.setRoomState(room);
         }
 
@@ -60,7 +60,10 @@ export class RoomManager {
         // Run all structures in the room if they exist
         // Run Towers
         const roomState = room.memory.roomState;
-        if (RoomHelper_Structure.excecuteEveryTicks(RUN_TOWER_TIMER) && RoomHelper_Structure.isExistInRoom(room, STRUCTURE_TOWER)) {
+        if (
+            RoomHelper_Structure.executeEveryTicks(RUN_TOWER_TIMER) &&
+            RoomHelper_Structure.isExistInRoom(room, STRUCTURE_TOWER)
+        ) {
             // Check first if we have EMERGECY ramparts to heal up
             // I just got this to work while it was bug testable, so feel free to refactor into something thats NOT this (maybe pull into a function either way idc)
             const rampart: Structure<StructureConstant> = <Structure<StructureConstant>>_.first(
@@ -81,23 +84,32 @@ export class RoomManager {
         }
 
         // Run Labs
-        if (RoomHelper_Structure.isExistInRoom(room, STRUCTURE_LAB) && RoomHelper_Structure.excecuteEveryTicks(RUN_LAB_TIMER)) {
+        if (
+            RoomHelper_Structure.isExistInRoom(room, STRUCTURE_LAB) &&
+            RoomHelper_Structure.executeEveryTicks(RUN_LAB_TIMER)
+        ) {
             RoomApi_Structure.runLabs(room);
         }
 
         // Run Links
-        if (RoomHelper_Structure.isExistInRoom(room, STRUCTURE_LINK) && RoomHelper_Structure.excecuteEveryTicks(RUN_LINKS_TIMER)) {
+        if (
+            RoomHelper_Structure.isExistInRoom(room, STRUCTURE_LINK) &&
+            RoomHelper_Structure.executeEveryTicks(RUN_LINKS_TIMER)
+        ) {
             RoomApi_Structure.runLinks(room);
         }
 
         // Run Terminals
-        if (RoomHelper_Structure.isExistInRoom(room, STRUCTURE_TERMINAL) && RoomHelper_Structure.excecuteEveryTicks(RUN_TERMINAL_TIMER)) {
+        if (
+            RoomHelper_Structure.isExistInRoom(room, STRUCTURE_TERMINAL) &&
+            RoomHelper_Structure.executeEveryTicks(RUN_TERMINAL_TIMER)
+        ) {
             RoomApi_Structure.runTerminal(room);
         }
 
         // Run accessory functions for dependent rooms ----
         // Update reserve timer for remote rooms
-        if (RoomHelper_Structure.excecuteEveryTicks(RUN_RESERVE_TTL_TIMER)) {
+        if (RoomHelper_Structure.executeEveryTicks(RUN_RESERVE_TTL_TIMER)) {
             RoomApi_State.simulateReserveTTL(room);
         }
     }
@@ -108,7 +120,7 @@ export class RoomManager {
      */
     private static runSingleDependentRoom(room: Room): void {
         // Set Defcon for the dependent room
-        if (RoomHelper_Structure.excecuteEveryTicks(RUN_ROOM_STATE_TIMER)) {
+        if (RoomHelper_Structure.executeEveryTicks(RUN_ROOM_STATE_TIMER)) {
             RoomApi_State.setDefconLevel(room);
         }
     }

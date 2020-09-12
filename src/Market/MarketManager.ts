@@ -9,9 +9,11 @@ export class MarketManager {
             return false;
         });
 
-        console.log(marketOrders.length);
-
         const bestOrder = _.max(marketOrders, (order: Order) => order.price);
+
+        if (bestOrder.price < 0.01) {
+            return;
+        }
 
         console.log(
             bestOrder.resourceType,
