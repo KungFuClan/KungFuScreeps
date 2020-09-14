@@ -101,8 +101,8 @@ export class EmpireHelper {
             throw new UserException(
                 "Manual Dependent Room Finding Error",
                 "Flag [" +
-                    overrideFlag.name +
-                    "]. We have no vision in the room you attempted to manually set as override dependent room.",
+                overrideFlag.name +
+                "]. We have no vision in the room you attempted to manually set as override dependent room.",
                 ERROR_ERROR
             );
         }
@@ -240,70 +240,6 @@ export class EmpireHelper {
                         10
                     );
                     delete claimRoom!.flags[flag];
-                }
-            }
-        }
-    }
-
-    /**
-     * if an remote room has no flags associated with it, delete the attack room memory structure
-     * @param attackRooms an array of all the attack room memory structures in the empire
-     */
-    public static cleanDeadRemoteRooms(remoteRooms: Array<RemoteRoomMemory | undefined>): void {
-        // Loop over remote rooms, and if we find one with no associated flag, remove it
-        for (const remoteRoom in remoteRooms) {
-            if (!remoteRooms[remoteRoom]) {
-                continue;
-            }
-            const remoteRoomName: string = remoteRooms[remoteRoom]!.roomName;
-
-            if (!remoteRooms[remoteRoom]!.flags[0]) {
-                MemoryApi_Empire.createEmpireAlertNode(
-                    "Removing Remote Room [" + remoteRooms[remoteRoom]!.roomName + "]",
-                    10
-                );
-
-                // Get the dependent room for this room
-                const dependentRoom: Room | undefined = _.find(MemoryApi_Empire.getOwnedRooms(), (room: Room) => {
-                    const rr = room.memory.remoteRooms;
-                    return _.some(rr!, (innerRR: RemoteRoomMemory) => {
-                        if (innerRR) {
-                            return innerRR.roomName === remoteRoomName;
-                        }
-                        return false;
-                    });
-                });
-
-                delete Memory.rooms[dependentRoom!.name].remoteRooms![remoteRoom];
-            }
-        }
-    }
-
-    /**
-     * removes all claim room memory structures that do not have an existing flag associated with them
-     * @param claimRooms an array of all the claim room memory structures in the empire
-     */
-    public static cleanDeadRemoteRoomsFlags(remoteRooms: Array<RemoteRoomMemory | undefined>): void {
-        // Loop over remote rooms and make sure the flag they're referencing actually exists
-        // Delete the memory structure if its not associated with an existing flag
-        for (const remoteRoom of remoteRooms) {
-            if (!remoteRoom) {
-                continue;
-            }
-
-            for (const flag in remoteRoom!.flags) {
-                if (!remoteRoom!.flags[flag]) {
-                    continue;
-                }
-
-                // Tell typescript that these are claim flag memory structures
-                const currentFlag: RemoteFlagMemory = remoteRoom!.flags[flag] as RemoteFlagMemory;
-                if (!Game.flags[currentFlag.flagName]) {
-                    MemoryApi_Empire.createEmpireAlertNode(
-                        "Removing [" + flag + "] from Remote Room Memory [" + remoteRoom!.roomName + "]",
-                        10
-                    );
-                    delete remoteRoom!.flags[flag];
                 }
             }
         }

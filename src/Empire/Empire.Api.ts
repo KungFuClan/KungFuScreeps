@@ -77,14 +77,11 @@ export class EmpireApi {
     /**
      * look for dead flags (memory with no associated flag existing) and remove them
      */
-    public static cleanDeadFlags(): void {
+    public static cleanClaimRooms(): void {
         // Get all flag based action memory structures (Remote, Claim, and Attack Room Memory)
         const allRooms = MemoryApi_Empire.getOwnedRooms();
         const claimRooms: Array<ClaimRoomMemory | undefined> = _.flatten(
             _.map(allRooms, room => MemoryApi_Room.getClaimRooms(room))
-        );
-        const remoteRooms: Array<RemoteRoomMemory | undefined> = _.flatten(
-            _.map(allRooms, room => MemoryApi_Room.getRemoteRooms(room))
         );
 
         // Remove claim room flags once the room is sufficiently built up
@@ -92,11 +89,9 @@ export class EmpireApi {
 
         // Clean dead flags from memory structures
         EmpireHelper.cleanDeadClaimRoomFlags(claimRooms);
-        EmpireHelper.cleanDeadRemoteRoomsFlags(remoteRooms);
 
         // Clean the memory of each type of dependent room memory structure with no existing flags associated
         EmpireHelper.cleanDeadClaimRooms(claimRooms);
-        EmpireHelper.cleanDeadRemoteRooms(remoteRooms);
     }
 
     /**
