@@ -1006,7 +1006,7 @@ interface RoomMemory {
     /**
      * Names of all rooms flagged to remote harvest
      */
-    remoteRooms?: RemoteRoomMemory[];
+    remoteRooms?: RemoteRoomObject;
     /**
      * Names of all rooms flagged to colonize
      */
@@ -1023,6 +1023,10 @@ interface RoomMemory {
      * The last tick we had a scout spawn
      */
     lastScoutSpawn?: number;
+}
+
+interface RemoteRoomObject {
+    [key: string]: RemoteRoomMemory;
 }
 
 interface Memory {

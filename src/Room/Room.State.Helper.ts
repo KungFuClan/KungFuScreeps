@@ -203,7 +203,7 @@ export class RoomHelper_State {
      */
     public static numRemoteSources(room: Room): number {
         // TODO: remove sources and structures from the remote room dependent memory itself
-        const remoteRooms: RemoteRoomMemory[] = Memory.rooms[room.name].remoteRooms!;
+        const remoteRooms: RemoteRoomObject = Memory.rooms[room.name].remoteRooms!;
         let numSources: number = 0;
 
         _.forEach(remoteRooms, (rr: RemoteRoomMemory) => {

@@ -1,4 +1,4 @@
-import { EmpireHelper, PROCESS_FLAG_HELPERS, MemoryApi_Empire, MemoryApi_Room, UserException } from "Utils/Imports/internals";
+import { EmpireHelper, PROCESS_FLAG_HELPERS, MemoryApi_Empire, MemoryApi_Room, UserException, ERROR_WARN, RoomManager } from "Utils/Imports/internals";
 import _ from "lodash";
 
 export class EmpireApi {
@@ -155,7 +155,8 @@ export class EmpireApi {
             "Remote Flag [" + flag.name + "] processed - Host Room: [" + dependentRoom.name + "] - Remote Room type [" + remoteRoomType + "]",
             10
         );
-        dependentRoom.memory.remoteRooms!.push(remoteRoomMemory);
+        if (!dependentRoom.memory.remoteRooms) dependentRoom.memory.remoteRooms = {};
+        dependentRoom.memory.remoteRooms![roomName] = remoteRoomMemory;
     }
 
     /**
@@ -164,14 +165,18 @@ export class EmpireApi {
      */
     public static removeRemoteRoomInstance(flag: Flag): void {
         const flagTypeConst: FlagTypeConstant | undefined = EmpireHelper.getFlagType(flag);
+        const remoteRoomName = flag.pos.roomName;
         Memory.flags[flag.name].complete = true;
         Memory.flags[flag.name].processed = true;
         Memory.flags[flag.name].timePlaced = Game.time;
         Memory.flags[flag.name].flagType = flagTypeConst;
         Memory.flags[flag.name].flagName = flag.name;
 
-        // find the d-room for this remote room, remove all references to it!
-        // suicide/recycle all creeps
-        // destroy all humans
+        const ownedRooms: Room[] = MemoryApi_Empire.getOwnedRooms();
+        delete Memory.rooms[remoteRoomName];
+        for (const room of ownedRooms) {
+            if (!room.memory.remoteRooms) room.memory.remoteRooms = {};
+            delete Memory.rooms[room.name].remoteRooms![remoteRoomName];
+        }
     }
 }
