@@ -190,12 +190,10 @@ export class CreepCivApi {
             }
         }
 
+        // TODO Swap this for the right option
         if (creepOptions.getDroppedEnergy && !isEmergencyProtocol) {
             // All dropped resources with enough energy to fill at least 60% of carry
-            const dropJobs = MemoryApi_Jobs.getNonEnergyPickupJobs(
-                room,
-                (dJob: GetNonEnergyJob) => !dJob.isTaken && dJob.resourceAmount >= creep.store.getCapacity() * 0.6
-            );
+            const dropJobs = MemoryApi_Jobs.getNonEnergyPickupJobs(room, (dJob: GetNonEnergyJob) => !dJob.isTaken);
 
             if (dropJobs.length > 0) {
                 return dropJobs[0];

@@ -1031,6 +1031,7 @@ interface RemoteRoomObject {
 
 interface Memory {
     empire: EmpireMemory;
+    mapVisualData: string;
     debug: StringMap;
 }
 
