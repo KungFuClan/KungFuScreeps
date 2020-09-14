@@ -1420,6 +1420,10 @@ interface RemoteRoomMemory extends DependentRoomParentMemory {
      * username reserving the controller - used to detect invader reserve
      */
     reserveUsername: string | undefined;
+    /**
+     * The type of remote room this is
+     */
+    remoteRoomType: RemoteRoomTypeConstant;
 }
 
 /**
@@ -1543,3 +1547,15 @@ interface ETAMemory {
 type AllCreepCount = {
     [key in RoleConstant]: number;
 };
+
+/**
+ * Constants for types of remote rooms
+ */
+type REMOTE_ENERGY = "remoteRoomEnergy";
+type REMOTE_SK_ENERGY = "remoteRoomSKEnergy";
+type REMOTE_SK_COMBINED = "remoteRoomSKCombined";
+
+type RemoteRoomTypeConstant =
+    REMOTE_ENERGY
+    | REMOTE_SK_COMBINED
+    | REMOTE_SK_ENERGY;

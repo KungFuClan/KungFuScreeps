@@ -1,4 +1,4 @@
-import { EmpireHelper, PROCESS_FLAG_HELPERS, MemoryApi_Empire, MemoryApi_Room } from "Utils/Imports/internals";
+import { EmpireHelper, PROCESS_FLAG_HELPERS, MemoryApi_Empire, MemoryApi_Room, UserException } from "Utils/Imports/internals";
 import _ from "lodash";
 
 export class EmpireApi {
@@ -97,5 +97,86 @@ export class EmpireApi {
         // Clean the memory of each type of dependent room memory structure with no existing flags associated
         EmpireHelper.cleanDeadClaimRooms(claimRooms);
         EmpireHelper.cleanDeadRemoteRooms(remoteRooms);
+    }
+
+    /**
+     * Create the specified remote room instance in the room specified
+     * @param roomName the room we are creating the remote room instance for
+     * @param flag the flag we used to create the remote room
+     * @param dependentRoom the room that is supplying the remote room with its powers
+     * @param remoteRoomType the type of remote room we are creating
+     */
+    public static createRemoteRoomInstance(flag: Flag, remoteRoomType: RemoteRoomTypeConstant): void {
+        // Get the host room and set the flags memory
+        const dependentRoom: Room = Game.rooms[EmpireHelper.findDependentRoom(flag.pos.roomName)];
+        const flagTypeConst: FlagTypeConstant | undefined = EmpireHelper.getFlagType(flag);
+        const roomName: string = flag.pos.roomName;
+        Memory.flags[flag.name].complete = true;
+        Memory.flags[flag.name].processed = true;
+        Memory.flags[flag.name].timePlaced = Game.time;
+        Memory.flags[flag.name].flagType = flagTypeConst;
+        Memory.flags[flag.name].flagName = flag.name;
+
+        // Create the RemoteFlagMemory object for this flag
+        const remoteFlagMemory: RemoteFlagMemory = {
+            flagName: flag.name,
+            flagType: flagTypeConst
+        };
+
+        // If the dependent room already has this room covered, set the flag to be deleted and throw a warning
+        const existingDepedentRemoteRoomMem: RemoteRoomMemory | undefined = _.find(
+            MemoryApi_Room.getRemoteRooms(dependentRoom),
+            (rr: RemoteRoomMemory) => {
+                if (rr) {
+                    return rr.roomName === roomName;
+                }
+                return false;
+            }
+        );
+
+        if (existingDepedentRemoteRoomMem) {
+            Memory.flags[flag.name].complete = true;
+            throw new UserException(
+                "Already working this dependent room!",
+                "The room you placed the remote flag in is already being worked by " +
+                existingDepedentRemoteRoomMem.roomName,
+                ERROR_WARN
+            );
+        }
+
+        // Otherwise, add a brand new memory structure onto it
+        const remoteRoomMemory: RemoteRoomMemory = {
+            sources: { cache: Game.time, data: 1 },
+            hostiles: { cache: Game.time, data: null },
+            structures: { cache: Game.time, data: null },
+            roomName: flag.pos.roomName,
+            flags: [remoteFlagMemory],
+            reserveTTL: 0,
+            reserveUsername: undefined,
+            remoteRoomType
+        };
+
+        MemoryApi_Empire.createEmpireAlertNode(
+            "Remote Flag [" + flag.name + "] processed - Host Room: [" + dependentRoom.name + "] - Remote Room type [" + remoteRoomType + "]",
+            10
+        );
+        dependentRoom.memory.remoteRooms!.push(remoteRoomMemory);
+    }
+
+    /**
+     * Remove all remote room instances from the room in question
+     * @param roomName the name of the room we are removing the remote room instance from
+     */
+    public static removeRemoteRoomInstance(flag: Flag): void {
+        const flagTypeConst: FlagTypeConstant | undefined = EmpireHelper.getFlagType(flag);
+        Memory.flags[flag.name].complete = true;
+        Memory.flags[flag.name].processed = true;
+        Memory.flags[flag.name].timePlaced = Game.time;
+        Memory.flags[flag.name].flagType = flagTypeConst;
+        Memory.flags[flag.name].flagName = flag.name;
+
+        // find the d-room for this remote room, remove all references to it!
+        // suicide/recycle all creeps
+        // destroy all humans
     }
 }
