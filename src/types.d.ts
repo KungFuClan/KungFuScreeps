@@ -1398,10 +1398,6 @@ interface DependentRoomParentMemory {
      * the name of the room for lookup purposes
      */
     roomName: string;
-    /**
-     * reference to the attack flags placed in the room
-     */
-    flags: ParentFlagMemory[];
 }
 
 /**
@@ -1442,38 +1438,6 @@ interface ClaimRoomMemory extends DependentRoomParentMemory {
     // Parent memory covers everything currently needed in here
     claimRoomType: ClaimRoomTypeConstant;
     buildComplete: boolean;
-}
-
-/**
- * Parent flag memory that all flag memory inhereits
- */
-interface ParentFlagMemory {
-    /**
-     * the name of the flag
-     */
-    flagName: string;
-    /**
-     * the type of the flag
-     */
-    flagType: FlagTypeConstant | undefined;
-}
-
-/**
- * memory associated with a claim flag inside a claim room memory
- */
-// tslint:disable-next-line:no-empty-interface
-interface ClaimFlagMemory extends ParentFlagMemory {
-    // For now, its covered by parent interface
-    // Extra claim room flags at the moment don't do anything like it does for attack rooms
-    // its just meant to mark the room (possible to change)
-}
-
-/**
- * memory associated with a remote flag inside a remote room memory
- */
-// tslint:disable-next-line:no-empty-interface
-interface RemoteFlagMemory extends ParentFlagMemory {
-    // Same deal as above for now
 }
 
 /**

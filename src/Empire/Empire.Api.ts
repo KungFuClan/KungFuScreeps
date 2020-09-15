@@ -123,12 +123,6 @@ export class EmpireApi {
         Memory.flags[flag.name].flagType = flagTypeConst;
         Memory.flags[flag.name].flagName = flag.name;
 
-        // Create the RemoteFlagMemory object for this flag
-        const remoteFlagMemory: RemoteFlagMemory = {
-            flagName: flag.name,
-            flagType: flagTypeConst
-        };
-
         // If the dependent room already has this room covered, set the flag to be deleted and throw a warning
         const existingDepedentRemoteRoomMem: RemoteRoomMemory | undefined = _.find(
             MemoryApi_Room.getRemoteRooms(dependentRoom),
@@ -156,7 +150,6 @@ export class EmpireApi {
             hostiles: { cache: Game.time, data: null },
             structures: { cache: Game.time, data: null },
             roomName: flag.pos.roomName,
-            flags: [remoteFlagMemory],
             reserveTTL: 0,
             reserveUsername: undefined,
             remoteRoomType
@@ -217,12 +210,6 @@ export class EmpireApi {
         Memory.flags[flag.name].flagType = flagTypeConst;
         Memory.flags[flag.name].flagName = flag.name;
 
-        // Create the ClaimFlagMemory object for this flag
-        const claimFlagMemory: ClaimFlagMemory = {
-            flagName: flag.name,
-            flagType: flagTypeConst
-        };
-
         // If the dependent room already has this room covered, set the flag to be deleted and throw a warning
         const existingDepedentClaimRoomMem: ClaimRoomMemory | undefined = _.find(
             MemoryApi_Room.getClaimRooms(dependentRoom),
@@ -247,7 +234,6 @@ export class EmpireApi {
         // Otherwise, add a brand new memory structure onto it
         const claimRoomMemory: ClaimRoomMemory = {
             roomName: flag.pos.roomName,
-            flags: [claimFlagMemory],
             claimRoomType,
             buildComplete: false
         };

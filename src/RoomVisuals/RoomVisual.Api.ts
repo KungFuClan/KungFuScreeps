@@ -271,7 +271,6 @@ export class RoomVisualApi {
             }
 
             lines.push("Room:   [ " + dr!.roomName + " ] ");
-            lines.push("Flag:   [ " + dr!.flags[0].flagName + " ] ");
             lines.push("");
         }
 
@@ -314,7 +313,6 @@ export class RoomVisualApi {
             }
 
             lines.push("Room:   [ " + dr!.roomName + " ] ");
-            lines.push("Flag:   [ " + dr!.flags[0].flagName + " ] ");
             lines.push("");
         }
 
