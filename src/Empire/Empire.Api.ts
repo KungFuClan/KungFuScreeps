@@ -36,17 +36,23 @@ export class EmpireApi {
 
         for (const flag of newFlags) {
             // Find the proper implementation of the flag processer we need
+            let processedFlag = false;
             for (const i in PROCESS_FLAG_HELPERS) {
                 const currentHelper: IFlagProcesser = PROCESS_FLAG_HELPERS[i];
                 if (currentHelper.primaryColor === flag.color) {
                     // We've found primary color, search for undefined or matching secondary color
                     currentHelper.processFlag(flag);
+                    processedFlag = true;
                     break;
                 }
+            }
+
+            if (!processedFlag) {
                 // If we make it here, we didn't find a match for the flag type, delete the flag and carry on
                 MemoryApi_Empire.createEmpireAlertNode("Attempted to process flag of an unhandled type.", 10);
                 flag.memory.processed = true;
                 flag.memory.complete = true;
+                return;
             }
 
             // Create room memory for the dependent room to prevent errors in accessing the rooms memory for spawning and traveling
