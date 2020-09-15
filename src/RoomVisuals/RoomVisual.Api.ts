@@ -20,7 +20,8 @@ import {
     TOWER_MAX_DAMAGE_THRESHOLD,
     RoomHelper_Structure,
     MemoryApi_Creep,
-    MemoryApi_Room
+    MemoryApi_Room,
+    ROLE_MINERAL_MINER
 } from "Utils/Imports/internals";
 import _ from "lodash";
 
@@ -147,6 +148,9 @@ export class RoomVisualApi {
             }
             if (creepLimits.domesticLimits.scout > 0) {
                 lines.push("Scouts:    " + roles[ROLE_SCOUT] + " / " + creepLimits.domesticLimits.scout);
+            }
+            if (creepLimits.domesticLimits.mineralMiner > 0) {
+                lines.push("Mineral Miners:    " + roles[ROLE_MINERAL_MINER] + " / " + creepLimits.domesticLimits.mineralMiner);
             }
         }
 
