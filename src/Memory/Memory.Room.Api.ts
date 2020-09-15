@@ -810,7 +810,7 @@ export class MemoryApi_Room {
      * @param room the room we are in
      */
     public static getAllCreepCount(room: Room): AllCreepCount {
-        const creepsInRoom: Creep[] = MemoryApi_Creep.getMyCreeps(room.name);
+        const creepsInRoom: Creep[] = MemoryApi_Creep.getMyCreeps(room.name, undefined, true);
         const allCreepCount: AllCreepCount = MemoryHelper.generateDefaultAllCreepCountObject();
 
         // sum up the number of each role we come across
