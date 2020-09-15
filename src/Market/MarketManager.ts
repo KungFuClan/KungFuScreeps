@@ -15,15 +15,15 @@ export class MarketManager {
             return;
         }
 
-        console.log(
-            bestOrder.resourceType,
-            bestOrder.amount,
-            bestOrder.price,
-            bestOrder.roomName,
-            Game.market.calcTransactionCost(bestOrder.amount, bestOrder.roomName!, "W9N7")
-        );
+        // console.log(
+        //     bestOrder.resourceType,
+        //     bestOrder.amount,
+        //     bestOrder.price,
+        //     bestOrder.roomName,
+        //     Game.market.calcTransactionCost(bestOrder.amount, bestOrder.roomName!, "W9N7")
+        // );
 
         // Code to put in console to deal this order
-        console.log(`Game.market.deal("${bestOrder.id}", ${bestOrder.amount}, "W9N7")`);
+        // console.log(`Game.market.deal("${bestOrder.id}", ${bestOrder.amount}, "W9N7")`);
     }
 }

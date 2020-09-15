@@ -431,7 +431,6 @@ interface IJobTypeHelper {
  */
 interface IFlagProcesser {
     primaryColor: ColorConstant;
-    secondaryColor: ColorConstant | undefined;
     processFlag: (flag: Flag) => void;
 }
 // --------------------------------------------------------------------
@@ -1006,7 +1005,7 @@ interface RoomMemory {
     /**
      * Names of all rooms flagged to remote harvest
      */
-    remoteRooms?: RemoteRoomMemory[];
+    remoteRooms?: RemoteRoomObject;
     /**
      * Names of all rooms flagged to colonize
      */
@@ -1023,6 +1022,10 @@ interface RoomMemory {
      * The last tick we had a scout spawn
      */
     lastScoutSpawn?: number;
+}
+
+interface RemoteRoomObject {
+    [key: string]: RemoteRoomMemory;
 }
 
 interface Memory {
@@ -1421,6 +1424,10 @@ interface RemoteRoomMemory extends DependentRoomParentMemory {
      * username reserving the controller - used to detect invader reserve
      */
     reserveUsername: string | undefined;
+    /**
+     * The type of remote room this is
+     */
+    remoteRoomType: RemoteRoomTypeConstant;
 }
 
 /**
@@ -1544,3 +1551,15 @@ interface ETAMemory {
 type AllCreepCount = {
     [key in RoleConstant]: number;
 };
+
+/**
+ * Constants for types of remote rooms
+ */
+type REMOTE_ENERGY = "remoteRoomEnergy";
+type REMOTE_SK_ENERGY = "remoteRoomSKEnergy";
+type REMOTE_SK_COMBINED = "remoteRoomSKCombined";
+
+type RemoteRoomTypeConstant =
+    REMOTE_ENERGY
+    | REMOTE_SK_COMBINED
+    | REMOTE_SK_ENERGY;
