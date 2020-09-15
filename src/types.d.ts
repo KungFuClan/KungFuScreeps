@@ -1009,7 +1009,7 @@ interface RoomMemory {
     /**
      * Names of all rooms flagged to colonize
      */
-    claimRooms?: ClaimRoomMemory[];
+    claimRooms?: ClaimRoomObject;
     /**
      * List of all of the room's GetEnergyJobs
      */
@@ -1026,6 +1026,10 @@ interface RoomMemory {
 
 interface RemoteRoomObject {
     [key: string]: RemoteRoomMemory;
+}
+
+interface ClaimRoomObject {
+    [key: string]: ClaimRoomMemory;
 }
 
 interface Memory {
@@ -1436,6 +1440,7 @@ interface RemoteRoomMemory extends DependentRoomParentMemory {
 // tslint:disable-next-line:no-empty-interface
 interface ClaimRoomMemory extends DependentRoomParentMemory {
     // Parent memory covers everything currently needed in here
+    claimRoomType: ClaimRoomTypeConstant;
 }
 
 /**
@@ -1563,3 +1568,13 @@ type RemoteRoomTypeConstant =
     REMOTE_ENERGY
     | REMOTE_SK_COMBINED
     | REMOTE_SK_ENERGY;
+
+/**
+ * Constants for types of claim rooms
+ */
+type CLAIM_DEFAULT = "claimDefault";
+type CLAIM_ESCORT = "claimEscort";
+
+type ClaimRoomTypeConstant =
+    CLAIM_DEFAULT
+    | CLAIM_ESCORT;

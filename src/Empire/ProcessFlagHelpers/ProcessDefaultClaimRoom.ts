@@ -1,9 +1,8 @@
-import { EmpireHelper, UserException, MemoryApi_Room, MemoryApi_Empire } from "Utils/Imports/internals";
+import { EmpireHelper, UserException, MemoryApi_Room, MemoryApi_Empire, EmpireApi, CLAIM_DEFAULT } from "Utils/Imports/internals";
 import _ from "lodash";
 
 export class ProcessDefaultClaimRoom implements IFlagProcesser {
     public primaryColor: ColorConstant = COLOR_WHITE;
-    public secondaryColor: ColorConstant = COLOR_WHITE;
 
     constructor() {
         const self = this;
@@ -15,6 +14,16 @@ export class ProcessDefaultClaimRoom implements IFlagProcesser {
      * @param flag
      */
     public processFlag(flag: Flag): void {
+
+        switch (flag.secondaryColor) {
+            case COLOR_WHITE:
+                EmpireApi.createClaimRoomInstance(flag, CLAIM_DEFAULT);
+                break;
+
+            case COLOR_RED:
+                EmpireApi.removeClaimRoomInstance(flag);
+                break;
+        }
         // Get the host room and set the flags memory
         const dependentRoom: Room = Game.rooms[EmpireHelper.findDependentRoom(flag.pos.roomName)];
         const flagTypeConst: FlagTypeConstant | undefined = EmpireHelper.getFlagType(flag);

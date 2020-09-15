@@ -100,9 +100,8 @@ export class EmpireApi {
 
     /**
      * Create the specified remote room instance in the room specified
-     * @param roomName the room we are creating the remote room instance for
+     * TODO - Remove flag from this to generalize it
      * @param flag the flag we used to create the remote room
-     * @param dependentRoom the room that is supplying the remote room with its powers
      * @param remoteRoomType the type of remote room we are creating
      */
     public static createRemoteRoomInstance(flag: Flag, remoteRoomType: RemoteRoomTypeConstant): void {
@@ -165,6 +164,7 @@ export class EmpireApi {
 
     /**
      * Remove all remote room instances from the room in question
+     * TODO - Remove flag from this to generalize it
      * @param roomName the name of the room we are removing the remote room instance from
      */
     public static removeRemoteRoomInstance(flag: Flag): void {
@@ -191,5 +191,23 @@ export class EmpireApi {
                 creep.suicide();
             }
         }
+    }
+
+    /**
+     * TODO - Remove flag from this to generalize it
+     * @param flag The flag we used to generate the request
+     * @param claimRoomType the type of claim room we are creating
+     */
+    public static createClaimRoomInstance(flag: Flag, claimRoomType: ClaimRoomTypeConstant): void {
+
+    }
+
+    /**
+     * Remove the claim room instance from the room specified
+     * TODO - Remove flag from this to generizise it
+     * @param flag The flag we used to generate the request
+     */
+    public static removeClaimRoomInstance(flag: Flag): void {
+
     }
 }
