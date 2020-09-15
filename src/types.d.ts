@@ -1441,6 +1441,7 @@ interface RemoteRoomMemory extends DependentRoomParentMemory {
 interface ClaimRoomMemory extends DependentRoomParentMemory {
     // Parent memory covers everything currently needed in here
     claimRoomType: ClaimRoomTypeConstant;
+    buildComplete: boolean;
 }
 
 /**

@@ -84,18 +84,26 @@ export class EmpireApi {
     public static cleanClaimRooms(): void {
         // Get all flag based action memory structures (Remote, Claim, and Attack Room Memory)
         const allRooms = MemoryApi_Empire.getOwnedRooms();
-        const claimRooms: Array<ClaimRoomMemory | undefined> = _.flatten(
-            _.map(allRooms, room => MemoryApi_Room.getClaimRooms(room))
-        );
 
-        // Remove claim room flags once the room is sufficiently built up
-        EmpireHelper.markCompletedClaimRooms(claimRooms);
+        for (const room of allRooms) {
+            const claimRooms: Array<ClaimRoomMemory | undefined> = MemoryApi_Room.getClaimRooms(room)
+            EmpireHelper.markCompletedClaimRooms(claimRooms);
+            this.cleanCompletedClaimRooms(claimRooms, room.name);
+        }
 
-        // Clean dead flags from memory structures
-        EmpireHelper.cleanDeadClaimRoomFlags(claimRooms);
+    }
 
-        // Clean the memory of each type of dependent room memory structure with no existing flags associated
-        EmpireHelper.cleanDeadClaimRooms(claimRooms);
+    /**
+     * Remove all claim rooms that have build complete on them
+     * @param claimRooms all the claim rooms we have for the current room
+     */
+    public static cleanCompletedClaimRooms(claimRooms: Array<ClaimRoomMemory | undefined>, dependentRoomName: string): void {
+        for (const claimRoom of claimRooms) {
+            if (!claimRoom) continue;
+            if (claimRoom.buildComplete) {
+                delete Memory.rooms[dependentRoomName].claimRooms![claimRoom.roomName];
+            }
+        }
     }
 
     /**
@@ -240,7 +248,8 @@ export class EmpireApi {
         const claimRoomMemory: ClaimRoomMemory = {
             roomName: flag.pos.roomName,
             flags: [claimFlagMemory],
-            claimRoomType
+            claimRoomType,
+            buildComplete: false
         };
 
         MemoryApi_Empire.createEmpireAlertNode(
@@ -264,7 +273,7 @@ export class EmpireApi {
         Memory.flags[flag.name].flagType = flagTypeConst;
         Memory.flags[flag.name].flagName = flag.name;
 
-        // Delete all creep associated with remote room
+        // Delete all creep associated with claim room
         const ownedRooms: Room[] = MemoryApi_Empire.getOwnedRooms();
         delete Memory.rooms[claimRoomName];
         for (const room of ownedRooms) {
@@ -272,7 +281,7 @@ export class EmpireApi {
             delete Memory.rooms[room.name].claimRooms![claimRoomName];
         }
 
-        // Suicide all creeps associated with the remote room
+        // Suicide all creeps associated with the claim room
         for (let i in Game.creeps) {
             const creep: Creep = Game.creeps[i];
             if (creep.memory.targetRoom === claimRoomName) {
