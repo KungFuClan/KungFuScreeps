@@ -40,10 +40,8 @@ export class EmpireApi {
                 const currentHelper: IFlagProcesser = PROCESS_FLAG_HELPERS[i];
                 if (currentHelper.primaryColor === flag.color) {
                     // We've found primary color, search for undefined or matching secondary color
-                    if (!currentHelper.secondaryColor || currentHelper.secondaryColor === flag.secondaryColor) {
-                        currentHelper.processFlag(flag);
-                        break;
-                    }
+                    currentHelper.processFlag(flag);
+                    break;
                 }
                 // If we make it here, we didn't find a match for the flag type, delete the flag and carry on
                 MemoryApi_Empire.createEmpireAlertNode("Attempted to process flag of an unhandled type.", 10);
@@ -172,11 +170,20 @@ export class EmpireApi {
         Memory.flags[flag.name].flagType = flagTypeConst;
         Memory.flags[flag.name].flagName = flag.name;
 
+        // Delete all creep associated with remote room
         const ownedRooms: Room[] = MemoryApi_Empire.getOwnedRooms();
         delete Memory.rooms[remoteRoomName];
         for (const room of ownedRooms) {
             if (!room.memory.remoteRooms) room.memory.remoteRooms = {};
             delete Memory.rooms[room.name].remoteRooms![remoteRoomName];
+        }
+
+        // Suicide all creeps associated with the remote room
+        for (let i in Game.creeps) {
+            const creep: Creep = Game.creeps[i];
+            if (creep.memory.targetRoom === remoteRoomName) {
+                creep.suicide();
+            }
         }
     }
 }

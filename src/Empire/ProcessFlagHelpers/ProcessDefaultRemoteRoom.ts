@@ -3,7 +3,6 @@ import _ from "lodash";
 
 export class ProcessDefaultRemoteRoom implements IFlagProcesser {
     public primaryColor: ColorConstant = COLOR_YELLOW;
-    public secondaryColor: ColorConstant = COLOR_YELLOW;
 
     constructor() {
         const self = this;

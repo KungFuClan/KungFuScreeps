@@ -646,6 +646,10 @@ export class MemoryApi_Room {
         }
 
         let remoteRooms: RemoteRoomMemory[] = [];
+        for (let i in room.memory.remoteRooms) {
+            const rr: RemoteRoomMemory = room.memory.remoteRooms[i];
+            if (rr) remoteRooms.push(rr);
+        }
 
         // TargetRoom parameter provided
         if (targetRoom !== undefined) {

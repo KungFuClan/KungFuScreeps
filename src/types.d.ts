@@ -431,7 +431,6 @@ interface IJobTypeHelper {
  */
 interface IFlagProcesser {
     primaryColor: ColorConstant;
-    secondaryColor: ColorConstant | undefined;
     processFlag: (flag: Flag) => void;
 }
 // --------------------------------------------------------------------
