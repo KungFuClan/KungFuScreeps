@@ -681,7 +681,11 @@ export class MemoryApi_Room {
             return [];
         }
 
-        let claimRooms: ClaimRoomMemory[] = Memory.rooms[room.name].claimRooms!;
+        let claimRooms: ClaimRoomMemory[] = [];
+        for (let i in room.memory.remoteRooms) {
+            const cc: ClaimRoomMemory = room.memory.claimRooms![i];
+            if (cc) claimRooms.push(cc);
+        }
 
         if (targetRoom !== undefined) {
             claimRooms = _.filter(claimRooms, (roomMemory: ClaimRoomMemory) => roomMemory.roomName === targetRoom);

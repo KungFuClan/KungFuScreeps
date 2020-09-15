@@ -199,7 +199,55 @@ export class EmpireApi {
      * @param claimRoomType the type of claim room we are creating
      */
     public static createClaimRoomInstance(flag: Flag, claimRoomType: ClaimRoomTypeConstant): void {
+        // Get the host room and set the flags memory
+        const dependentRoom: Room = Game.rooms[EmpireHelper.findDependentRoom(flag.pos.roomName)];
+        const flagTypeConst: FlagTypeConstant | undefined = EmpireHelper.getFlagType(flag);
+        const roomName: string = flag.pos.roomName;
+        Memory.flags[flag.name].complete = false;
+        Memory.flags[flag.name].processed = true;
+        Memory.flags[flag.name].timePlaced = Game.time;
+        Memory.flags[flag.name].flagType = flagTypeConst;
+        Memory.flags[flag.name].flagName = flag.name;
 
+        // Create the ClaimFlagMemory object for this flag
+        const claimFlagMemory: ClaimFlagMemory = {
+            flagName: flag.name,
+            flagType: flagTypeConst
+        };
+
+        // If the dependent room already has this room covered, set the flag to be deleted and throw a warning
+        const existingDepedentClaimRoomMem: ClaimRoomMemory | undefined = _.find(
+            MemoryApi_Room.getClaimRooms(dependentRoom),
+            (rr: ClaimRoomMemory) => {
+                if (rr) {
+                    return rr.roomName === roomName;
+                }
+                return false;
+            }
+        );
+
+        if (existingDepedentClaimRoomMem) {
+            Memory.flags[flag.name].complete = true;
+            throw new UserException(
+                "Already working this dependent room!",
+                "The room you placed the claim flag in is already being worked by " +
+                existingDepedentClaimRoomMem.roomName,
+                ERROR_WARN
+            );
+        }
+
+        // Otherwise, add a brand new memory structure onto it
+        const claimRoomMemory: ClaimRoomMemory = {
+            roomName: flag.pos.roomName,
+            flags: [claimFlagMemory],
+            claimRoomType
+        };
+
+        MemoryApi_Empire.createEmpireAlertNode(
+            "Claim Flag [" + flag.name + "] processed - Host Room: [" + dependentRoom.name + "] - Claim Room Type [" + claimRoomType + "].",
+            10
+        );
+        dependentRoom.memory.claimRooms![roomName] = claimRoomMemory;
     }
 
     /**
@@ -208,6 +256,28 @@ export class EmpireApi {
      * @param flag The flag we used to generate the request
      */
     public static removeClaimRoomInstance(flag: Flag): void {
+        const flagTypeConst: FlagTypeConstant | undefined = EmpireHelper.getFlagType(flag);
+        const claimRoomName = flag.pos.roomName;
+        Memory.flags[flag.name].complete = true;
+        Memory.flags[flag.name].processed = true;
+        Memory.flags[flag.name].timePlaced = Game.time;
+        Memory.flags[flag.name].flagType = flagTypeConst;
+        Memory.flags[flag.name].flagName = flag.name;
 
+        // Delete all creep associated with remote room
+        const ownedRooms: Room[] = MemoryApi_Empire.getOwnedRooms();
+        delete Memory.rooms[claimRoomName];
+        for (const room of ownedRooms) {
+            if (!room.memory.claimRooms) room.memory.claimRooms = {};
+            delete Memory.rooms[room.name].claimRooms![claimRoomName];
+        }
+
+        // Suicide all creeps associated with the remote room
+        for (let i in Game.creeps) {
+            const creep: Creep = Game.creeps[i];
+            if (creep.memory.targetRoom === claimRoomName) {
+                creep.suicide();
+            }
+        }
     }
 }
