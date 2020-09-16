@@ -345,4 +345,15 @@ export class MilitaryMovement_Helper {
             ERROR_ERROR
         );
     }
+
+    /**
+     * Tells us if the squad needs to switch the attack target (so we can decide if we need a new one)
+     * @param instance the instance we are controlling
+     * @param roomData the data for the room
+     * @param attackTarget the current attack target
+     * @returns boolean representing if we need to switch targets
+     */
+    public static needSwitchAttackTarget(instance: ISquadManager, roomData: MilitaryDataAll, attackTarget: Creep | Structure | undefined): boolean {
+        return true;
+    }
 }

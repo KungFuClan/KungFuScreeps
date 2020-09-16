@@ -1,7 +1,7 @@
 import {
     MemoryApi_Military,
     MilitaryCombat_Api,
-    MilitaryMovement_Api as MilitaryMovement_Api,
+    MilitaryMovement_Api,
     ACTION_MOVE,
     ACTION_RANGED_ATTACK,
     ACTION_HEAL,
@@ -9,9 +9,8 @@ import {
     UserException,
     ERROR_ERROR,
     SQUAD_STATUS_RALLY,
-    StandardSquadManager,
     militaryDataHelper,
-    CreepManager, RoomHelper_State, RoomHelper_Structure
+    RoomHelper_Structure
 } from "Utils/Imports/internals";
 import { MilitaryMovement_Helper } from "./Military.Movement.Helper";
 import _ from "lodash";

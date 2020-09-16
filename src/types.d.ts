@@ -376,10 +376,10 @@ interface ISquadManager {
     targetRoom: string;
     squadUUID: string;
     operationUUID: string;
-    // Booleans flags used in check status
     initialRallyComplete?: boolean;
     rallyPos: MockRoomPos | undefined;
     orientation: DirectionConstant | undefined;
+    attackTarget: Creep | Structure | undefined;
 
     runSquad: (instance: ISquadManager) => void;
     addCreep(instance: ISquadManager, creepName: string): void;

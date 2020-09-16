@@ -32,6 +32,7 @@ export class RemoteDefenderSquadManager implements ISquadManager {
     public initialRallyComplete: boolean = false;
     public rallyPos: MockRoomPos | undefined;
     public orientation: DirectionConstant | undefined;
+    public attackTarget: Creep | Structure | undefined;
 
     constructor() {
         const self = this;
@@ -83,6 +84,7 @@ export class RemoteDefenderSquadManager implements ISquadManager {
         instance.initialRallyComplete = false;
         instance.rallyPos = undefined;
         instance.orientation = undefined;
+        instance.attackTarget = undefined;
         return instance;
     }
 

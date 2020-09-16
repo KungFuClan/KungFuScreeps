@@ -1,5 +1,4 @@
 import {
-    UserException,
     STANDARD_MAN,
     SpawnApi,
     ROLE_MEDIC,
@@ -15,13 +14,11 @@ import {
     SQUAD_STATUS_DEAD,
     MilitaryCombat_Api,
     militaryDataHelper,
-    ACTION_MOVE,
-    ACTION_ATTACK, ERROR_ERROR
 } from "Utils/Imports/internals";
 import { MilitaryStatus_Helper } from "Military/Military.Status.Helper";
 import { MilitaryIntents_Api } from "Military/Military.Api.Intents";
-import { MilitaryMovement_Helper } from "Military/Military.Movement.Helper";
 import _ from "lodash";
+import { MilitaryMovement_Helper } from "Military/Military.Movement.Helper";
 
 export class StandardSquadManager implements ISquadManager {
     public name: SquadManagerConstant = STANDARD_MAN;
@@ -32,6 +29,7 @@ export class StandardSquadManager implements ISquadManager {
     public initialRallyComplete: boolean = false;
     public rallyPos: MockRoomPos | undefined;
     public orientation: DirectionConstant | undefined;
+    public attackTarget: Creep | Structure | undefined;
 
     constructor() {
         const self = this;
@@ -83,6 +81,7 @@ export class StandardSquadManager implements ISquadManager {
         instance.initialRallyComplete = false;
         instance.rallyPos = undefined;
         instance.orientation = undefined;
+        instance.attackTarget = undefined;
         return instance;
     }
 
@@ -174,6 +173,12 @@ export class StandardSquadManager implements ISquadManager {
             };
             const creeps: Creep[] = MemoryApi_Military.getLivingCreepsInSquadByInstance(instance);
             const roomData: MilitaryDataAll = militaryDataHelper.getRoomData(creeps, {}, dataNeeded, instance);
+
+            if (status !== SQUAD_STATUS_RALLY) {
+                if (!instance.attackTarget || MilitaryMovement_Helper.needSwitchAttackTarget(instance, roomData, instance.attackTarget)) {
+                    instance.attackTarget = MilitaryCombat_Api.getSeigeAttackTarget(instance, roomData);
+                }
+            }
 
             MilitaryIntents_Api.resetSquadIntents(instance);
             this.decideMoveIntents(instance, status, roomData);

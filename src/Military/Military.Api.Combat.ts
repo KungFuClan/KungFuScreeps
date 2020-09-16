@@ -302,4 +302,14 @@ export class MilitaryCombat_Api {
 
         return target;
     }
+
+    /**
+     * Get the attack target for the seiging squad
+     * @param instance the instance we are controlling
+     * @param roomData the data for the room we are seiging
+     * @returns [Creep | Structure | undefined] the target we want to attack
+     */
+    public static getSeigeAttackTarget(instance: ISquadManager, roomData: MilitaryDataRoom): Creep | Structure | undefined {
+        return undefined;
+    }
 }

@@ -33,6 +33,7 @@ export class SoloZealotSquadManager implements ISquadManager {
     public initialRallyComplete: boolean = false;
     public rallyPos: MockRoomPos | undefined;
     public orientation: DirectionConstant | undefined;
+    public attackTarget: Creep | Structure | undefined;
 
     constructor() {
         const self = this;
@@ -85,6 +86,8 @@ export class SoloZealotSquadManager implements ISquadManager {
         instance.operationUUID = operationUUID;
         instance.initialRallyComplete = false;
         instance.rallyPos = undefined;
+        instance.attackTarget = undefined;
+        instance.orientation = undefined;
         return instance;
     }
 
