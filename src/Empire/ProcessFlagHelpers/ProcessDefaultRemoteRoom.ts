@@ -69,6 +69,10 @@ export class ProcessDefaultRemoteRoom implements IFlagProcesser {
         }
     }
 
+    /**
+     * Handle the flag administration for the remote room removal
+     * @param flag the flag that triggered the removal of the remote room
+     */
     private handleRemoveRemoteFlagPlaced(flag: Flag): void {
         const flagTypeConst: FlagTypeConstant | undefined = EmpireHelper.getFlagType(flag);
         Memory.flags[flag.name].complete = true;
