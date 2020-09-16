@@ -49,6 +49,10 @@ export const REMOTE_ENERGY = "remoteRoomEnergy";
 export const REMOTE_SK_ENERGY = "remoteRoomSKEnergy";
 export const REMOTE_SK_COMBINED = "remoteRoomSKCombined";
 
+// Claim Room Type Constants
+export const CLAIM_DEFAULT = "claimDefault";
+export const CLAIM_ESCORT = "claimEscort";
+
 // Operation Strategy Constants
 export const OP_STRATEGY_NONE = "none";
 export const OP_STRATEGY_FFA = "ffa";

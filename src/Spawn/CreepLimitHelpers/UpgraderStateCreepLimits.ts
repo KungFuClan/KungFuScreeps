@@ -122,8 +122,7 @@ export class UpgraderStateCreepLimits implements ICreepSpawnLimits {
         );
         remoteLimits[ROLE_REMOTE_RESERVER] = SpawnHelper.getRemoteReserverLimitForRoom(room);
         remoteLimits[ROLE_COLONIZER] = numClaimRooms * SpawnHelper.getLimitPerClaimRoomForRole(ROLE_COLONIZER);
-        remoteLimits[ROLE_CLAIMER] =
-            numCurrentlyUnclaimedClaimRooms * SpawnHelper.getLimitPerClaimRoomForRole(ROLE_CLAIMER);
+        remoteLimits[ROLE_CLAIMER] = numCurrentlyUnclaimedClaimRooms * SpawnHelper.getLimitPerClaimRoomForRole(ROLE_CLAIMER);
 
         return remoteLimits;
     }

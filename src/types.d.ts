@@ -1009,7 +1009,7 @@ interface RoomMemory {
     /**
      * Names of all rooms flagged to colonize
      */
-    claimRooms?: ClaimRoomMemory[];
+    claimRooms?: ClaimRoomObject;
     /**
      * List of all of the room's GetEnergyJobs
      */
@@ -1026,6 +1026,10 @@ interface RoomMemory {
 
 interface RemoteRoomObject {
     [key: string]: RemoteRoomMemory;
+}
+
+interface ClaimRoomObject {
+    [key: string]: ClaimRoomMemory;
 }
 
 interface Memory {
@@ -1394,10 +1398,6 @@ interface DependentRoomParentMemory {
      * the name of the room for lookup purposes
      */
     roomName: string;
-    /**
-     * reference to the attack flags placed in the room
-     */
-    flags: ParentFlagMemory[];
 }
 
 /**
@@ -1436,38 +1436,8 @@ interface RemoteRoomMemory extends DependentRoomParentMemory {
 // tslint:disable-next-line:no-empty-interface
 interface ClaimRoomMemory extends DependentRoomParentMemory {
     // Parent memory covers everything currently needed in here
-}
-
-/**
- * Parent flag memory that all flag memory inhereits
- */
-interface ParentFlagMemory {
-    /**
-     * the name of the flag
-     */
-    flagName: string;
-    /**
-     * the type of the flag
-     */
-    flagType: FlagTypeConstant | undefined;
-}
-
-/**
- * memory associated with a claim flag inside a claim room memory
- */
-// tslint:disable-next-line:no-empty-interface
-interface ClaimFlagMemory extends ParentFlagMemory {
-    // For now, its covered by parent interface
-    // Extra claim room flags at the moment don't do anything like it does for attack rooms
-    // its just meant to mark the room (possible to change)
-}
-
-/**
- * memory associated with a remote flag inside a remote room memory
- */
-// tslint:disable-next-line:no-empty-interface
-interface RemoteFlagMemory extends ParentFlagMemory {
-    // Same deal as above for now
+    claimRoomType: ClaimRoomTypeConstant;
+    buildComplete: boolean;
 }
 
 /**
@@ -1563,3 +1533,13 @@ type RemoteRoomTypeConstant =
     REMOTE_ENERGY
     | REMOTE_SK_COMBINED
     | REMOTE_SK_ENERGY;
+
+/**
+ * Constants for types of claim rooms
+ */
+type CLAIM_DEFAULT = "claimDefault";
+type CLAIM_ESCORT = "claimEscort";
+
+type ClaimRoomTypeConstant =
+    CLAIM_DEFAULT
+    | CLAIM_ESCORT;

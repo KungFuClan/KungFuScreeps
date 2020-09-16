@@ -40,7 +40,7 @@ export class MemoryApi_Room {
         if (!RoomHelper_State.isMyRoom(room)) {
             throw new UserException(
                 "Stimulate flag check on non-owned room",
-                "You attempted to check for a stimulate flag in a room we do not own. Room [" + room.name + "]",
+                "You attempted to check for an upgrader link in a room we do not own. Room [" + room.name + "]",
                 ERROR_WARN
             );
         }
@@ -102,7 +102,7 @@ export class MemoryApi_Room {
         //                    unless we define a constructor for RoomMemory.
         if (isOwnedRoom) {
             Memory.rooms[roomName] = {
-                claimRooms: [],
+                claimRooms: {},
                 constructionSites: { data: null, cache: null },
                 creepLimit: {
                     domesticLimits: {
@@ -681,7 +681,11 @@ export class MemoryApi_Room {
             return [];
         }
 
-        let claimRooms: ClaimRoomMemory[] = Memory.rooms[room.name].claimRooms!;
+        let claimRooms: ClaimRoomMemory[] = [];
+        for (let i in room.memory.remoteRooms) {
+            const cc: ClaimRoomMemory = room.memory.claimRooms![i];
+            if (cc) claimRooms.push(cc);
+        }
 
         if (targetRoom !== undefined) {
             claimRooms = _.filter(claimRooms, (roomMemory: ClaimRoomMemory) => roomMemory.roomName === targetRoom);
