@@ -194,8 +194,11 @@ export class StandardSquadManager implements ISquadManager {
                 }
 
                 if (MilitaryIntents_Api.queueIntentMoveQuadSquadRallyPos(creep, instance, status)) {
+                    console.log("creep:", creep.name);
                     return;
                 }
+
+                console.log("RALLY DONE", status);
             });
         },
 

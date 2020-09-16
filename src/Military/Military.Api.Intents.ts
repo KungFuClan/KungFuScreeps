@@ -11,7 +11,7 @@ import {
     SQUAD_STATUS_RALLY,
     StandardSquadManager,
     militaryDataHelper,
-    CreepManager
+    CreepManager, RoomHelper_State, RoomHelper_Structure
 } from "Utils/Imports/internals";
 import { MilitaryMovement_Helper } from "./Military.Movement.Helper";
 import _ from "lodash";
@@ -99,7 +99,9 @@ export class MilitaryIntents_Api {
         const target: RoomPosition = posArr[options.caravanPos];
         let movePath: PathStep[] = militaryDataHelper.getMovePath(instance, creep.name);
 
-        if (MilitaryMovement_Api.verifyPathTarget(movePath, target) === false) {
+        // Handles the case of creep getting path blocked at some point
+        // TODO add stuck detection
+        if (MilitaryMovement_Api.verifyPathTarget(movePath, target) === false || RoomHelper_Structure.executeEveryTicks(10)) {
             movePath = creep.pos.findPathTo(posArr[options.caravanPos]);
             militaryDataHelper.movePath[instance.squadUUID][creep.name] = movePath;
         }
