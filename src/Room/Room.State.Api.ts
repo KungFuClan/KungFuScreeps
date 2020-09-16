@@ -68,7 +68,7 @@ export class RoomApi_State {
         const storage: StructureStorage | undefined = room.storage;
         const containers: Array<Structure | null> = MemoryApi_Room.getStructureOfType(room.name, STRUCTURE_CONTAINER);
         const sources: Array<Source | null> = MemoryApi_Room.getSources(room.name);
-        if (room.controller!.level >= 6) {
+        if (room.controller!.level >= 5) {
             // check if we are in upgrader room state
             // container mining and storage set up, and we got links online
             if (
