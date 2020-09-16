@@ -387,7 +387,7 @@ export class MilitaryIntents_Api {
      */
     public static queueIntentMeleeAttackSquadTarget(creep: Creep, instance: ISquadManager): boolean {
         if (!instance.attackTarget) return false;
-        if (creep.pos.isNearTo(instance.attackTarget)) {
+        if (MilitaryCombat_Api.isInAttackRange(creep, instance.attackTarget.pos, true)) {
             // Revisit need for target type at all, for now default to creep/structure (no difference in behavior)
             const intent: Attack_MiliIntent = {
                 action: ACTION_ATTACK,
@@ -415,6 +415,6 @@ export class MilitaryIntents_Api {
      * @returns boolean representing if we moved towards the attack target successfully
      */
     public static queueIntentsMoveQuadSquadTowardsAttackTarget(instance: ISquadManager): boolean {
-
+        return false;
     }
 }
