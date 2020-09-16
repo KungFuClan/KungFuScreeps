@@ -348,7 +348,7 @@ export class MilitaryIntents_Api {
     }
 
     /**
-     * The instance we are moving
+     * Queue the intents for all creeps in the squad to move them from the rally pos into the target room
      * TODO Currently only works for moving into target room from the room directly before
      * @param instance
      * @returns boolean representing if we queued the intents

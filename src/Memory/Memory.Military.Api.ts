@@ -174,8 +174,10 @@ export class MemoryApi_Military {
     }
 
     /**
-     *
+     * Return the leader of the squad
+     * TODO change so it handles main leader dying unexpectedly
      * @param instance the instance we are checking for the lead creep on
+     * @returns the creep object of the creep leader for the squad (Caravan pos 0)
      */
     public static getLeadSquadCreep(instance: ISquadManager): Creep {
         const creeps: Creep[] = this.getLivingCreepsInSquadByInstance(instance);
