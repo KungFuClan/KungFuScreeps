@@ -5,7 +5,8 @@ import {
     MemoryApi_Room,
     MemoryApi_Creep,
     MemoryApi_Empire,
-    ALLY_LIST
+    ALLY_LIST,
+    ConsoleCommands
 } from "Utils/Imports/internals";
 import _ from "lodash";
 
@@ -203,13 +204,14 @@ export class RoomHelper_State {
      */
     public static numRemoteSources(room: Room): number {
         // TODO: remove sources and structures from the remote room dependent memory itself
-        const remoteRooms: RemoteRoomMemory[] = Memory.rooms[room.name].remoteRooms!;
+        const remoteRooms: RemoteRoomObject = Memory.rooms[room.name].remoteRooms!;
         let numSources: number = 0;
 
         _.forEach(remoteRooms, (rr: RemoteRoomMemory) => {
             if (!rr) {
                 return;
             }
+
             // Don't consider these sources valid if the controller is reserved by an enemy, or theres defcon 2 >=
             if (
                 SpawnHelper.isRemoteRoomEnemyReserved(rr) ||
@@ -226,6 +228,7 @@ export class RoomHelper_State {
             }
             numSources += sourcesInRoom;
         });
+
         return numSources;
     }
 

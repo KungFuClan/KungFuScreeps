@@ -19,7 +19,6 @@ export class MemoryManager {
         _.forEach(ownedRooms, (room: Room) => {
             const isOwnedRoom: boolean = true;
             MemoryApi_Room.initRoomMemory(room.name, isOwnedRoom);
-            MemoryApi_Room.cleanDependentRoomMemory(room);
         });
 
         const dependentRooms: Room[] = MemoryApi_Room.getVisibleDependentRooms();

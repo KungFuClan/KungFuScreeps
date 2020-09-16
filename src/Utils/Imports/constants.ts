@@ -44,6 +44,11 @@ export const TOWER_DRAINER_MAN = "towerDrainerSquad";
 export const DOMESTIC_DEFENDER_MAN = "domesticDefenderSquad";
 export const REMOTE_DEFENDER_MAN = "remoteDefenderSquad";
 
+// Remote Room Type Constants
+export const REMOTE_ENERGY = "remoteRoomEnergy";
+export const REMOTE_SK_ENERGY = "remoteRoomSKEnergy";
+export const REMOTE_SK_COMBINED = "remoteRoomSKCombined";
+
 // Operation Strategy Constants
 export const OP_STRATEGY_NONE = "none";
 export const OP_STRATEGY_FFA = "ffa";

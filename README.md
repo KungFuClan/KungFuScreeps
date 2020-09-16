@@ -9,6 +9,11 @@
 
  ## [Learn More About Jacob Waldrip](https://www.jacobwaldrip.com/home)
 
- ## [Learn More About Brock Sharp](https://www.google.com)
+ ## [Learn More About Brock Sharp](https://www.github.com/UhmBrock)
 
 ---
+
+## Compile and upload code to screeps:
+
+ - rollup -c --environment DEST:main       // compile and upload once
+ - rollup -cw --environment DEST:main      // watch the code to compile and reupload on save

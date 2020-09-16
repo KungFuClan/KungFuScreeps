@@ -17,6 +17,6 @@ export class EmpireManager {
 
         // Delete unused flags and flag memory
         EmpireApi.deleteCompleteFlags();
-        EmpireApi.cleanDeadFlags();
+        EmpireApi.cleanClaimRooms();
     }
 }

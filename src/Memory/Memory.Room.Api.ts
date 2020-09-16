@@ -58,9 +58,9 @@ export class MemoryApi_Room {
             throw new UserException(
                 "Tried to getUpgraderLink of a room with no controller",
                 "Get Upgrader Link was called for room [" +
-                    room.name +
-                    "]" +
-                    ", but theres no controller in this room.",
+                room.name +
+                "]" +
+                ", but theres no controller in this room.",
                 ERROR_WARN
             );
         }
@@ -79,34 +79,6 @@ export class MemoryApi_Room {
      */
     public static updateUpgraderLink(room: Room, id: string): void {
         room.memory.upgradeLink = id;
-    }
-
-    /**
-     * Go through the room's depedent room memory and remove null values
-     * @param room the room we are cleaning the memory structure for
-     */
-    public static cleanDependentRoomMemory(room: Room): void {
-        // Re-map Remote Room array to remove null values
-        const allRemoteRooms: RemoteRoomMemory[] = Memory.rooms[room.name].remoteRooms!;
-        const nonNullRemoteRooms: RemoteRoomMemory[] = [];
-
-        _.forEach(allRemoteRooms, (rr: RemoteRoomMemory) => {
-            if (rr !== null) {
-                nonNullRemoteRooms.push(rr);
-            }
-        });
-        Memory.rooms[room.name].remoteRooms = nonNullRemoteRooms;
-
-        // Re-map Remote Room array to remove null values
-        const allClaimRooms: ClaimRoomMemory[] = Memory.rooms[room.name].claimRooms!;
-        const nonNullClaimRooms: ClaimRoomMemory[] = [];
-
-        _.forEach(allClaimRooms, (rr: ClaimRoomMemory) => {
-            if (rr !== null) {
-                nonNullClaimRooms.push(rr);
-            }
-        });
-        Memory.rooms[room.name].claimRooms = nonNullClaimRooms;
     }
 
     /**
@@ -157,7 +129,7 @@ export class MemoryApi_Room {
                 defcon: -1,
                 shotLastTick: false,
                 hostiles: { data: null, cache: null },
-                remoteRooms: [],
+                remoteRooms: {},
                 roomState: ROOM_STATE_INTRO,
                 sources: { data: null, cache: null },
                 minerals: { data: null, cache: null },
@@ -673,7 +645,11 @@ export class MemoryApi_Room {
             return [];
         }
 
-        let remoteRooms: RemoteRoomMemory[] = Memory.rooms[room.name].remoteRooms!;
+        let remoteRooms: RemoteRoomMemory[] = [];
+        for (let i in room.memory.remoteRooms) {
+            const rr: RemoteRoomMemory = room.memory.remoteRooms[i];
+            if (rr) remoteRooms.push(rr);
+        }
 
         // TargetRoom parameter provided
         if (targetRoom !== undefined) {
@@ -830,7 +806,7 @@ export class MemoryApi_Room {
      * @param room the room we are in
      */
     public static getAllCreepCount(room: Room): AllCreepCount {
-        const creepsInRoom: Creep[] = MemoryApi_Creep.getMyCreeps(room.name);
+        const creepsInRoom: Creep[] = MemoryApi_Creep.getMyCreeps(room.name, undefined, true);
         const allCreepCount: AllCreepCount = MemoryHelper.generateDefaultAllCreepCountObject();
 
         // sum up the number of each role we come across
