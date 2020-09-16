@@ -16,7 +16,7 @@ import {
     MilitaryCombat_Api,
     militaryDataHelper,
     ACTION_MOVE,
-    ACTION_ATTACK
+    ACTION_ATTACK, ERROR_ERROR
 } from "Utils/Imports/internals";
 import { MilitaryStatus_Helper } from "Military/Military.Status.Helper";
 import { MilitaryIntents_Api } from "Military/Military.Api.Intents";
@@ -31,6 +31,7 @@ export class StandardSquadManager implements ISquadManager {
     public operationUUID: string = "";
     public initialRallyComplete: boolean = false;
     public rallyPos: MockRoomPos | undefined;
+    public orientation: DirectionConstant | undefined;
 
     constructor() {
         const self = this;
@@ -81,6 +82,7 @@ export class StandardSquadManager implements ISquadManager {
         instance.operationUUID = operationUUID;
         instance.initialRallyComplete = false;
         instance.rallyPos = undefined;
+        instance.orientation = undefined;
         return instance;
     }
 
@@ -194,12 +196,22 @@ export class StandardSquadManager implements ISquadManager {
                 }
 
                 if (MilitaryIntents_Api.queueIntentMoveQuadSquadRallyPos(creep, instance, status)) {
-                    console.log("creep:", creep.name);
                     return;
                 }
-
-                console.log("RALLY DONE", status);
             });
+
+            // At this point, squad is finished rallying and moves as a unit at all times
+            // Only one path is required and all creeps will queue the same intent
+            if (status === SQUAD_STATUS_RALLY) {
+                return;
+            }
+
+            // Move into target room
+            if (MilitaryIntents_Api.queueIntentsMoveQuadSquadIntoTargetRoom(instance)) {
+                return;
+            }
+
+            // In target room, find target and move towards it
         },
 
         decideAttackIntents(instance: ISquadManager, status: SquadStatusConstant, roomData: MilitaryDataAll) {

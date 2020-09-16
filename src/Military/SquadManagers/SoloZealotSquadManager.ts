@@ -32,6 +32,7 @@ export class SoloZealotSquadManager implements ISquadManager {
     public operationUUID: string = "";
     public initialRallyComplete: boolean = false;
     public rallyPos: MockRoomPos | undefined;
+    public orientation: DirectionConstant | undefined;
 
     constructor() {
         const self = this;

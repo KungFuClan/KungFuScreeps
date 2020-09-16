@@ -346,4 +346,38 @@ export class MilitaryIntents_Api {
     public static queueHealAllyCreep(creep: Creep, instance: ISquadManager, roomData: MilitaryDataAll): boolean {
         return false;
     }
+
+    /**
+     * The instance we are moving
+     * TODO Currently only works for moving into target room from the room directly before
+     * @param instance
+     * @returns boolean representing if we queued the intents
+     */
+    public static queueIntentsMoveQuadSquadIntoTargetRoom(instance: ISquadManager): boolean {
+        if (!instance.orientation) {
+            if (!instance.rallyPos) throw new UserException("No rally position", "Squad - " + instance.squadUUID, ERROR_ERROR);
+            const currPos: RoomPosition = Normalize.convertMockToRealPos(instance.rallyPos);
+            const exit = Game.map.findExit(currPos.roomName, instance.targetRoom);
+            if (exit === ERR_NO_PATH || exit === ERR_INVALID_ARGS) {
+                throw new UserException("No path or invalid args for queueIntentMoveQuadSquadRallyPos", "rip", ERROR_ERROR);
+            }
+            instance.orientation = MilitaryMovement_Helper.getInitialSquadOrientation(instance, exit);
+        }
+
+        // If lead creep is in target room and 2 tiles from exit, we do not need to move squad into target room
+        if (MilitaryMovement_Helper.isLeadCreepInTargetRoom(instance)) {
+            return false;
+        }
+
+        const creeps: Creep[] = MemoryApi_Military.getLivingCreepsInSquadByInstance(instance);
+        _.forEach(creeps, (creep: Creep) => {
+            const intent: Move_MiliIntent = {
+                action: ACTION_MOVE,
+                target: instance.orientation!,
+                targetType: "direction"
+            };
+            MemoryApi_Military.pushIntentToCreepStack(instance, creep.name, intent);
+        });
+        return true;
+    }
 }

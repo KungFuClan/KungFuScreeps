@@ -379,6 +379,7 @@ interface ISquadManager {
     // Booleans flags used in check status
     initialRallyComplete?: boolean;
     rallyPos: MockRoomPos | undefined;
+    orientation: DirectionConstant | undefined;
 
     runSquad: (instance: ISquadManager) => void;
     addCreep(instance: ISquadManager, creepName: string): void;

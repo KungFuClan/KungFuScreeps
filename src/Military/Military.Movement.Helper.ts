@@ -10,7 +10,7 @@ import {
     ERROR_INFO,
     ERROR_ERROR,
     UtilHelper,
-    Normalize
+    Normalize, MemoryApi_Military
 } from "Utils/Imports/internals";
 
 export class MilitaryMovement_Helper {
@@ -283,5 +283,66 @@ export class MilitaryMovement_Helper {
         }
 
         return adjustedName[0].concat(adjustedName[1].toString(), adjustedName[2], adjustedName[3].toString());
+    }
+
+    /**
+     * Get the initial direction the squad is facing to move into the target room
+     * @param instance the instance we are controlling
+     * @param exit the exit to the target room
+     * @returns the direction the squad is facing
+     */
+    public static getInitialSquadOrientation(instance: ISquadManager, exit: ExitConstant): DirectionConstant {
+        if (exit === FIND_EXIT_LEFT) {
+            return LEFT;
+        }
+        else if (exit === FIND_EXIT_RIGHT) {
+            return RIGHT;
+        }
+        else if (exit === FIND_EXIT_TOP) {
+            return TOP;
+        }
+        else if (exit === FIND_EXIT_BOTTOM) {
+            return BOTTOM;
+        }
+
+        throw new UserException("Unable to locate initial orientation", "Squad - " + instance.squadUUID, ERROR_ERROR);
+    }
+
+    /**
+     * Update the orientation (direction) that the squad is facing
+     * @param instance the instance we are controlling
+     */
+    public static getMovingQuadSquadOrientation(instance: ISquadManager): void {
+        return;
+    }
+
+    /**
+     * Check if the lead creep is at least TWO steps into the target room (to make room for creeps behind it)
+     * @param instance the instance we are controlling
+     * @returns if the lead creep is two steps into the target room
+     */
+    public static isLeadCreepInTargetRoom(instance: ISquadManager): boolean {
+        if (!instance.orientation) throw new UserException("No Orientation for IsLeadCreepInTargetRoom", "Squad - " + instance.squadUUID, ERROR_ERROR);
+        const leadCreep = MemoryApi_Military.getLeadSquadCreep(instance);
+        if (leadCreep.room.name !== instance.targetRoom) return false;
+        switch (instance.orientation) {
+            case BOTTOM:
+                return leadCreep.pos.y >= 2;
+
+            case RIGHT:
+                return leadCreep.pos.x >= 2;
+
+            case LEFT:
+                return leadCreep.pos.x <= 47;
+
+            case TOP:
+                return leadCreep.pos.y <= 47;
+        }
+
+        throw new UserException(
+            "No return for isLeadCreepInTargetRoom",
+            "Squad - " + instance.squadUUID,
+            ERROR_ERROR
+        );
     }
 }

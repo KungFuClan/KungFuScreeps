@@ -1,4 +1,4 @@
-import { SQUAD_MANAGERS, UserException } from "Utils/Imports/internals";
+import { ERROR_WARN, ERROR_ERROR, SQUAD_MANAGERS, UserException } from "Utils/Imports/internals";
 import _ from "lodash";
 
 export class MemoryApi_Military {
@@ -171,5 +171,20 @@ export class MemoryApi_Military {
      */
     public static getAllOperations(): OperationData {
         return Memory.empire.militaryOperations;
+    }
+
+    /**
+     *
+     * @param instance the instance we are checking for the lead creep on
+     */
+    public static getLeadSquadCreep(instance: ISquadManager): Creep {
+        const creeps: Creep[] = this.getLivingCreepsInSquadByInstance(instance);
+        for (const creep of creeps) {
+            const militaryOptions: CreepOptionsMili = creep.memory.options as CreepOptionsMili;
+            if (militaryOptions.caravanPos === 0) {
+                return creep;
+            }
+        }
+        throw new UserException("No lead creep found", "Sqaud - " + instance.squadUUID, ERROR_WARN);
     }
 }

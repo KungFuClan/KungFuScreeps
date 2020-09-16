@@ -19,6 +19,7 @@ export class SoloStalkerSquadManager implements ISquadManager {
     public operationUUID: string = "";
     public initialRallyComplete: boolean = false;
     public rallyPos: MockRoomPos | undefined;
+    public orientation: DirectionConstant | undefined;
 
     constructor() {
         const self = this;
@@ -67,6 +68,7 @@ export class SoloStalkerSquadManager implements ISquadManager {
         instance.operationUUID = operationUUID;
         instance.initialRallyComplete = false;
         instance.rallyPos = undefined;
+        instance.orientation = undefined;
         return instance;
     }
 
