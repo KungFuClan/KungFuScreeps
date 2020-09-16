@@ -10,7 +10,7 @@ import {
     ERROR_ERROR,
     SQUAD_STATUS_RALLY,
     militaryDataHelper,
-    RoomHelper_Structure
+    RoomHelper_Structure, ACTION_ATTACK
 } from "Utils/Imports/internals";
 import { MilitaryMovement_Helper } from "./Military.Movement.Helper";
 import _ from "lodash";
@@ -378,5 +378,25 @@ export class MilitaryIntents_Api {
             MemoryApi_Military.pushIntentToCreepStack(instance, creep.name, intent);
         });
         return true;
+    }
+
+    /**
+     * Queue the intent to attack the squad target for a melee creep
+     * @param creep the creep we are currently queueing the intent for
+     * @param instance the instance we are currently controlling
+     */
+    public static queueIntentMeleeAttackSquadTarget(creep: Creep, instance: ISquadManager): boolean {
+        if (!instance.attackTarget) return false;
+        if (creep.pos.isNearTo(instance.attackTarget)) {
+            // Revisit need for target type at all, for now default to creep/structure (no difference in behavior)
+            const intent: Attack_MiliIntent = {
+                action: ACTION_ATTACK,
+                target: instance.attackTarget.id,
+                targetType: "structure"
+            }
+            MemoryApi_Military.pushIntentToCreepStack(instance, creep.name, intent);
+            return true;
+        }
+        return false;
     }
 }

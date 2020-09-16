@@ -216,7 +216,14 @@ export class StandardSquadManager implements ISquadManager {
                 return;
             }
 
-            // In target room, find target and move towards it
+            // In target room, move towards attack target
+            if (MilitaryIntents_Api.queueIntentsQuadSquadFixOrientation(instance)) {
+                return;
+            }
+
+            if (MilitaryIntents_Api.queueIntentsMoveQuadSquadTowardsAttackTarget(instance)) {
+                return;
+            }
         },
 
         decideAttackIntents(instance: ISquadManager, status: SquadStatusConstant, roomData: MilitaryDataAll) {
@@ -225,11 +232,10 @@ export class StandardSquadManager implements ISquadManager {
                 return;
             }
 
-            // get the ideal target we wanna SLAP
-
             const zealots: Creep[] = _.filter(creeps, (creep: Creep) => creep.memory.role === ROLE_ZEALOT);
             _.forEach(zealots, (creep: Creep) => {
-                // queue up the attack intents
+                if (!instance.attackTarget) return;
+                MilitaryIntents_Api.queueIntentMeleeAttackSquadTarget(creep, instance);
             });
         },
 
