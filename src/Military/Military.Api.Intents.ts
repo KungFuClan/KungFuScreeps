@@ -399,4 +399,22 @@ export class MilitaryIntents_Api {
         }
         return false;
     }
+
+    /**
+     * Queue the intents needed to fix the orientation of the quad squad
+     * @param instance the instance we are controlling
+     * @returns boolean representing if we had to reorient the squad
+     */
+    public static queueIntentsQuadSquadFixOrientation(instance: ISquadManager): boolean {
+        return false;
+    }
+
+    /**
+     * Queue the intents needed to move the quad squad towards their attack target
+     * @param instance the instance we are controller
+     * @returns boolean representing if we moved towards the attack target successfully
+     */
+    public static queueIntentsMoveQuadSquadTowardsAttackTarget(instance: ISquadManager): boolean {
+
+    }
 }

@@ -224,6 +224,11 @@ export class StandardSquadManager implements ISquadManager {
             if (MilitaryIntents_Api.queueIntentsMoveQuadSquadTowardsAttackTarget(instance)) {
                 return;
             }
+
+            // [ ] seige attack
+            // [ ] switch attack
+            // [ ] orient
+            // [ ] move towards attack
         },
 
         decideAttackIntents(instance: ISquadManager, status: SquadStatusConstant, roomData: MilitaryDataAll) {
