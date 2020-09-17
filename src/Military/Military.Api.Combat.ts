@@ -307,10 +307,11 @@ export class MilitaryCombat_Api {
      * Get the attack target for the seiging squad
      * @param instance the instance we are controlling
      * @param roomData the data for the room we are seiging
-     * @returns [Creep | Structure | undefined] the target we want to attack
+     * @returns [Id<Creep | Structure> | undefined] the target we want to attack
      */
     public static getSeigeAttackTarget(instance: ISquadManager, roomData: MilitaryDataAll): Creep | Structure | undefined {
         const leadCreep: Creep = MemoryApi_Military.getLeadSquadCreep(instance);
+        if (leadCreep.room.name !== instance.targetRoom) return undefined;
         // Find a fresh target if no creep in squad has a target yet
         let path: PathFinderPath;
         const goal: { pos: RoomPosition; range: number } = {

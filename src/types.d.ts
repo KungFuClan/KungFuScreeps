@@ -379,7 +379,7 @@ interface ISquadManager {
     initialRallyComplete?: boolean;
     rallyPos: MockRoomPos | undefined;
     orientation: DirectionConstant | undefined;
-    attackTarget: Creep | Structure | undefined;
+    attackTarget: Id<Creep | Structure> | undefined;
 
     runSquad: (instance: ISquadManager) => void;
     addCreep(instance: ISquadManager, creepName: string): void;

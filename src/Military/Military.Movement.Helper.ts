@@ -353,7 +353,7 @@ export class MilitaryMovement_Helper {
      * @param attackTarget the current attack target
      * @returns boolean representing if we need to switch targets
      */
-    public static needSwitchAttackTarget(instance: ISquadManager, roomData: MilitaryDataAll, attackTarget: Creep | Structure | undefined): boolean {
+    public static needSwitchAttackTarget(instance: ISquadManager, roomData: MilitaryDataAll, attackTarget: Id<Creep | Structure> | undefined): boolean {
         return false;
     }
 }

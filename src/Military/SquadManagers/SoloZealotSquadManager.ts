@@ -33,7 +33,7 @@ export class SoloZealotSquadManager implements ISquadManager {
     public initialRallyComplete: boolean = false;
     public rallyPos: MockRoomPos | undefined;
     public orientation: DirectionConstant | undefined;
-    public attackTarget: Creep | Structure | undefined;
+    public attackTarget: Id<Creep | Structure> | undefined;
 
     constructor() {
         const self = this;

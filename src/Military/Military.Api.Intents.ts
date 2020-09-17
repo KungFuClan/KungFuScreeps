@@ -387,11 +387,13 @@ export class MilitaryIntents_Api {
      */
     public static queueIntentMeleeAttackSquadTarget(creep: Creep, instance: ISquadManager): boolean {
         if (!instance.attackTarget) return false;
-        if (MilitaryCombat_Api.isInAttackRange(creep, instance.attackTarget.pos, true)) {
+        const attackTarget: Creep | Structure | null = Game.getObjectById(instance.attackTarget);
+        if (!attackTarget) return false;
+        if (MilitaryCombat_Api.isInAttackRange(creep, attackTarget.pos, true)) {
             // Revisit need for target type at all, for now default to creep/structure (no difference in behavior)
             const intent: Attack_MiliIntent = {
                 action: ACTION_ATTACK,
-                target: instance.attackTarget.id,
+                target: instance.attackTarget,
                 targetType: "structure"
             }
             MemoryApi_Military.pushIntentToCreepStack(instance, creep.name, intent);

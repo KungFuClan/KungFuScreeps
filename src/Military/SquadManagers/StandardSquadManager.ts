@@ -29,7 +29,7 @@ export class StandardSquadManager implements ISquadManager {
     public initialRallyComplete: boolean = false;
     public rallyPos: MockRoomPos | undefined;
     public orientation: DirectionConstant | undefined;
-    public attackTarget: Creep | Structure | undefined;
+    public attackTarget: Id<Creep | Structure> | undefined;
 
     constructor() {
         const self = this;
@@ -176,7 +176,8 @@ export class StandardSquadManager implements ISquadManager {
 
             if (status !== SQUAD_STATUS_RALLY) {
                 if (!instance.attackTarget || MilitaryMovement_Helper.needSwitchAttackTarget(instance, roomData, instance.attackTarget)) {
-                    instance.attackTarget = MilitaryCombat_Api.getSeigeAttackTarget(instance, roomData);
+                    const attackTarget: Structure | Creep | undefined = MilitaryCombat_Api.getSeigeAttackTarget(instance, roomData);
+                    instance.attackTarget = attackTarget ? attackTarget.id : undefined;
                 }
             }
 
@@ -225,10 +226,10 @@ export class StandardSquadManager implements ISquadManager {
                 return;
             }
 
-            // [ ] seige attack
-            // [ ] switch attack
-            // [ ] orient
-            // [ ] move towards attack
+            // [X] seige attack
+            // [] switch attack
+            // [] orient
+            // [] move towards attack
         },
 
         decideAttackIntents(instance: ISquadManager, status: SquadStatusConstant, roomData: MilitaryDataAll) {
