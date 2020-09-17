@@ -417,6 +417,44 @@ export class MilitaryIntents_Api {
      * @returns boolean representing if we moved towards the attack target successfully
      */
     public static queueIntentsMoveQuadSquadTowardsAttackTarget(instance: ISquadManager): boolean {
-        return false;
+        if (!instance.attackTarget) return false;
+        const attackTarget: Creep | Structure | null = Game.getObjectById(instance.attackTarget);
+        if (!attackTarget) return false;
+
+        const leadCreep: Creep = MemoryApi_Military.getLeadSquadCreep(instance);
+        // No need to move if we are in attack range
+        if (MilitaryCombat_Api.isInAttackRange(leadCreep, attackTarget.pos, true)) return false;
+
+        let movePath = militaryDataHelper.getMovePath(instance, leadCreep.name);
+        if (MilitaryMovement_Api.verifyPathTarget(movePath, attackTarget.pos) === false) {
+            // Replace this with proper quad squad compatible path
+            movePath = leadCreep.pos.findPathTo(attackTarget.pos);
+            militaryDataHelper.movePath[instance.squadUUID][leadCreep.name] = movePath;
+        }
+
+        const nextStepIndex: number = MilitaryMovement_Api.nextPathStep(leadCreep, movePath);
+        if (nextStepIndex === -1) {
+            return false;
+        }
+
+        const directionToTarget = movePath[nextStepIndex].direction;
+        const creeps: Creep[] = MemoryApi_Military.getLivingCreepsInSquadByInstance(instance);
+        const creepHasFatigue: boolean = _.some(creeps, (creep: Creep) => creep.fatigue > 0);
+
+        // Prevent intents until all creeps have no fatigue
+        if (creepHasFatigue) {
+            return true;
+        }
+
+        _.forEach(creeps, (creep: Creep) => {
+            const intent: Move_MiliIntent = {
+                action: ACTION_MOVE,
+                target: directionToTarget,
+                targetType: "direction"
+            };
+            MemoryApi_Military.pushIntentToCreepStack(instance, creep.name, intent);
+        });
+
+        return true;
     }
 }

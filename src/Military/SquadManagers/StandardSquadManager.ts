@@ -214,6 +214,8 @@ export class StandardSquadManager implements ISquadManager {
 
             // Move into target room
             if (MilitaryIntents_Api.queueIntentsMoveQuadSquadIntoTargetRoom(instance)) {
+                // Once we're moving into the target room reset the move path to work off a clean slate
+                _.forEach(creeps, (creep: Creep) => militaryDataHelper.movePath[instance.squadUUID][creep.name] = []);
                 return;
             }
 
