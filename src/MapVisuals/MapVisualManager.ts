@@ -65,10 +65,10 @@ export class MapVisualManager {
             }
         }
 
-        console.log(`<p style="color: #800080 ">${numTicks}+ ${displayElements[4].length}</p>`);
-        console.log(`<p style="color: #FF5733 ">${numTicks * 0.75} ${displayElements[0].length}</p>`);
-        console.log(`<p style="color: #FF9633 ">${numTicks * 0.5} ${displayElements[1].length}</p>`);
-        console.log(`<p style="color: #FFE333 ">${numTicks * 0.25} ${displayElements[2].length}</p>`);
-        console.log(`<p style="color: #9CFF33 ">${numTicks * 0} ${displayElements[3].length}</p>`);
+        // console.log(`<p style="color: #800080 ">${numTicks}+ ${displayElements[4].length}</p>`);
+        // console.log(`<p style="color: #FF5733 ">${numTicks * 0.75} ${displayElements[0].length}</p>`);
+        // console.log(`<p style="color: #FF9633 ">${numTicks * 0.5} ${displayElements[1].length}</p>`);
+        // console.log(`<p style="color: #FFE333 ">${numTicks * 0.25} ${displayElements[2].length}</p>`);
+        // console.log(`<p style="color: #9CFF33 ">${numTicks * 0} ${displayElements[3].length}</p>`);
     }
 }
