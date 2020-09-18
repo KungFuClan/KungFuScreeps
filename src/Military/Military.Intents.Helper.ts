@@ -4,20 +4,11 @@ import { ACTION_MOVE, ERROR_ERROR, MemoryApi_Military, UserException } from "Uti
 export class MilitaryIntents_Helper {
 
     /**
-     * Queue the intents to turn the squads orientation around
-     * @param instance The current instance we are controlling
-     * @param currentOrientation the current direction the squad is facing
-     */
-    public static queueIntentsQuadSquadTurnAround(instance: ISquadManager, currentOrientation: DirectionConstant): void {
-
-    }
-
-    /**
-     * Get the map of the creeps based on their caravan position
-     * @param creeps the creeps in the squad
-     * @param instance the instance we are controlling
-     * @returns hash map of creeps with caravan position being the key
-     */
+ * Get the map of the creeps based on their caravan position
+ * @param creeps the creeps in the squad
+ * @param instance the instance we are controlling
+ * @returns hash map of creeps with caravan position being the key
+ */
     private static getCreepPositionMap(instance: ISquadManager): { [key: number]: Creep } {
         const creeps: Creep[] = MemoryApi_Military.getLivingCreepsInSquadByInstance(instance);
         const positionMap: { [key: number]: Creep } = {}
@@ -40,6 +31,26 @@ export class MilitaryIntents_Helper {
                 target: LEFT,
                 targetType: "direction"
             },
+            ["up_left"]: {
+                action: ACTION_MOVE,
+                target: TOP_LEFT,
+                targetType: "direction"
+            },
+            ["down_left"]: {
+                action: ACTION_MOVE,
+                target: BOTTOM_LEFT,
+                targetType: "direction"
+            },
+            ["up_right"]: {
+                action: ACTION_MOVE,
+                target: TOP_RIGHT,
+                targetType: "direction"
+            },
+            ["down_right"]: {
+                action: ACTION_MOVE,
+                target: BOTTOM_RIGHT,
+                targetType: "direction"
+            },
             ["right"]: {
                 action: ACTION_MOVE,
                 target: RIGHT,
@@ -56,6 +67,46 @@ export class MilitaryIntents_Helper {
                 targetType: "direction"
             }
         };
+    }
+
+    /**
+     * Queue the intents to turn the squads orientation around
+     * @param instance The current instance we are controlling
+     * @param currentOrientation the current direction the squad is facing
+     */
+    public static queueIntentsQuadSquadTurnAround(instance: ISquadManager, currentOrientation: DirectionConstant): void {
+        const positionMap: { [key: number]: Creep } = this.getCreepPositionMap(instance);
+        const intentMapper: { [key: string]: Move_MiliIntent } = this.getIntentMap();
+
+        switch (currentOrientation) {
+            case TOP:
+                if (positionMap[0] !== undefined) MemoryApi_Military.pushIntentToCreepStack(instance, positionMap[0].name, intentMapper["down_right"]);
+                if (positionMap[1] !== undefined) MemoryApi_Military.pushIntentToCreepStack(instance, positionMap[1].name, intentMapper["down_left"]);
+                if (positionMap[2] !== undefined) MemoryApi_Military.pushIntentToCreepStack(instance, positionMap[2].name, intentMapper["up_right"]);
+                if (positionMap[3] !== undefined) MemoryApi_Military.pushIntentToCreepStack(instance, positionMap[3].name, intentMapper["up_left"]);
+                break;
+
+            case LEFT:
+                if (positionMap[0] !== undefined) MemoryApi_Military.pushIntentToCreepStack(instance, positionMap[0].name, intentMapper["up_right"]);
+                if (positionMap[1] !== undefined) MemoryApi_Military.pushIntentToCreepStack(instance, positionMap[1].name, intentMapper["down_right"]);
+                if (positionMap[2] !== undefined) MemoryApi_Military.pushIntentToCreepStack(instance, positionMap[2].name, intentMapper["up_left"]);
+                if (positionMap[3] !== undefined) MemoryApi_Military.pushIntentToCreepStack(instance, positionMap[3].name, intentMapper["down_left"]);
+                break;
+
+            case RIGHT:
+                if (positionMap[0] !== undefined) MemoryApi_Military.pushIntentToCreepStack(instance, positionMap[0].name, intentMapper["down_left"]);
+                if (positionMap[1] !== undefined) MemoryApi_Military.pushIntentToCreepStack(instance, positionMap[1].name, intentMapper["up_left"]);
+                if (positionMap[2] !== undefined) MemoryApi_Military.pushIntentToCreepStack(instance, positionMap[2].name, intentMapper["down_right"]);
+                if (positionMap[3] !== undefined) MemoryApi_Military.pushIntentToCreepStack(instance, positionMap[3].name, intentMapper["up_right"]);
+                break;
+
+            case BOTTOM:
+                if (positionMap[0] !== undefined) MemoryApi_Military.pushIntentToCreepStack(instance, positionMap[0].name, intentMapper["up_left"]);
+                if (positionMap[1] !== undefined) MemoryApi_Military.pushIntentToCreepStack(instance, positionMap[1].name, intentMapper["up_right"]);
+                if (positionMap[2] !== undefined) MemoryApi_Military.pushIntentToCreepStack(instance, positionMap[2].name, intentMapper["down_left"]);
+                if (positionMap[3] !== undefined) MemoryApi_Military.pushIntentToCreepStack(instance, positionMap[3].name, intentMapper["down_right"]);
+                break;
+        }
     }
 
     /**
