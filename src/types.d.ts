@@ -1047,6 +1047,10 @@ interface EmpireMemory {
      * Military operations
      */
     militaryOperations: OperationData;
+    /**
+     * Market Requests
+     */
+    market: MarketData;
 }
 
 interface OperationData {
@@ -1066,6 +1070,44 @@ interface MilitaryOperation {
 interface MovementData {
     [key: string]: RoomMovementData;
 }
+
+interface MarketData {
+    /**
+     * The target price for each resource that we track
+     */
+    priceData: {
+        [key in MarketResourceConstant]?: number;
+    };
+
+    /**
+     * The current requests
+     */
+    requests: MarketRequest[];
+}
+
+interface MarketRequest {
+    /**
+     * The type of resource
+     */
+    resourceType: MarketResourceConstant;
+
+    /**
+     * The amount of the resource to sell/buy
+     */
+    amount: number;
+
+    /**
+     * The number of ticks before we force completion of the order
+     */
+    maxWaitRemaining: number;
+
+    /**
+     * The current status of the request
+     * complete ( needs to delete ), incomplete (failed to fill), pendingMarket (waiting for market to fill), pendingTransfer (waiting for room to fill before we place order)
+     */
+    status: "complete" | "incomplete" | "pendingMarket" | "pendingTransfer";
+}
+
 /**
  * Contains pathfinding information about a room
  */
@@ -1559,7 +1601,4 @@ type REMOTE_ENERGY = "remoteRoomEnergy";
 type REMOTE_SK_ENERGY = "remoteRoomSKEnergy";
 type REMOTE_SK_COMBINED = "remoteRoomSKCombined";
 
-type RemoteRoomTypeConstant =
-    REMOTE_ENERGY
-    | REMOTE_SK_COMBINED
-    | REMOTE_SK_ENERGY;
+type RemoteRoomTypeConstant = REMOTE_ENERGY | REMOTE_SK_COMBINED | REMOTE_SK_ENERGY;

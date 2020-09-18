@@ -1,6 +1,7 @@
 import _ from "lodash";
 import { MemoryApi_Room } from "Memory/Memory.Room.Api";
 import { MemoryApi_Empire } from "Utils/Imports/internals";
+import { Mem } from "Utils/MemHack";
 
 interface MarketRequest {
     resourceType: MarketResourceConstant;
@@ -10,13 +11,34 @@ interface MarketRequest {
     status: "complete" | "incomplete" | "pendingMarket" | "pendingTransfer";
 }
 
+// ! Only the resources listed in these constants will be processed in requests
+const MIN_ResourceLimits: { [key in MarketResourceConstant]?: number } = {
+    L: 10000,
+    O: 10000,
+    X: 5000,
+    H: 10000
+};
+
+const MAX_ResourceLimits: { [key in MarketResourceConstant]?: number } = {
+    L: 20000,
+    O: 20000,
+    X: 10000,
+    H: 20000
+};
+
 export class MarketManager {
     public static runMarketManager() {
         // Temp code for testing market
         this.runTempCode();
 
-        const ownedRooms = MemoryApi_Empire.getOwnedRooms();
+        if (!Memory.empire.market) {
+            Memory.empire.market = {
+                priceData: {},
+                requests: []
+            };
+        }
 
+        const ownedRooms = MemoryApi_Empire.getOwnedRooms();
         for (const room of ownedRooms) {
             this.createMarketRequests(room);
         }
@@ -31,7 +53,7 @@ export class MarketManager {
         // resourceType
         // amount
         // maximumWaitTime (ticks that decrement each cycle until we place a buy order)
-        // status - complete ( needs to delete ), incomplete (failed to fill), pendingMarket (waiting for market to fill), pendingTransfer (waiting for room to fill before we place order)
+        // status -
         // We will also check if we have more than MAX_RESOURCE_AMOUNT and create a request to sell it (maxWaitTime will be the time before we place an order, in case another room requests that mineral)
 
         // Process Requests
@@ -86,16 +108,16 @@ export class MarketManager {
             return;
         }
 
-        // console.log(
-        //     bestOrder.resourceType,
-        //     bestOrder.amount,
-        //     bestOrder.price,
-        //     bestOrder.roomName,
-        //     Game.market.calcTransactionCost(bestOrder.amount, bestOrder.roomName!, "W9N7")
-        // );
+        console.log(
+            bestOrder.resourceType,
+            bestOrder.amount,
+            bestOrder.price,
+            bestOrder.roomName,
+            Game.market.calcTransactionCost(bestOrder.amount, bestOrder.roomName!, "W9N7")
+        );
 
         // Code to put in console to deal this order
-        // console.log(`Game.market.deal("${bestOrder.id}", ${bestOrder.amount}, "W9N7")`);
+        console.log(`Game.market.deal("${bestOrder.id}", ${bestOrder.amount}, "W9N7")`);
     }
 
     /**
