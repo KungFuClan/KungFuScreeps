@@ -10,7 +10,7 @@ import {
     ERROR_ERROR,
     SQUAD_STATUS_RALLY,
     militaryDataHelper,
-    RoomHelper_Structure, ACTION_ATTACK
+    RoomHelper_Structure, ACTION_ATTACK, MilitaryIntents_Helper
 } from "Utils/Imports/internals";
 import { MilitaryMovement_Helper } from "./Military.Movement.Helper";
 import _ from "lodash";
@@ -408,7 +408,69 @@ export class MilitaryIntents_Api {
      * @returns boolean representing if we had to reorient the squad
      */
     public static queueIntentsQuadSquadFixOrientation(instance: ISquadManager): boolean {
-        return false;
+        const currentOrientation: DirectionConstant | undefined = instance.orientation;
+        if (!currentOrientation) throw new UserException("No orientation for squad", "Squad - " + instance.squadUUID, ERROR_ERROR);
+
+        // Get the direction that we are going for the next step
+        const leadCreep: Creep = MemoryApi_Military.getLeadSquadCreep(instance);
+        const movePath: PathStep[] = militaryDataHelper.getMovePath(instance, leadCreep.name)
+        if (movePath.length === 0) return false;
+        const moveIndex: number = MilitaryMovement_Api.nextPathStep(leadCreep, movePath);
+        if (moveIndex === -1) {
+            return false;
+        }
+        const nextStepDirection: DirectionConstant = movePath[moveIndex].direction;
+        if (MilitaryMovement_Helper.isOrientationChangeRequired(currentOrientation, nextStepDirection)) return false;
+
+        // Change orientation based on current orientation and desired orientation
+        let clockWiseRotations: DirectionConstant[] = [];
+        let counterClockwiseRotations: DirectionConstant[] = [];
+        let turnAroundRotations: DirectionConstant[] = [];
+        switch (currentOrientation) {
+            case LEFT:
+                clockWiseRotations = [TOP, TOP_RIGHT];
+                counterClockwiseRotations = [BOTTOM, BOTTOM_RIGHT];
+                turnAroundRotations = [RIGHT];
+                break;
+
+            case RIGHT:
+                clockWiseRotations = [BOTTOM, BOTTOM_LEFT];
+                counterClockwiseRotations = [TOP, TOP_LEFT];
+                turnAroundRotations = [LEFT];
+                break;
+
+            case TOP:
+                clockWiseRotations = [RIGHT, BOTTOM_RIGHT];
+                counterClockwiseRotations = [LEFT, BOTTOM_LEFT];
+                turnAroundRotations = [BOTTOM];
+                break;
+
+            case BOTTOM:
+                clockWiseRotations = [LEFT, TOP_LEFT];
+                counterClockwiseRotations = [RIGHT, TOP_RIGHT];
+                turnAroundRotations = [TOP];
+                break;
+            default:
+                throw new UserException("Invalid orientation - " + currentOrientation, "Squad - " + instance.squadUUID, ERROR_ERROR);
+        }
+
+        // Apply the correct operation to reorient the squad
+        if (turnAroundRotations.includes(nextStepDirection)) {
+            MilitaryIntents_Helper.queueIntentsQuadSquadTurnAround(instance, currentOrientation);
+            MilitaryIntents_Helper.updateSquadOrientation(currentOrientation, "turnAround");
+        }
+        else if (clockWiseRotations.includes(nextStepDirection)) {
+            MilitaryIntents_Helper.queueIntentsQuadSquadRotateClockwise(instance, currentOrientation);
+            MilitaryIntents_Helper.updateSquadOrientation(currentOrientation, "clockwise");
+        }
+        else if (counterClockwiseRotations.includes(nextStepDirection)) {
+            MilitaryIntents_Helper.queueIntentsQuadSquadRotateCounterClockwise(instance, currentOrientation);
+            MilitaryIntents_Helper.updateSquadOrientation(currentOrientation, "counterClockwise");
+        }
+        else {
+            throw new UserException("Could not reorient squad, incorrect mapping", "Squad - " + instance.squadUUID, ERROR_ERROR);
+        }
+        return true;
     }
 
     /**

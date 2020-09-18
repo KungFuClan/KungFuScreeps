@@ -356,4 +356,22 @@ export class MilitaryMovement_Helper {
     public static needSwitchAttackTarget(instance: ISquadManager, roomData: MilitaryDataAll, attackTarget: Id<Creep | Structure> | undefined): boolean {
         return false;
     }
+
+    /**
+     * Decide if we need to change orientation for a quad squad
+     * @param currentDirection the direction we're currently facing
+     * @param nextStepDirection the direction our next step is in
+     * @returns boolean representing if we need to change directions
+     */
+    public static isOrientationChangeRequired(currentDirection: DirectionConstant, nextStepDirection: DirectionConstant): boolean {
+        interface DirectionMapper {
+            [key: string]: DirectionConstant[];
+        }
+        const directionMapper: DirectionMapper = {};
+        directionMapper[LEFT] = [LEFT, TOP_LEFT, BOTTOM_LEFT];
+        directionMapper[TOP] = [TOP_LEFT, TOP, TOP_RIGHT];
+        directionMapper[RIGHT] = [RIGHT, BOTTOM_RIGHT, TOP_RIGHT];
+        directionMapper[BOTTOM] = [BOTTOM, BOTTOM_LEFT, BOTTOM_RIGHT];
+        return directionMapper[currentDirection].includes(nextStepDirection);
+    }
 }

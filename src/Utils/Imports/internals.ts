@@ -36,6 +36,7 @@ export * from "Spawn/SpawnHelper";
 export * from "Memory/MemoryHelper";
 export * from "Memory/Memory.Room.Helper";
 export * from "Military/militaryData.Helper";
+export * from "Military/Military.Intents.Helper";
 // -----------------------------
 // Body/Option Helper Implementations
 export * from "Creeps/RoleHelpers/MinerBodyOptsHelper";
