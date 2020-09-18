@@ -4,11 +4,11 @@ import { ACTION_MOVE, ERROR_ERROR, MemoryApi_Military, UserException } from "Uti
 export class MilitaryIntents_Helper {
 
     /**
- * Get the map of the creeps based on their caravan position
- * @param creeps the creeps in the squad
- * @param instance the instance we are controlling
- * @returns hash map of creeps with caravan position being the key
- */
+     * Get the map of the creeps based on their caravan position
+     * @param creeps the creeps in the squad
+     * @param instance the instance we are controlling
+     * @returns hash map of creeps with caravan position being the key
+     */
     private static getCreepPositionMap(instance: ISquadManager): { [key: number]: Creep } {
         const creeps: Creep[] = MemoryApi_Military.getLivingCreepsInSquadByInstance(instance);
         const positionMap: { [key: number]: Creep } = {}
