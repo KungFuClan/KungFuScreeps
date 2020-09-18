@@ -509,7 +509,6 @@ export class MilitaryIntents_Api {
         const pathingPoint: RoomPosition = MilitaryMovement_Helper.getQuadSquadPathingPoint(instance);
         const topLeftCreep: Creep = MemoryApi_Military.findTopLeftCreep(instance);
         if (MilitaryMovement_Api.verifyPathTarget(movePath, attackTarget.pos) === false) {
-            // Replace this with proper quad squad compatible path
             movePath = pathingPoint.findPathTo(attackTarget.pos, {
                 costCallback(roomName, costMatrix) {
                     return CostMatrixApi.getQuadSquadMatrix(instance.targetRoom, TOP);
