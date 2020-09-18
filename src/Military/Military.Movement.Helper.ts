@@ -172,13 +172,13 @@ export class MilitaryMovement_Helper {
             posArr.push(new RoomPosition(currPos.x - 1, currPos.y + 1, currPos.roomName));
         }
         else if (exit === FIND_EXIT_TOP) {
-            posArr.push(new RoomPosition(currPos.x, currPos.y + 1, currPos.roomName));
             posArr.push(new RoomPosition(currPos.x + 1, currPos.y, currPos.roomName));
+            posArr.push(new RoomPosition(currPos.x, currPos.y + 1, currPos.roomName));
             posArr.push(new RoomPosition(currPos.x + 1, currPos.y + 1, currPos.roomName));
         }
         else if (exit === FIND_EXIT_BOTTOM) {
-            posArr.push(new RoomPosition(currPos.x, currPos.y - 1, currPos.roomName));
             posArr.push(new RoomPosition(currPos.x - 1, currPos.y, currPos.roomName));
+            posArr.push(new RoomPosition(currPos.x, currPos.y - 1, currPos.roomName));
             posArr.push(new RoomPosition(currPos.x - 1, currPos.y - 1, currPos.roomName));
         }
 

@@ -420,7 +420,7 @@ export class MilitaryIntents_Api {
             return false;
         }
         const nextStepDirection: DirectionConstant = movePath[moveIndex].direction;
-        if (MilitaryMovement_Helper.isOrientationChangeRequired(currentOrientation, nextStepDirection)) return false;
+        if (!MilitaryMovement_Helper.isOrientationChangeRequired(currentOrientation, nextStepDirection)) return false;
 
         // Change orientation based on current orientation and desired orientation
         let clockWiseRotations: DirectionConstant[] = [];
@@ -457,15 +457,15 @@ export class MilitaryIntents_Api {
         // Apply the correct operation to reorient the squad
         if (turnAroundRotations.includes(nextStepDirection)) {
             MilitaryIntents_Helper.queueIntentsQuadSquadTurnAround(instance, currentOrientation);
-            MilitaryIntents_Helper.updateSquadOrientation(currentOrientation, "turnAround");
+            instance.orientation = MilitaryIntents_Helper.updateSquadOrientation(currentOrientation, "turnAround");
         }
         else if (clockWiseRotations.includes(nextStepDirection)) {
             MilitaryIntents_Helper.queueIntentsQuadSquadRotateClockwise(instance, currentOrientation);
-            MilitaryIntents_Helper.updateSquadOrientation(currentOrientation, "clockwise");
+            instance.orientation = MilitaryIntents_Helper.updateSquadOrientation(currentOrientation, "clockwise");
         }
         else if (counterClockwiseRotations.includes(nextStepDirection)) {
             MilitaryIntents_Helper.queueIntentsQuadSquadRotateCounterClockwise(instance, currentOrientation);
-            MilitaryIntents_Helper.updateSquadOrientation(currentOrientation, "counterClockwise");
+            instance.orientation = MilitaryIntents_Helper.updateSquadOrientation(currentOrientation, "counterClockwise");
         }
         else {
             throw new UserException("Could not reorient squad, incorrect mapping", "Squad - " + instance.squadUUID, ERROR_ERROR);
@@ -488,7 +488,7 @@ export class MilitaryIntents_Api {
         if (MilitaryCombat_Api.isInAttackRange(leadCreep, attackTarget.pos, true)) return false;
 
         let movePath = militaryDataHelper.getMovePath(instance, leadCreep.name);
-        if (MilitaryMovement_Api.verifyPathTarget(movePath, attackTarget.pos) === false) {
+        if (MilitaryMovement_Api.verifyPathTarget(movePath, attackTarget.pos) === false || true) {
             // Replace this with proper quad squad compatible path
             movePath = leadCreep.pos.findPathTo(attackTarget.pos);
             militaryDataHelper.movePath[instance.squadUUID][leadCreep.name] = movePath;
