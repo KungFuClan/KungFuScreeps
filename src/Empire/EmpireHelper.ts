@@ -126,62 +126,17 @@ export class EmpireHelper {
     }
 
     /**
-     * if a claim room has no flags associated with it, delete the claim room memory structure
-     * @param claimRooms an array of all the claim room memory structures in the empire
-     */
-    public static cleanDeadClaimRooms(claimRooms: Array<ClaimRoomMemory | undefined>): void {
-        // Loop over claim rooms, and if we find one with no associated flag, remove it
-        for (const claimRoom in claimRooms) {
-            if (!claimRooms[claimRoom]) {
-                continue;
-            }
-            const claimRoomName: string = claimRooms[claimRoom]!.roomName;
-
-            if (!claimRooms[claimRoom]!.flags[0]) {
-                MemoryApi_Empire.createEmpireAlertNode(
-                    "Removing Claim Room [" + claimRooms[claimRoom]!.roomName + "]",
-                    10
-                );
-
-                // Get the dependent room for the attack room we are removing from memory
-                const dependentRoom: Room | undefined = _.find(MemoryApi_Empire.getOwnedRooms(), (room: Room) => {
-                    const rr = room.memory.claimRooms;
-                    return _.some(rr!, (innerRR: ClaimRoomMemory) => {
-                        if (innerRR) {
-                            return innerRR.roomName === claimRoomName;
-                        }
-                        return false;
-                    });
-                });
-
-                delete Memory.rooms[dependentRoom!.name].claimRooms![claimRoom];
-            }
-        }
-    }
-
-    /**
      * Mark the flag as complete for each claim room that is considered "built"
      * @param claimRooms the claim rooms we are checking in memory
      */
     public static markCompletedClaimRooms(claimRooms: Array<ClaimRoomMemory | undefined>): void {
         for (const claimRoom of claimRooms) {
-            if (!claimRoom) {
-                continue;
-            }
+            if (!claimRoom) continue;
+            if (claimRoom.buildComplete) continue;
 
             // If the room is built, complete all the flags associated with it
             if (this.claimRoomBuildComplete(claimRoom)) {
-                for (const flag in claimRoom!.flags) {
-                    const currentFlagName: string = claimRoom.flags[flag].flagName;
-                    if (!Game.flags[currentFlagName]) {
-                        continue;
-                    }
-                    MemoryApi_Empire.createEmpireAlertNode(
-                        "Completing flag for claim room [" + claimRoom.roomName + "].",
-                        10
-                    );
-                    Game.flags[currentFlagName].memory.complete = true;
-                }
+                claimRoom.buildComplete = true;
 
                 // Destroy all the structures in the claim room EXCEPT our spawn
                 const room: Room = Game.rooms[claimRoom.roomName];
@@ -213,36 +168,6 @@ export class EmpireHelper {
             (struct: StructureSpawn) => struct.my
         );
         return spawns.length > 0;
-    }
-
-    /**
-     * removes all claim room memory structures that do not have an existing flag associated with them
-     * @param claimRooms an array of all the claim room memory structures in the empire
-     */
-    public static cleanDeadClaimRoomFlags(claimRooms: Array<ClaimRoomMemory | undefined>): void {
-        // Loop over claim rooms, remote rooms, and attack rooms, and make sure the flag they're referencing actually exists
-        // Delete the memory structure if its not associated with an existing flag
-        for (const claimRoom of claimRooms) {
-            if (!claimRoom) {
-                continue;
-            }
-
-            for (const flag in claimRoom!.flags) {
-                if (!claimRoom!.flags[flag]) {
-                    continue;
-                }
-
-                // Tell typescript that these are claim flag memory structures
-                const currentFlag: ClaimFlagMemory = claimRoom!.flags[flag] as ClaimFlagMemory;
-                if (!Game.flags[currentFlag.flagName]) {
-                    MemoryApi_Empire.createEmpireAlertNode(
-                        "Removing [" + flag + "] from Claim Room [" + claimRoom!.roomName + "]",
-                        10
-                    );
-                    delete claimRoom!.flags[flag];
-                }
-            }
-        }
     }
 
     /**

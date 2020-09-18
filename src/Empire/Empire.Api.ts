@@ -84,98 +84,59 @@ export class EmpireApi {
     public static cleanClaimRooms(): void {
         // Get all flag based action memory structures (Remote, Claim, and Attack Room Memory)
         const allRooms = MemoryApi_Empire.getOwnedRooms();
-        const claimRooms: Array<ClaimRoomMemory | undefined> = _.flatten(
-            _.map(allRooms, room => MemoryApi_Room.getClaimRooms(room))
-        );
 
-        // Remove claim room flags once the room is sufficiently built up
-        EmpireHelper.markCompletedClaimRooms(claimRooms);
+        for (const room of allRooms) {
+            const claimRooms: Array<ClaimRoomMemory | undefined> = MemoryApi_Room.getClaimRooms(room)
+            EmpireHelper.markCompletedClaimRooms(claimRooms);
+            this.cleanCompletedClaimRooms(claimRooms, room.name);
+        }
 
-        // Clean dead flags from memory structures
-        EmpireHelper.cleanDeadClaimRoomFlags(claimRooms);
+    }
 
-        // Clean the memory of each type of dependent room memory structure with no existing flags associated
-        EmpireHelper.cleanDeadClaimRooms(claimRooms);
+    /**
+     * Remove all claim rooms that have build complete on them
+     * @param claimRooms all the claim rooms we have for the current room
+     */
+    public static cleanCompletedClaimRooms(claimRooms: Array<ClaimRoomMemory | undefined>, dependentRoomName: string): void {
+        for (const claimRoom of claimRooms) {
+            if (!claimRoom) continue;
+            if (claimRoom.buildComplete) {
+                delete Memory.rooms[dependentRoomName].claimRooms![claimRoom.roomName];
+            }
+        }
     }
 
     /**
      * Create the specified remote room instance in the room specified
-     * @param roomName the room we are creating the remote room instance for
+     * TODO - Remove flag from this to generalize it
      * @param flag the flag we used to create the remote room
-     * @param dependentRoom the room that is supplying the remote room with its powers
      * @param remoteRoomType the type of remote room we are creating
      */
-    public static createRemoteRoomInstance(flag: Flag, remoteRoomType: RemoteRoomTypeConstant): void {
-        // Get the host room and set the flags memory
-        const dependentRoom: Room = Game.rooms[EmpireHelper.findDependentRoom(flag.pos.roomName)];
-        const flagTypeConst: FlagTypeConstant | undefined = EmpireHelper.getFlagType(flag);
-        const roomName: string = flag.pos.roomName;
-        Memory.flags[flag.name].complete = true;
-        Memory.flags[flag.name].processed = true;
-        Memory.flags[flag.name].timePlaced = Game.time;
-        Memory.flags[flag.name].flagType = flagTypeConst;
-        Memory.flags[flag.name].flagName = flag.name;
-
-        // Create the RemoteFlagMemory object for this flag
-        const remoteFlagMemory: RemoteFlagMemory = {
-            flagName: flag.name,
-            flagType: flagTypeConst
-        };
-
-        // If the dependent room already has this room covered, set the flag to be deleted and throw a warning
-        const existingDepedentRemoteRoomMem: RemoteRoomMemory | undefined = _.find(
-            MemoryApi_Room.getRemoteRooms(dependentRoom),
-            (rr: RemoteRoomMemory) => {
-                if (rr) {
-                    return rr.roomName === roomName;
-                }
-                return false;
-            }
-        );
-
-        if (existingDepedentRemoteRoomMem) {
-            Memory.flags[flag.name].complete = true;
-            throw new UserException(
-                "Already working this dependent room!",
-                "The room you placed the remote flag in is already being worked by " +
-                existingDepedentRemoteRoomMem.roomName,
-                ERROR_WARN
-            );
-        }
-
-        // Otherwise, add a brand new memory structure onto it
+    public static createRemoteRoomInstance(remoteRoomName: string, dependentRoom: Room, remoteRoomType: RemoteRoomTypeConstant): void {
         const remoteRoomMemory: RemoteRoomMemory = {
             sources: { cache: Game.time, data: 1 },
             hostiles: { cache: Game.time, data: null },
             structures: { cache: Game.time, data: null },
-            roomName: flag.pos.roomName,
-            flags: [remoteFlagMemory],
+            roomName: remoteRoomName,
             reserveTTL: 0,
             reserveUsername: undefined,
             remoteRoomType
         };
 
         MemoryApi_Empire.createEmpireAlertNode(
-            "Remote Flag [" + flag.name + "] processed - Host Room: [" + dependentRoom.name + "] - Remote Room type [" + remoteRoomType + "]",
+            "Host Room: [" + dependentRoom.name + "] - Remote Room type [" + remoteRoomType + "]",
             10
         );
         if (!dependentRoom.memory.remoteRooms) dependentRoom.memory.remoteRooms = {};
-        dependentRoom.memory.remoteRooms![roomName] = remoteRoomMemory;
+        dependentRoom.memory.remoteRooms![remoteRoomName] = remoteRoomMemory;
     }
 
     /**
      * Remove all remote room instances from the room in question
+     * TODO - Remove flag from this to generalize it
      * @param roomName the name of the room we are removing the remote room instance from
      */
-    public static removeRemoteRoomInstance(flag: Flag): void {
-        const flagTypeConst: FlagTypeConstant | undefined = EmpireHelper.getFlagType(flag);
-        const remoteRoomName = flag.pos.roomName;
-        Memory.flags[flag.name].complete = true;
-        Memory.flags[flag.name].processed = true;
-        Memory.flags[flag.name].timePlaced = Game.time;
-        Memory.flags[flag.name].flagType = flagTypeConst;
-        Memory.flags[flag.name].flagName = flag.name;
-
+    public static removeRemoteRoomInstance(remoteRoomName: string): void {
         // Delete all creep associated with remote room
         const ownedRooms: Room[] = MemoryApi_Empire.getOwnedRooms();
         delete Memory.rooms[remoteRoomName];
@@ -188,6 +149,49 @@ export class EmpireApi {
         for (let i in Game.creeps) {
             const creep: Creep = Game.creeps[i];
             if (creep.memory.targetRoom === remoteRoomName) {
+                creep.suicide();
+            }
+        }
+    }
+
+    /**
+     * TODO - Remove flag from this to generalize it
+     * @param flag The flag we used to generate the request
+     * @param claimRoomType the type of claim room we are creating
+     */
+    public static createClaimRoomInstance(claimRoomName: string, dependentRoom: Room, claimRoomType: ClaimRoomTypeConstant): void {
+        // Otherwise, add a brand new memory structure onto it
+        const claimRoomMemory: ClaimRoomMemory = {
+            roomName: claimRoomName,
+            claimRoomType,
+            buildComplete: false
+        };
+
+        MemoryApi_Empire.createEmpireAlertNode(
+            "Host Room: [" + dependentRoom.name + "] - Claim Room Type [" + claimRoomType + "].",
+            10
+        );
+        dependentRoom.memory.claimRooms![claimRoomName] = claimRoomMemory;
+    }
+
+    /**
+     * Remove the claim room instance from the room specified
+     * TODO - Remove flag from this to generizise it
+     * @param flag The flag we used to generate the request
+     */
+    public static removeClaimRoomInstance(claimRoomName: string): void {
+        // Delete all creep associated with claim room
+        const ownedRooms: Room[] = MemoryApi_Empire.getOwnedRooms();
+        delete Memory.rooms[claimRoomName];
+        for (const room of ownedRooms) {
+            if (!room.memory.claimRooms) room.memory.claimRooms = {};
+            delete Memory.rooms[room.name].claimRooms![claimRoomName];
+        }
+
+        // Suicide all creeps associated with the claim room
+        for (let i in Game.creeps) {
+            const creep: Creep = Game.creeps[i];
+            if (creep.memory.targetRoom === claimRoomName) {
                 creep.suicide();
             }
         }
