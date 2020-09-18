@@ -189,4 +189,36 @@ export class MemoryApi_Military {
         }
         throw new UserException("No lead creep found", "Sqaud - " + instance.squadUUID, ERROR_WARN);
     }
+
+    /**
+     * Find the top left creep based on the squad's orientation
+     * @param instance the instance we are controlling
+     * @returns the creep object of the top left creep
+     */
+    public static findTopLeftCreep(instance: ISquadManager): Creep {
+        if (!instance.orientation) throw new UserException("Couldn't find top left creep, no orientation", "Squad - " + instance.squadUUID, ERROR_ERROR);
+        const creeps: Creep[] = this.getLivingCreepsInSquadByInstance(instance);
+        for (const creep of creeps) {
+            const militaryOptions: CreepOptionsMili = creep.memory.options as CreepOptionsMili;
+            if (militaryOptions.caravanPos === undefined || militaryOptions.caravanPos === null) continue;
+            switch (instance.orientation) {
+                case TOP:
+                    if (militaryOptions.caravanPos === 0) return creep;
+                    break;
+
+                case LEFT:
+                    if (militaryOptions.caravanPos === 1) return creep;
+                    break;
+
+                case RIGHT:
+                    if (militaryOptions.caravanPos === 2) return creep;
+                    break;
+
+                case BOTTOM:
+                    if (militaryOptions.caravanPos === 3) return creep;
+                    break;
+            }
+        }
+        throw new UserException("No top left creep found", "Sqaud - " + instance.squadUUID, ERROR_ERROR);
+    }
 }

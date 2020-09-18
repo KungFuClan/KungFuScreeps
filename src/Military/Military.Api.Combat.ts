@@ -380,7 +380,7 @@ export class MilitaryCombat_Api {
 
         // Enemy Extensions
         const enemyExtension: StructureExtension = leadCreep.pos.findClosestByRange(FIND_HOSTILE_STRUCTURES, {
-            filter: (struct: Structure) => struct.structureType === STRUCTURE_TOWER
+            filter: (struct: Structure) => struct.structureType === STRUCTURE_EXTENSION
         }) as StructureExtension;
         if (enemyExtension) {
             goal.pos = enemyExtension.pos;
@@ -429,5 +429,14 @@ export class MilitaryCombat_Api {
             return wall.pos.getRangeTo(leadCreep.pos) < rampart.pos.getRangeTo(leadCreep.pos) ? wall : rampart;
         }
         return wall ? wall : rampart;
+    }
+
+    public static getHealTarget(instance: ISquadManager): Creep | undefined {
+        const creeps: Creep[] = MemoryApi_Military.getLivingCreepsInSquadByInstance(instance);
+        if (!_.some(creeps, (creep) => creep.hits < creep.hitsMax)) return undefined;
+        for (const creep of creeps) {
+            if (creep.hits < creep.hitsMax) return creep;
+        }
+        return undefined;
     }
 }

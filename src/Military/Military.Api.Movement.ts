@@ -28,14 +28,14 @@ export class MilitaryMovement_Api {
      * @param creep The creep to check the path for
      * @returns the index of the next step, -1 if we're at the end
      */
-    public static nextPathStep(creep: Creep, path: PathStep[]): number | -1 {
+    public static nextPathStep(referencePosition: RoomPosition, path: PathStep[]): number | -1 {
 
         if (path.length === 0) {
             return -1;
         }
 
         // Return the index of the next step (where the previous step is our current position) or -1 if not found
-        return _.findIndex(path, (step: PathStep) => step.x - step.dx === creep.pos.x && step.y - step.dy === creep.pos.y);
+        return _.findIndex(path, (step: PathStep) => step.x - step.dx === referencePosition.x && step.y - step.dy === referencePosition.y);
     }
 
     /**

@@ -14,6 +14,7 @@ import {
 } from "Utils/Imports/internals";
 import { MilitaryMovement_Helper } from "./Military.Movement.Helper";
 import _ from "lodash";
+import { CostMatrixApi } from "Pathfinding/CostMatrix.Api";
 
 export class MilitaryIntents_Api {
     /**
@@ -105,7 +106,7 @@ export class MilitaryIntents_Api {
             militaryDataHelper.movePath[instance.squadUUID][creep.name] = movePath;
         }
 
-        const nextStepIndex: number = MilitaryMovement_Api.nextPathStep(creep, movePath);
+        const nextStepIndex: number = MilitaryMovement_Api.nextPathStep(creep.pos, movePath);
         if (nextStepIndex === -1) {
             return true;
         }
@@ -162,7 +163,7 @@ export class MilitaryIntents_Api {
             movePath = creep.pos.findPathTo(target, { range: 25 });
         }
 
-        const moveIndex: number = MilitaryMovement_Api.nextPathStep(creep, movePath);
+        const moveIndex: number = MilitaryMovement_Api.nextPathStep(creep.pos, movePath);
 
         if (moveIndex === -1) {
             return false;
@@ -311,7 +312,7 @@ export class MilitaryIntents_Api {
      * @param roomData the roomData for the operation
      * @returns boolean representing if we queued the intent
      */
-    public static queueHealSelfIntent(creep: Creep, instance: ISquadManager, roomData: MilitaryDataAll): boolean {
+    public static queueHealSelfIntentDefender(creep: Creep, instance: ISquadManager, roomData: MilitaryDataAll): boolean {
         // Heal if we are below full, preheal if theres hostiles and we aren't under a rampart
         const creepIsOnRampart: boolean =
             _.filter(
@@ -334,6 +335,17 @@ export class MilitaryIntents_Api {
         return false;
     }
 
+    public static queueHealSelfIntentSquad(creep: Creep, instance: ISquadManager, roomData: MilitaryDataAll): boolean {
+        const intent: Heal_MiliIntent = {
+            action: ACTION_HEAL,
+            target: creep.name,
+            targetType: "creepName"
+        };
+
+        MemoryApi_Military.pushIntentToCreepStack(instance, creep.name, intent);
+        return true;
+    }
+
     /**
      * TODO
      * Queue intent for healing friendly creeps
@@ -342,8 +354,14 @@ export class MilitaryIntents_Api {
      * @param roomData the roomData for the operation
      * @returns boolean representing if we queued the intent
      */
-    public static queueHealAllyCreep(creep: Creep, instance: ISquadManager, roomData: MilitaryDataAll): boolean {
-        return false;
+    public static queueHealAllyCreep(creep: Creep, instance: ISquadManager, targetCreep: Creep, roomData: MilitaryDataAll): boolean {
+        const intent: Heal_MiliIntent = {
+            action: ACTION_HEAL,
+            target: targetCreep.name,
+            targetType: "creepName"
+        };
+        MemoryApi_Military.pushIntentToCreepStack(instance, creep.name, intent);
+        return true;
     }
 
     /**
@@ -412,10 +430,10 @@ export class MilitaryIntents_Api {
         if (!currentOrientation) throw new UserException("No orientation for squad", "Squad - " + instance.squadUUID, ERROR_ERROR);
 
         // Get the direction that we are going for the next step
-        const leadCreep: Creep = MemoryApi_Military.getLeadSquadCreep(instance);
-        const movePath: PathStep[] = militaryDataHelper.getMovePath(instance, leadCreep.name)
+        const topLeftCreep: Creep = MemoryApi_Military.findTopLeftCreep(instance);
+        const movePath: PathStep[] = militaryDataHelper.getMovePath(instance, instance.targetRoom)
         if (movePath.length === 0) return false;
-        const moveIndex: number = MilitaryMovement_Api.nextPathStep(leadCreep, movePath);
+        const moveIndex: number = MilitaryMovement_Api.nextPathStep(topLeftCreep.pos, movePath);
         if (moveIndex === -1) {
             return false;
         }
@@ -482,19 +500,25 @@ export class MilitaryIntents_Api {
         if (!instance.attackTarget) return false;
         const attackTarget: Creep | Structure | null = Game.getObjectById(instance.attackTarget);
         if (!attackTarget) return false;
-
         const leadCreep: Creep = MemoryApi_Military.getLeadSquadCreep(instance);
         // No need to move if we are in attack range
         if (MilitaryCombat_Api.isInAttackRange(leadCreep, attackTarget.pos, true)) return false;
 
-        let movePath = militaryDataHelper.getMovePath(instance, leadCreep.name);
-        if (MilitaryMovement_Api.verifyPathTarget(movePath, attackTarget.pos) === false || true) {
+        // Since the move path is squad based off static location in the squad, use targetRoom as secondary lookup value
+        let movePath = militaryDataHelper.getMovePath(instance, instance.targetRoom);
+        const pathingPoint: RoomPosition = MilitaryMovement_Helper.getQuadSquadPathingPoint(instance);
+        const topLeftCreep: Creep = MemoryApi_Military.findTopLeftCreep(instance);
+        if (MilitaryMovement_Api.verifyPathTarget(movePath, attackTarget.pos) === false) {
             // Replace this with proper quad squad compatible path
-            movePath = leadCreep.pos.findPathTo(attackTarget.pos);
-            militaryDataHelper.movePath[instance.squadUUID][leadCreep.name] = movePath;
+            movePath = pathingPoint.findPathTo(attackTarget.pos, {
+                costCallback(roomName, costMatrix) {
+                    return CostMatrixApi.getQuadSquadMatrix(instance.targetRoom, TOP);
+                }
+            });
+            militaryDataHelper.movePath[instance.squadUUID][instance.targetRoom] = movePath;
         }
 
-        const nextStepIndex: number = MilitaryMovement_Api.nextPathStep(leadCreep, movePath);
+        const nextStepIndex: number = MilitaryMovement_Api.nextPathStep(topLeftCreep.pos, movePath);
         if (nextStepIndex === -1) {
             return false;
         }

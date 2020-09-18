@@ -224,7 +224,7 @@ export class SoloZealotSquadManager implements ISquadManager {
             const movePath = militaryDataHelper.movePath[instance.squadUUID].path;
             // If we have a path already, use it to get the target room
             if (MilitaryMovement_Api.verifyPathTarget(movePath, target)) {
-                const nextStepIndex: number = MilitaryMovement_Api.nextPathStep(creep, movePath);
+                const nextStepIndex: number = MilitaryMovement_Api.nextPathStep(creep.pos, movePath);
             }
         }
     };

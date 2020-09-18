@@ -216,6 +216,7 @@ export class StandardSquadManager implements ISquadManager {
             if (MilitaryIntents_Api.queueIntentsMoveQuadSquadIntoTargetRoom(instance)) {
                 // Once we're moving into the target room reset the move path to work off a clean slate
                 _.forEach(creeps, (creep: Creep) => militaryDataHelper.movePath[instance.squadUUID][creep.name] = []);
+                militaryDataHelper.movePath[instance.squadUUID][instance.targetRoom] = [];
                 return;
             }
 
@@ -230,7 +231,7 @@ export class StandardSquadManager implements ISquadManager {
 
             // [X] seige attack
             // [] switch attack
-            // [] orient
+            // [X] orient
             // [] move towards attack
         },
 
@@ -253,11 +254,16 @@ export class StandardSquadManager implements ISquadManager {
                 return;
             }
 
-            // get our ideal heal target we wanna HEAL
+            const healTarget: Creep | undefined = MilitaryCombat_Api.getHealTarget(instance);
 
             const healers: Creep[] = _.filter(creeps, (creep: Creep) => creep.memory.role === ROLE_MEDIC);
             _.forEach(healers, (creep: Creep) => {
-                // queue up the heal intents
+                if (!healTarget) {
+                    MilitaryIntents_Api.queueHealSelfIntentSquad(creep, instance, roomData);
+                }
+                else {
+                    MilitaryIntents_Api.queueHealAllyCreep(creep, instance, healTarget, roomData);
+                }
             });
         }
     };

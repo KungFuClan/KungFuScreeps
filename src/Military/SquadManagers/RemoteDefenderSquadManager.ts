@@ -279,13 +279,10 @@ export class RemoteDefenderSquadManager implements ISquadManager {
             const creeps = MemoryApi_Military.getLivingCreepsInSquadByInstance(instance);
 
             _.forEach(creeps, (creep: Creep) => {
-                // Try to heal any creep in range that is below full health first
-                if (MilitaryIntents_Api.queueHealAllyCreep(creep, instance, roomData)) {
-                    return;
-                }
+                // TODO Try to heal any creep in range that is below full health first
 
                 // Try to heal ourselves
-                if (MilitaryIntents_Api.queueHealSelfIntent(creep, instance, roomData)) {
+                if (MilitaryIntents_Api.queueHealSelfIntentDefender(creep, instance, roomData)) {
                     return;
                 }
             });
