@@ -72,7 +72,10 @@ export class MarketManager {
 
         let termStore = room.terminal?.store;
 
+        let trackedResources: MarketResourceConstant[] = Object.keys(MIN_ResourceLimits) as MarketResourceConstant[];
+
         // TODO Check if termStore < establish amounts, create request for more
+
         // TODO Check if termStore > establish amounts, create request to sell
     }
 
