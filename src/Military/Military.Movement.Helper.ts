@@ -372,6 +372,6 @@ export class MilitaryMovement_Helper {
         directionMapper[TOP] = [TOP_LEFT, TOP, TOP_RIGHT];
         directionMapper[RIGHT] = [RIGHT, BOTTOM_RIGHT, TOP_RIGHT];
         directionMapper[BOTTOM] = [BOTTOM, BOTTOM_LEFT, BOTTOM_RIGHT];
-        return directionMapper[currentDirection].includes(nextStepDirection);
+        return !directionMapper[currentDirection].includes(nextStepDirection);
     }
 }
