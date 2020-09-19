@@ -1,40 +1,38 @@
 import _ from "lodash";
 import { MemoryApi_Room } from "Memory/Memory.Room.Api";
-import { MemoryApi_Empire } from "Utils/Imports/internals";
+import { send } from "process";
+import { MemoryApi_Empire, UserException } from "Utils/Imports/internals";
 import { Mem } from "Utils/MemHack";
-
-interface MarketRequest {
-    resourceType: MarketResourceConstant;
-    resourceAmount: number;
-    requestingRoom: string;
-    maximumWaitTime: number;
-    status: "complete" | "incomplete" | "pendingMarket" | "pendingTransfer";
-}
+import { MarketHelper } from "./MarketHelper";
 
 // ! Only the resources listed in these constants will be processed in requests
 const MIN_ResourceLimits: { [key in MarketResourceConstant]?: number } = {
     L: 10000,
     O: 10000,
     X: 5000,
-    H: 10000
+    H: 10000,
+    K: 10000
 };
 
 const MAX_ResourceLimits: { [key in MarketResourceConstant]?: number } = {
     L: 20000,
     O: 20000,
     X: 10000,
-    H: 20000
+    H: 20000,
+    K: 20000
 };
 
-export class MarketManager {
-    public static runMarketManager() {
-        // Temp code for testing market
-        this.runTempCode();
+const defaultWaitTime = 500;
 
+export class MarketManager {
+    /**
+     * Run the Market Manager for the empire
+     */
+    public static runMarketManager() {
         if (!Memory.empire.market) {
             Memory.empire.market = {
                 priceData: {},
-                requests: []
+                requests: {}
             };
         }
 
@@ -44,23 +42,6 @@ export class MarketManager {
         }
 
         this.processMarketRequests();
-
-        // For room in game.rooms / ownedRooms
-
-        // Create Requests
-        // This is where we will check if we are low on a resource, create a request for that resource
-        // A request will have a
-        // resourceType
-        // amount
-        // maximumWaitTime (ticks that decrement each cycle until we place a buy order)
-        // status -
-        // We will also check if we have more than MAX_RESOURCE_AMOUNT and create a request to sell it (maxWaitTime will be the time before we place an order, in case another room requests that mineral)
-
-        // Process Requests
-        // We will decrement the maximumWaitTime in this method, each tick that a request is processed
-        // This is where we will attempt to fill a request
-        // If the request is to receive resource, we will look for a room that has between MIN_RESOURCE_AMOUNT and MAX_RESOURCE_AMOUNT and attempt to pull from that room
-        // If the request is to sell a resource, we will check if the timer is <= 0, then create an order
     }
 
     /**
@@ -74,24 +55,166 @@ export class MarketManager {
 
         let trackedResources: MarketResourceConstant[] = Object.keys(MIN_ResourceLimits) as MarketResourceConstant[];
 
-        // TODO Check if termStore < establish amounts, create request for more
+        for (let resource of trackedResources) {
+            // TODO Handle subscription tokens
+            if (resource === SUBSCRIPTION_TOKEN) {
+                return;
+            }
 
-        // TODO Check if termStore > establish amounts, create request to sell
+            // Don't regenerate an existing request that still has time remaining
+            if (Memory.empire.market.requests[`${room.name}_${resource}`] !== undefined) {
+                return;
+            }
+
+            let resourceAmount = termStore.getUsedCapacity(resource);
+
+            let request: MarketRequest | undefined;
+
+            // Handle less than minimum resource amount
+            if (resourceAmount < MIN_ResourceLimits[resource]!) {
+                request = {
+                    roomName: room.name,
+                    resourceType: resource,
+                    amount: MIN_ResourceLimits[resource]! - resourceAmount,
+                    maxWaitRemaining: defaultWaitTime,
+                    requestType: "receive",
+                    status: "pendingTransfer"
+                };
+            }
+
+            // Handle more than maximum resource amount
+            if (resourceAmount > MAX_ResourceLimits[resource]!) {
+                request = {
+                    roomName: room.name,
+                    resourceType: resource,
+                    amount: resourceAmount - MAX_ResourceLimits[resource]!,
+                    maxWaitRemaining: defaultWaitTime,
+                    requestType: "send",
+                    status: "pendingTransfer"
+                };
+            }
+
+            if (request !== undefined) {
+                Memory.empire.market.requests[`${room.name}_${resource}`] = request;
+            }
+        }
     }
 
     /**
      * Process all marketRequests
      */
     public static processMarketRequests(): void {
-        // TODO get requests from memory
-        const marketRequests: MarketRequest[] = [];
+        const marketRequests = Memory.empire.market.requests;
 
-        for (const request of marketRequests) {
-            // Decrement timer
-            request.maximumWaitTime--;
+        for (const requestIndex in marketRequests) {
+            const request = marketRequests[requestIndex];
+            // Decrement timer - allowed negative
+            request.maxWaitRemaining--;
 
-            // Process request
+            if (request.requestType === "receive") {
+                if (this.fillFromOwnedTerminals(request)) continue;
+            } else if (request.requestType === "send") {
+                // Sending to other terminals is handled on the receive side while the CD is > 0
+                if (request.maxWaitRemaining > 0) continue;
+
+                // TODO Check here if the order is in pendingMarket phase, and if so remove the request once the minerals have sold
+                if (request.status === "pendingMarket") continue;
+
+                if (this.sellExtraMinerals(request)) continue;
+            }
         }
+    }
+
+    /**
+     * Sell the minerals in the send request,
+     * @param request
+     */
+    public static sellExtraMinerals(request: MarketRequest): boolean {
+        // TODO Improve this algorithm, currently we get average for the day + 25%
+        let targetPrice = Game.market.getHistory(request.resourceType as ResourceConstant)[13].avgPrice * 1.25;
+
+        let result = Game.market.createOrder({
+            type: "sell",
+            resourceType: request.resourceType,
+            price: targetPrice,
+            totalAmount: request.amount,
+            roomName: request.roomName
+        });
+
+        if (result === OK) {
+            request.status = "pendingMarket";
+            return true;
+        } else {
+            console.log(MarketHelper.getRequestName(request) + " " + result);
+        }
+
+        return false;
+    }
+
+    /**
+     * Transfer resources to fill a receive request from a terminal with a send request
+     * @param request The request to fill
+     */
+    public static fillFromOwnedTerminals(request: MarketRequest): boolean {
+        // Find all send requests that match the resourceType using a custom method below
+        const sendingRequests = this.getSendingRequests(request.resourceType);
+
+        if (sendingRequests.length === 0) {
+            return false;
+        }
+
+        // TODO find a better targeting algorithm
+        const targetRequest = _.max(sendingRequests, request => request.amount);
+        const targetTerminal = Game.rooms[targetRequest.roomName].terminal;
+
+        if (targetTerminal === undefined) {
+            delete Memory.empire.market.requests[MarketHelper.getRequestName(request)];
+            return false;
+        }
+
+        let amountToSend = targetRequest.amount < request.amount ? targetRequest.amount : request.amount;
+
+        // Send the resources from the target send request to the receive request
+        let result = targetTerminal.send(
+            request.resourceType as ResourceConstant,
+            amountToSend,
+            request.roomName,
+            MarketHelper.getRequestName(request)
+        );
+
+        // If successful, reduce the amount left in each job
+        if (result === OK) {
+            request.amount -= amountToSend;
+            targetRequest.amount -= amountToSend;
+
+            if (request.amount <= 0) {
+                MarketHelper.deleteRequest(request);
+            }
+
+            if (targetRequest.amount <= 0) {
+                MarketHelper.deleteRequest(targetRequest);
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Get requests that are sending the resource
+     * @param resource The type of resource to find requests for
+     */
+    public static getSendingRequests(resource: MarketResourceConstant): MarketRequest[] {
+        const marketRequests = _.filter(
+            Memory.empire.market.requests,
+            (request: MarketRequest) =>
+                request.requestType === "send" &&
+                request.resourceType === resource &&
+                request.status === "pendingTransfer"
+        );
+
+        return marketRequests;
     }
 
     public static runTempCode() {

@@ -49,7 +49,7 @@ export class MemoryManager {
             Memory.empire = {
                 market: {
                     priceData: {},
-                    requests: []
+                    requests: {}
                 },
 
                 militaryOperations: {}
