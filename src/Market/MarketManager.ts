@@ -61,7 +61,7 @@ export class MarketManager {
                 return;
             }
 
-            // Don't regenerate an existing request that still has time remaining
+            // Don't regenerate an existing request
             if (Memory.empire.market.requests[`${room.name}_${resource}`] !== undefined) {
                 return;
             }
@@ -75,7 +75,7 @@ export class MarketManager {
                 request = {
                     roomName: room.name,
                     resourceType: resource,
-                    amount: MIN_ResourceLimits[resource]! - resourceAmount,
+                    amount: MAX_ResourceLimits[resource]! - resourceAmount,
                     maxWaitRemaining: defaultWaitTime,
                     requestType: "receive",
                     status: "pendingTransfer"
