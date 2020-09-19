@@ -111,14 +111,27 @@ export class MarketManager {
             // Decrement timer - allowed negative
             request.maxWaitRemaining--;
 
+            if (request.status === "complete" || request.status === "incomplete") {
+                MarketHelper.deleteRequest(request);
+                continue;
+            }
+
+            if (request.status === "pendingMarket") {
+                MarketHelper.updateOrderStatus(request);
+                continue;
+            }
+
+            // Handle pendingTransfer
             if (request.requestType === "receive") {
-                if (this.fillFromOwnedTerminals(request)) continue;
+                if (request.maxWaitRemaining <= 0) {
+                    // TODO Buy minerals here
+                    continue;
+                }
+
+                this.fillFromOwnedTerminals(request);
             } else if (request.requestType === "send") {
                 // Sending to other terminals is handled on the receive side while the CD is > 0
                 if (request.maxWaitRemaining > 0) continue;
-
-                // TODO Check here if the order is in pendingMarket phase, and if so remove the request once the minerals have sold
-                if (request.status === "pendingMarket") continue;
 
                 if (this.sellExtraMinerals(request)) continue;
             }
@@ -144,8 +157,6 @@ export class MarketManager {
         if (result === OK) {
             request.status = "pendingMarket";
             return true;
-        } else {
-            console.log(MarketHelper.getRequestName(request) + " " + result);
         }
 
         return false;
@@ -188,11 +199,11 @@ export class MarketManager {
             targetRequest.amount -= amountToSend;
 
             if (request.amount <= 0) {
-                MarketHelper.deleteRequest(request);
+                request.status === "complete";
             }
 
             if (targetRequest.amount <= 0) {
-                MarketHelper.deleteRequest(targetRequest);
+                targetRequest.status === "complete";
             }
 
             return true;
