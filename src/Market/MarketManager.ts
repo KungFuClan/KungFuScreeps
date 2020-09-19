@@ -130,8 +130,8 @@ export class MarketManager {
      * @param request
      */
     public static sellExtraMinerals(request: MarketRequest): boolean {
-        // TODO Improve this algorithm, currently we get average for the day + 25%
-        let targetPrice = Game.market.getHistory(request.resourceType as ResourceConstant)[13].avgPrice * 1.25;
+        // TODO Improve this algorithm, currently we get average for the day + 10%
+        let targetPrice = Game.market.getHistory(request.resourceType as ResourceConstant)[13].avgPrice * 1.1;
 
         let result = Game.market.createOrder({
             type: "sell",
