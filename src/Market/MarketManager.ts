@@ -10,14 +10,16 @@ const MIN_ResourceLimits: { [key in MarketResourceConstant]?: number } = {
     L: 10000,
     O: 10000,
     X: 5000,
-    H: 10000
+    H: 10000,
+    K: 10000
 };
 
 const MAX_ResourceLimits: { [key in MarketResourceConstant]?: number } = {
     L: 20000,
     O: 20000,
     X: 10000,
-    H: 20000
+    H: 20000,
+    K: 20000
 };
 
 const defaultWaitTime = 500;
