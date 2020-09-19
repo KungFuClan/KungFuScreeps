@@ -21,6 +21,10 @@ export class PathfindingApi {
         if (!Memory.empire) {
             Memory.empire = {
                 militaryOperations: {},
+                market: {
+                    priceData: {},
+                    requests: []
+                }
             };
         }
 
