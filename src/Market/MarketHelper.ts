@@ -48,16 +48,11 @@ export class MarketHelper {
             return total + order.amount;
         }, 0);
 
-        console.log(this.getRequestName(request) + "_amount_" + JSON.stringify(amountLeftInOrder));
-
         if (amountLeftInOrder === 0) {
             request.status = "complete";
             for (let order of orders) {
-                let result = Game.market.cancelOrder(order.id);
-                console.log(this.getRequestName(request) + "_result_" + result);
+                Game.market.cancelOrder(order.id);
             }
         }
-
-        // Find the market order
     }
 }

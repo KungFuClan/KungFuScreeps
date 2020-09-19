@@ -7,11 +7,11 @@ import { MarketHelper } from "./MarketHelper";
 
 // ! Only the resources listed in these constants will be processed in requests
 const MIN_ResourceLimits: { [key in MarketResourceConstant]?: number } = {
-    L: 10000,
-    O: 10000,
-    X: 5000,
-    H: 10000,
-    K: 10000
+    L: 10001,
+    O: 10001,
+    X: 5001,
+    H: 10001,
+    K: 10001
 };
 
 const MAX_ResourceLimits: { [key in MarketResourceConstant]?: number } = {
@@ -197,19 +197,17 @@ export class MarketManager {
         if (result === OK) {
             request.amount -= amountToSend;
             targetRequest.amount -= amountToSend;
-
-            if (request.amount <= 0) {
-                request.status === "complete";
-            }
-
-            if (targetRequest.amount <= 0) {
-                targetRequest.status === "complete";
-            }
-
-            return true;
         }
 
-        return false;
+        if (request.amount <= 0) {
+            request.status = "complete";
+        }
+
+        if (targetRequest.amount <= 0) {
+            targetRequest.status = "complete";
+        }
+
+        return result === OK;
     }
 
     /**
