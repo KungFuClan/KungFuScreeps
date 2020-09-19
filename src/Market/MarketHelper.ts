@@ -55,4 +55,20 @@ export class MarketHelper {
             }
         }
     }
+
+    /**
+     * Get the target sell price for a resource
+     * @param resource The type of resource
+     */
+    public static getSellPrice(resource: ResourceConstant | MarketResourceConstant): number {
+        // TODO Improve this algorithm, currently we get average for the day + 10%
+        let targetAverage = Game.market.getHistory(resource as ResourceConstant)[13].avgPrice * 1.1;
+
+        let bestBuyPrice = _.max(
+            Game.market.getAllOrders(order => order.resourceType === resource && order.type === "buy"),
+            order => order.price
+        ).price;
+
+        return Math.max(targetAverage, bestBuyPrice);
+    }
 }

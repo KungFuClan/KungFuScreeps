@@ -144,7 +144,7 @@ export class MarketManager {
      */
     public static sellExtraMinerals(request: MarketRequest): boolean {
         // TODO Improve this algorithm, currently we get average for the day + 10%
-        let targetPrice = Game.market.getHistory(request.resourceType as ResourceConstant)[13].avgPrice * 1.1;
+        let targetPrice = MarketHelper.getSellPrice(request.resourceType);
 
         let result = Game.market.createOrder({
             type: "sell",
@@ -224,54 +224,5 @@ export class MarketManager {
         );
 
         return marketRequests;
-    }
-
-    public static runTempCode() {
-        const marketOrders = Game.market.getAllOrders((order: Order) => {
-            if (
-                (order.resourceType === RESOURCE_LEMERGIUM || order.resourceType === RESOURCE_OXYGEN) &&
-                order.type === ORDER_BUY
-            ) {
-                return true;
-            }
-            return false;
-        });
-
-        const bestOrder = _.max(marketOrders, (order: Order) => order.price);
-
-        if (bestOrder.price < Game.market.getHistory(bestOrder.resourceType as ResourceConstant)[13].avgPrice) {
-            return;
-        }
-
-        console.log(
-            bestOrder.resourceType,
-            bestOrder.amount,
-            bestOrder.price,
-            bestOrder.roomName,
-            Game.market.calcTransactionCost(bestOrder.amount, bestOrder.roomName!, "W9N7")
-        );
-
-        // Code to put in console to deal this order
-        console.log(`Game.market.deal("${bestOrder.id}", ${bestOrder.amount}, "W9N7")`);
-    }
-
-    /**
-     * Returns the average price of the resource + the standard deviation
-     * @param resourceType The resource to get the max price for
-     */
-    public static getMaxMarketPrice_Today(resourceType: ResourceConstant) {
-        let historicalMarketData: PriceHistory = Game.market.getHistory(resourceType)[13];
-
-        return historicalMarketData.avgPrice + historicalMarketData.stddevPrice;
-    }
-
-    /**
-     * Returns the average price of the resource - the standard deviation
-     * @param resourceType The resource to get the min price for
-     */
-    public static getMinMarketPrice_Today(resourceType: ResourceConstant) {
-        let historicalMarketData: PriceHistory = Game.market.getHistory(resourceType)[13];
-
-        return historicalMarketData.avgPrice - historicalMarketData.stddevPrice;
     }
 }
