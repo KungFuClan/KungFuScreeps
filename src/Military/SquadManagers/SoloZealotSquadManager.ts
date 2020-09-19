@@ -32,6 +32,8 @@ export class SoloZealotSquadManager implements ISquadManager {
     public operationUUID: string = "";
     public initialRallyComplete: boolean = false;
     public rallyPos: MockRoomPos | undefined;
+    public orientation: DirectionConstant | undefined;
+    public attackTarget: Id<Creep | Structure> | undefined;
 
     constructor() {
         const self = this;
@@ -84,6 +86,8 @@ export class SoloZealotSquadManager implements ISquadManager {
         instance.operationUUID = operationUUID;
         instance.initialRallyComplete = false;
         instance.rallyPos = undefined;
+        instance.attackTarget = undefined;
+        instance.orientation = undefined;
         return instance;
     }
 
@@ -220,7 +224,7 @@ export class SoloZealotSquadManager implements ISquadManager {
             const movePath = militaryDataHelper.movePath[instance.squadUUID].path;
             // If we have a path already, use it to get the target room
             if (MilitaryMovement_Api.verifyPathTarget(movePath, target)) {
-                const nextStepIndex: number = MilitaryMovement_Api.nextPathStep(creep, movePath);
+                const nextStepIndex: number = MilitaryMovement_Api.nextPathStep(creep.pos, movePath);
             }
         }
     };

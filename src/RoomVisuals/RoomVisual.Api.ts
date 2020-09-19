@@ -93,7 +93,8 @@ export class RoomVisualApi {
             claimer: _.filter(creepsInRoom, (c: Creep) => c.memory.role === ROLE_CLAIMER).length,
             remoteColonizer: _.filter(creepsInRoom, (c: Creep) => c.memory.role === ROLE_COLONIZER).length,
             manager: _.filter(creepsInRoom, (c: Creep) => c.memory.role === ROLE_MANAGER).length,
-            scout: _.filter(creepsInRoom, (c: Creep) => c.memory.role === ROLE_SCOUT).length
+            scout: _.filter(creepsInRoom, (c: Creep) => c.memory.role === ROLE_SCOUT).length,
+            mineralMiner: _.filter(creepsInRoom, (c: Creep) => c.memory.role === ROLE_MINERAL_MINER).length
         };
 
         const lines: string[] = [];

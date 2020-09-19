@@ -138,18 +138,18 @@ export class militaryDataHelper {
      * Always returns at least an empty array for move path - will initialize the values if they have not been created yet
      * @param instance The instance to get the movePath for
      */
-    public static getMovePath(instance: ISquadManager, creepName: string): PathStep[] {
+    public static getMovePath(instance: ISquadManager, secondaryLookup: string): PathStep[] {
         if (!militaryDataHelper.movePath) {
             militaryDataHelper.movePath = {};
         }
         if (!militaryDataHelper.movePath[instance.squadUUID]) {
             militaryDataHelper.movePath[instance.squadUUID] = {};
         }
-        if (!militaryDataHelper.movePath[instance.squadUUID][creepName]) {
-            militaryDataHelper.movePath[instance.squadUUID][creepName] = [];
+        if (!militaryDataHelper.movePath[instance.squadUUID][secondaryLookup]) {
+            militaryDataHelper.movePath[instance.squadUUID][secondaryLookup] = [];
         }
 
-        return militaryDataHelper.movePath[instance.squadUUID][creepName];
+        return militaryDataHelper.movePath[instance.squadUUID][secondaryLookup];
     }
 
     /**

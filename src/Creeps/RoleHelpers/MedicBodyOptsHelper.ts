@@ -63,11 +63,18 @@ export class MedicBodyOptsHelper implements ICreepBodyOptsHelper {
                 body = { heal: 6, move: 6 };
                 break;
 
-            case TIER_8:
-            case TIER_7:
             case TIER_6: // 8 Heal, 6 Move - Total Cost: 2300
-                body = { heal: 6, move: 6 };
+                body = { heal: 8, move: 6 };
                 break;
+
+            case TIER_7:    // 8 Heal, 8 Move - Total Cost: 2400
+                body = { heal: 15, move: 15 };
+                break;
+
+            case TIER_8:    // 15 Heal, 15 Move - Total Cost: 4500
+                body = { heal: 15, move: 15 };
+                break;
+
         }
 
         // ! Important DONT FORGET TO CHANGE

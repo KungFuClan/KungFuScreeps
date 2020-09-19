@@ -1,4 +1,4 @@
-import { SQUAD_MANAGERS, UserException } from "Utils/Imports/internals";
+import { ERROR_WARN, ERROR_ERROR, SQUAD_MANAGERS, UserException } from "Utils/Imports/internals";
 import _ from "lodash";
 
 export class MemoryApi_Military {
@@ -171,5 +171,54 @@ export class MemoryApi_Military {
      */
     public static getAllOperations(): OperationData {
         return Memory.empire.militaryOperations;
+    }
+
+    /**
+     * Return the leader of the squad
+     * TODO change so it handles main leader dying unexpectedly
+     * @param instance the instance we are checking for the lead creep on
+     * @returns the creep object of the creep leader for the squad (Caravan pos 0)
+     */
+    public static getLeadSquadCreep(instance: ISquadManager): Creep {
+        const creeps: Creep[] = this.getLivingCreepsInSquadByInstance(instance);
+        for (const creep of creeps) {
+            const militaryOptions: CreepOptionsMili = creep.memory.options as CreepOptionsMili;
+            if (militaryOptions.caravanPos === 0) {
+                return creep;
+            }
+        }
+        throw new UserException("No lead creep found", "Sqaud - " + instance.squadUUID, ERROR_WARN);
+    }
+
+    /**
+     * Find the top left creep based on the squad's orientation
+     * @param instance the instance we are controlling
+     * @returns the creep object of the top left creep
+     */
+    public static findTopLeftCreep(instance: ISquadManager): Creep {
+        if (!instance.orientation) throw new UserException("Couldn't find top left creep, no orientation", "Squad - " + instance.squadUUID, ERROR_ERROR);
+        const creeps: Creep[] = this.getLivingCreepsInSquadByInstance(instance);
+        for (const creep of creeps) {
+            const militaryOptions: CreepOptionsMili = creep.memory.options as CreepOptionsMili;
+            if (militaryOptions.caravanPos === undefined || militaryOptions.caravanPos === null) continue;
+            switch (instance.orientation) {
+                case TOP:
+                    if (militaryOptions.caravanPos === 0) return creep;
+                    break;
+
+                case LEFT:
+                    if (militaryOptions.caravanPos === 1) return creep;
+                    break;
+
+                case RIGHT:
+                    if (militaryOptions.caravanPos === 2) return creep;
+                    break;
+
+                case BOTTOM:
+                    if (militaryOptions.caravanPos === 3) return creep;
+                    break;
+            }
+        }
+        throw new UserException("No top left creep found", "Sqaud - " + instance.squadUUID, ERROR_ERROR);
     }
 }

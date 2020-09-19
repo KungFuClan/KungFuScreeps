@@ -1,5 +1,4 @@
 import {
-    UserException,
     STANDARD_MAN,
     SpawnApi,
     ROLE_MEDIC,
@@ -15,13 +14,11 @@ import {
     SQUAD_STATUS_DEAD,
     MilitaryCombat_Api,
     militaryDataHelper,
-    ACTION_MOVE,
-    ACTION_ATTACK
 } from "Utils/Imports/internals";
 import { MilitaryStatus_Helper } from "Military/Military.Status.Helper";
 import { MilitaryIntents_Api } from "Military/Military.Api.Intents";
-import { MilitaryMovement_Helper } from "Military/Military.Movement.Helper";
 import _ from "lodash";
+import { MilitaryMovement_Helper } from "Military/Military.Movement.Helper";
 
 export class StandardSquadManager implements ISquadManager {
     public name: SquadManagerConstant = STANDARD_MAN;
@@ -31,6 +28,8 @@ export class StandardSquadManager implements ISquadManager {
     public operationUUID: string = "";
     public initialRallyComplete: boolean = false;
     public rallyPos: MockRoomPos | undefined;
+    public orientation: DirectionConstant | undefined;
+    public attackTarget: Id<Creep | Structure> | undefined;
 
     constructor() {
         const self = this;
@@ -81,6 +80,8 @@ export class StandardSquadManager implements ISquadManager {
         instance.operationUUID = operationUUID;
         instance.initialRallyComplete = false;
         instance.rallyPos = undefined;
+        instance.orientation = undefined;
+        instance.attackTarget = undefined;
         return instance;
     }
 
@@ -173,6 +174,13 @@ export class StandardSquadManager implements ISquadManager {
             const creeps: Creep[] = MemoryApi_Military.getLivingCreepsInSquadByInstance(instance);
             const roomData: MilitaryDataAll = militaryDataHelper.getRoomData(creeps, {}, dataNeeded, instance);
 
+            if (status !== SQUAD_STATUS_RALLY) {
+                if (!instance.attackTarget || MilitaryMovement_Helper.needSwitchAttackTarget(instance, roomData, instance.attackTarget)) {
+                    const attackTarget: Structure | Creep | undefined = MilitaryCombat_Api.getSeigeAttackTarget(instance, roomData);
+                    instance.attackTarget = attackTarget ? attackTarget.id : undefined;
+                }
+            }
+
             MilitaryIntents_Api.resetSquadIntents(instance);
             this.decideMoveIntents(instance, status, roomData);
             this.decideAttackIntents(instance, status, roomData);
@@ -197,6 +205,34 @@ export class StandardSquadManager implements ISquadManager {
                     return;
                 }
             });
+
+            // At this point, squad is finished rallying and moves as a unit at all times
+            // Only one path is required and all creeps will queue the same intent
+            if (status === SQUAD_STATUS_RALLY) {
+                return;
+            }
+
+            // Move into target room
+            if (MilitaryIntents_Api.queueIntentsMoveQuadSquadIntoTargetRoom(instance)) {
+                // Once we're moving into the target room reset the move path to work off a clean slate
+                _.forEach(creeps, (creep: Creep) => militaryDataHelper.movePath[instance.squadUUID][creep.name] = []);
+                militaryDataHelper.movePath[instance.squadUUID][instance.targetRoom] = [];
+                return;
+            }
+
+            // In target room, move towards attack target
+            if (MilitaryIntents_Api.queueIntentsQuadSquadFixOrientation(instance)) {
+                return;
+            }
+
+            if (MilitaryIntents_Api.queueIntentsMoveQuadSquadTowardsAttackTarget(instance)) {
+                return;
+            }
+
+            // [X] seige attack
+            // [] switch attack
+            // [X] orient
+            // [] move towards attack
         },
 
         decideAttackIntents(instance: ISquadManager, status: SquadStatusConstant, roomData: MilitaryDataAll) {
@@ -205,11 +241,10 @@ export class StandardSquadManager implements ISquadManager {
                 return;
             }
 
-            // get the ideal target we wanna SLAP
-
             const zealots: Creep[] = _.filter(creeps, (creep: Creep) => creep.memory.role === ROLE_ZEALOT);
             _.forEach(zealots, (creep: Creep) => {
-                // queue up the attack intents
+                if (!instance.attackTarget) return;
+                MilitaryIntents_Api.queueIntentMeleeAttackSquadTarget(creep, instance);
             });
         },
 
@@ -219,11 +254,16 @@ export class StandardSquadManager implements ISquadManager {
                 return;
             }
 
-            // get our ideal heal target we wanna HEAL
+            const healTarget: Creep | undefined = MilitaryCombat_Api.getHealTarget(instance);
 
             const healers: Creep[] = _.filter(creeps, (creep: Creep) => creep.memory.role === ROLE_MEDIC);
             _.forEach(healers, (creep: Creep) => {
-                // queue up the heal intents
+                if (!healTarget) {
+                    MilitaryIntents_Api.queueHealSelfIntentSquad(creep, instance, roomData);
+                }
+                else {
+                    MilitaryIntents_Api.queueHealAllyCreep(creep, instance, healTarget, roomData);
+                }
             });
         }
     };

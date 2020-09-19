@@ -1,11 +1,9 @@
 import {
-    UserException,
     DOMESTIC_DEFENDER_MAN,
     SpawnApi,
     ROLE_STALKER,
     MemoryApi_Military,
     SQUAD_STATUS_OK,
-    OP_STRATEGY_NONE,
     OP_STRATEGY_COMBINED,
     OP_STRATEGY_FFA,
     HIGH_PRIORITY,
@@ -14,16 +12,11 @@ import {
     MilitaryMovement_Api,
     MilitaryCombat_Api,
     SQUAD_STATUS_DEAD,
-    MemoryApi_Room,
-    MemoryApi_Creep,
-    SQUAD_MANAGERS,
     militaryDataHelper,
-    RoomManager,
     ACTION_MOVE,
     ACTION_RANGED_ATTACK,
     ACTION_HEAL
 } from "Utils/Imports/internals";
-import { join } from "path";
 import { MilitaryIntents_Api } from "Military/Military.Api.Intents";
 import { MilitaryStatus_Helper } from "Military/Military.Status.Helper";
 import _ from "lodash";
@@ -36,6 +29,8 @@ export class DomesticDefenderSquadManager implements ISquadManager {
     public operationUUID: string = "";
     public initialRallyComplete: boolean = false;
     public rallyPos: MockRoomPos | undefined;
+    public orientation: DirectionConstant | undefined;
+    public attackTarget: Id<Creep | Structure> | undefined;
 
     constructor() {
         const self = this;
@@ -85,6 +80,8 @@ export class DomesticDefenderSquadManager implements ISquadManager {
         instance.operationUUID = operationUUID;
         instance.initialRallyComplete = false;
         instance.rallyPos = undefined;
+        instance.orientation = undefined;
+        instance.attackTarget = undefined;
         return instance;
     }
 

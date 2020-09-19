@@ -31,6 +31,8 @@ export class RemoteDefenderSquadManager implements ISquadManager {
     public operationUUID: string = "";
     public initialRallyComplete: boolean = false;
     public rallyPos: MockRoomPos | undefined;
+    public orientation: DirectionConstant | undefined;
+    public attackTarget: Id<Creep | Structure> | undefined;
 
     constructor() {
         const self = this;
@@ -81,6 +83,8 @@ export class RemoteDefenderSquadManager implements ISquadManager {
         instance.operationUUID = operationUUID;
         instance.initialRallyComplete = false;
         instance.rallyPos = undefined;
+        instance.orientation = undefined;
+        instance.attackTarget = undefined;
         return instance;
     }
 
@@ -275,13 +279,10 @@ export class RemoteDefenderSquadManager implements ISquadManager {
             const creeps = MemoryApi_Military.getLivingCreepsInSquadByInstance(instance);
 
             _.forEach(creeps, (creep: Creep) => {
-                // Try to heal any creep in range that is below full health first
-                if (MilitaryIntents_Api.queueHealAllyCreep(creep, instance, roomData)) {
-                    return;
-                }
+                // TODO Try to heal any creep in range that is below full health first
 
                 // Try to heal ourselves
-                if (MilitaryIntents_Api.queueHealSelfIntent(creep, instance, roomData)) {
+                if (MilitaryIntents_Api.queueHealSelfIntentDefender(creep, instance, roomData)) {
                     return;
                 }
             });

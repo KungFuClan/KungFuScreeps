@@ -10,7 +10,7 @@ import {
     ERROR_INFO,
     ERROR_ERROR,
     UtilHelper,
-    Normalize
+    Normalize, MemoryApi_Military
 } from "Utils/Imports/internals";
 
 export class MilitaryMovement_Helper {
@@ -172,13 +172,13 @@ export class MilitaryMovement_Helper {
             posArr.push(new RoomPosition(currPos.x - 1, currPos.y + 1, currPos.roomName));
         }
         else if (exit === FIND_EXIT_TOP) {
-            posArr.push(new RoomPosition(currPos.x, currPos.y + 1, currPos.roomName));
             posArr.push(new RoomPosition(currPos.x + 1, currPos.y, currPos.roomName));
+            posArr.push(new RoomPosition(currPos.x, currPos.y + 1, currPos.roomName));
             posArr.push(new RoomPosition(currPos.x + 1, currPos.y + 1, currPos.roomName));
         }
         else if (exit === FIND_EXIT_BOTTOM) {
-            posArr.push(new RoomPosition(currPos.x, currPos.y - 1, currPos.roomName));
             posArr.push(new RoomPosition(currPos.x - 1, currPos.y, currPos.roomName));
+            posArr.push(new RoomPosition(currPos.x, currPos.y - 1, currPos.roomName));
             posArr.push(new RoomPosition(currPos.x - 1, currPos.y - 1, currPos.roomName));
         }
 
@@ -283,5 +283,145 @@ export class MilitaryMovement_Helper {
         }
 
         return adjustedName[0].concat(adjustedName[1].toString(), adjustedName[2], adjustedName[3].toString());
+    }
+
+    /**
+     * Get the initial direction the squad is facing to move into the target room
+     * @param instance the instance we are controlling
+     * @param exit the exit to the target room
+     * @returns the direction the squad is facing
+     */
+    public static getInitialSquadOrientation(instance: ISquadManager, exit: ExitConstant): DirectionConstant {
+        if (exit === FIND_EXIT_LEFT) {
+            return LEFT;
+        }
+        else if (exit === FIND_EXIT_RIGHT) {
+            return RIGHT;
+        }
+        else if (exit === FIND_EXIT_TOP) {
+            return TOP;
+        }
+        else if (exit === FIND_EXIT_BOTTOM) {
+            return BOTTOM;
+        }
+
+        throw new UserException("Unable to locate initial orientation", "Squad - " + instance.squadUUID, ERROR_ERROR);
+    }
+
+    /**
+     * Update the orientation (direction) that the squad is facing
+     * @param instance the instance we are controlling
+     */
+    public static getMovingQuadSquadOrientation(instance: ISquadManager): void {
+        return;
+    }
+
+    /**
+     * Check if the lead creep is at least TWO steps into the target room (to make room for creeps behind it)
+     * @param instance the instance we are controlling
+     * @returns if the lead creep is two steps into the target room
+     */
+    public static isLeadCreepInTargetRoom(instance: ISquadManager): boolean {
+        if (!instance.orientation) throw new UserException("No Orientation for IsLeadCreepInTargetRoom", "Squad - " + instance.squadUUID, ERROR_ERROR);
+        const leadCreep = MemoryApi_Military.getLeadSquadCreep(instance);
+        if (leadCreep.room.name !== instance.targetRoom) return false;
+        switch (instance.orientation) {
+            case BOTTOM:
+                return leadCreep.pos.y >= 2;
+
+            case RIGHT:
+                return leadCreep.pos.x >= 2;
+
+            case LEFT:
+                return leadCreep.pos.x <= 47;
+
+            case TOP:
+                return leadCreep.pos.y <= 47;
+        }
+
+        throw new UserException(
+            "No return for isLeadCreepInTargetRoom",
+            "Squad - " + instance.squadUUID,
+            ERROR_ERROR
+        );
+    }
+
+    /**
+     * Tells us if the squad needs to switch the attack target (so we can decide if we need a new one)
+     * @param instance the instance we are controlling
+     * @param roomData the data for the room
+     * @param attackTarget the current attack target
+     * @returns boolean representing if we need to switch targets
+     */
+    public static needSwitchAttackTarget(instance: ISquadManager, roomData: MilitaryDataAll, attackTarget: Id<Creep | Structure> | undefined): boolean {
+        if (!instance.attackTarget) return true;
+        const attackTargetObject = Game.getObjectById(instance.attackTarget);
+        if (!attackTargetObject) return true;
+        return false;
+    }
+
+    /**
+     * Decide if we need to change orientation for a quad squad
+     * @param currentDirection the direction we're currently facing
+     * @param nextStepDirection the direction our next step is in
+     * @returns boolean representing if we need to change directions
+     */
+    public static isOrientationChangeRequired(currentDirection: DirectionConstant, nextStepDirection: DirectionConstant): boolean {
+        interface DirectionMapper {
+            [key: string]: DirectionConstant[];
+        }
+        const directionMapper: DirectionMapper = {};
+        directionMapper[LEFT] = [LEFT, TOP_LEFT, BOTTOM_LEFT];
+        directionMapper[TOP] = [TOP_LEFT, TOP, TOP_RIGHT];
+        directionMapper[RIGHT] = [RIGHT, BOTTOM_RIGHT, TOP_RIGHT];
+        directionMapper[BOTTOM] = [BOTTOM, BOTTOM_LEFT, BOTTOM_RIGHT];
+        return !directionMapper[currentDirection].includes(nextStepDirection);
+    }
+
+    /**
+     * Get the pathing point for the quad squad
+     * @param instance the instance we are controlling
+     * @returns RoomPosition representing the staticnorth west point of the squad relative to the room
+     */
+    public static getQuadSquadPathingPoint(instance: ISquadManager): RoomPosition {
+        if (!instance.orientation) throw new UserException("No orientation for pathing point", "Squad - " + instance.squadUUID, ERROR_ERROR);
+        const creeps: Creep[] = MemoryApi_Military.getLivingCreepsInSquadByInstance(instance);
+        for (const creep of creeps) {
+            if (!creep) continue;
+            const creepOptions: CreepOptionsMili = creep.memory.options as CreepOptionsMili
+            if (creepOptions.caravanPos === null || creepOptions.caravanPos === undefined) continue;
+            const caravanPos: number = creepOptions.caravanPos;
+            switch (instance.orientation) {
+                case TOP:
+                    if (caravanPos === 0) return new RoomPosition(creep.pos.x, creep.pos.y, creep.room.name);
+                    if (caravanPos === 1) return new RoomPosition(creep.pos.x - 1, creep.pos.y, creep.room.name);
+                    if (caravanPos === 2) return new RoomPosition(creep.pos.x, creep.pos.y - 1, creep.room.name);
+                    if (caravanPos === 3) return new RoomPosition(creep.pos.x - 1, creep.pos.y - 1, creep.room.name);
+                    break;
+
+                case LEFT:
+                    if (caravanPos === 0) return new RoomPosition(creep.pos.x, creep.pos.y - 1, creep.room.name);
+                    if (caravanPos === 1) return new RoomPosition(creep.pos.x, creep.pos.y, creep.room.name);
+                    if (caravanPos === 2) return new RoomPosition(creep.pos.x - 1, creep.pos.y - 1, creep.room.name);
+                    if (caravanPos === 3) return new RoomPosition(creep.pos.x - 1, creep.pos.y, creep.room.name);
+                    break;
+
+                case RIGHT:
+                    if (caravanPos === 0) return new RoomPosition(creep.pos.x - 1, creep.pos.y, creep.room.name);
+                    if (caravanPos === 1) return new RoomPosition(creep.pos.x - 1, creep.pos.y - 1, creep.room.name);
+                    if (caravanPos === 2) return new RoomPosition(creep.pos.x, creep.pos.y, creep.room.name);
+                    if (caravanPos === 3) return new RoomPosition(creep.pos.x, creep.pos.y - 1, creep.room.name);
+                    break;
+
+                case BOTTOM:
+                    if (caravanPos === 0) return new RoomPosition(creep.pos.x - 1, creep.pos.y - 1, creep.room.name);
+                    if (caravanPos === 1) return new RoomPosition(creep.pos.x, creep.pos.y - 1, creep.room.name);
+                    if (caravanPos === 2) return new RoomPosition(creep.pos.x - 1, creep.pos.y, creep.room.name);
+                    if (caravanPos === 3) return new RoomPosition(creep.pos.x, creep.pos.y, creep.room.name);
+                    break;
+            }
+        }
+
+        throw new UserException("No quad squad pathing point found.", "Squad - " + instance.squadUUID, ERROR_ERROR);
     }
 }

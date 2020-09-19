@@ -19,6 +19,8 @@ export class TowerDrainerSquadManager implements ISquadManager {
     public operationUUID: string = "";
     public initialRallyComplete: boolean = false;
     public rallyPos: MockRoomPos | undefined;
+    public orientation = undefined;
+    public attackTarget: Id<Creep | Structure> | undefined;
 
     constructor() {
         const self = this;
@@ -67,6 +69,8 @@ export class TowerDrainerSquadManager implements ISquadManager {
         instance.operationUUID = operationUUID;
         instance.initialRallyComplete = false;
         instance.rallyPos = undefined
+        instance.orientation = undefined;
+        instance.attackTarget = undefined;
         return instance;
     }
 

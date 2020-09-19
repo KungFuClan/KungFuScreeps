@@ -302,4 +302,141 @@ export class MilitaryCombat_Api {
 
         return target;
     }
+
+    /**
+     * Get the attack target for the seiging squad
+     * @param instance the instance we are controlling
+     * @param roomData the data for the room we are seiging
+     * @returns [Id<Creep | Structure> | undefined] the target we want to attack
+     */
+    public static getSeigeAttackTarget(instance: ISquadManager, roomData: MilitaryDataAll): Creep | Structure | undefined {
+        const leadCreep: Creep = MemoryApi_Military.getLeadSquadCreep(instance);
+        if (leadCreep.room.name !== instance.targetRoom) return undefined;
+        // Find a fresh target if no creep in squad has a target yet
+        let path: PathFinderPath;
+        const goal: { pos: RoomPosition; range: number } = {
+            pos: new RoomPosition(25, 25, instance.targetRoom),
+            range: 1
+        };
+
+        const pathFinderOptions: PathFinderOpts = {
+            roomCallback: (roomName): boolean | CostMatrix => {
+                const room: Room = Game.rooms[roomName];
+                const costs = new PathFinder.CostMatrix();
+                if (!room) {
+                    return false;
+                }
+
+                // Set walls and ramparts as unwalkable
+                room.find(FIND_STRUCTURES).forEach(function (struct: Structure<StructureConstant>) {
+                    if (struct.structureType === STRUCTURE_WALL || struct.structureType === STRUCTURE_RAMPART) {
+                        // Set walls and ramparts as unwalkable
+                        costs.set(struct.pos.x, struct.pos.y, 0xff);
+                    }
+                } as any);
+
+                // Set creeps as unwalkable
+                room.find(FIND_CREEPS).forEach(function (currentCreep: Creep) {
+                    costs.set(currentCreep.pos.x, currentCreep.pos.y, 0xff);
+                });
+
+                return costs;
+            }
+        };
+
+        // Check for a straight path to one of the preferred targets
+        // Enemy Creeps
+        const hostileCreeps: Creep[] = roomData[instance.targetRoom].hostiles!.allHostiles;
+        const closestCreep: Creep | null = _.first(hostileCreeps);
+        if (closestCreep) {
+            goal.pos = closestCreep.pos;
+            path = PathFinder.search(leadCreep.pos, goal, pathFinderOptions);
+            if (!path.incomplete) {
+                return closestCreep;
+            }
+        }
+
+        // Enemy Towers
+        const enemyTower: StructureTower | null = leadCreep.pos.findClosestByRange(FIND_HOSTILE_STRUCTURES, {
+            filter: (struct: Structure) => struct.structureType === STRUCTURE_TOWER
+        }) as StructureTower;
+        if (enemyTower) {
+            goal.pos = enemyTower.pos;
+            path = PathFinder.search(leadCreep.pos, goal, pathFinderOptions);
+            if (!path.incomplete) {
+                return enemyTower;
+            }
+        }
+
+        // Enemy Spawn
+        const enemySpawn: StructureSpawn | null = leadCreep.pos.findClosestByRange(FIND_HOSTILE_SPAWNS);
+        if (enemySpawn) {
+            goal.pos = enemySpawn.pos;
+            path = PathFinder.search(leadCreep.pos, goal, pathFinderOptions);
+            if (!path.incomplete) {
+                return (enemySpawn as any) as Structure;
+            }
+        }
+
+        // Enemy Extensions
+        const enemyExtension: StructureExtension = leadCreep.pos.findClosestByRange(FIND_HOSTILE_STRUCTURES, {
+            filter: (struct: Structure) => struct.structureType === STRUCTURE_EXTENSION
+        }) as StructureExtension;
+        if (enemyExtension) {
+            goal.pos = enemyExtension.pos;
+            path = PathFinder.search(leadCreep.pos, goal, pathFinderOptions);
+            if (!path.incomplete) {
+                return enemyExtension;
+            }
+        }
+
+        // Other Structures
+        const enemyStructure: Structure<StructureConstant> = leadCreep.pos.findClosestByRange(FIND_HOSTILE_STRUCTURES, {
+            filter: (struct: Structure) =>
+                struct.structureType !== STRUCTURE_TOWER &&
+                struct.structureType !== STRUCTURE_SPAWN &&
+                struct.structureType !== STRUCTURE_EXTENSION
+        }) as Structure<StructureConstant>;
+        if (enemyStructure) {
+            goal.pos = enemyStructure.pos;
+            path = PathFinder.search(leadCreep.pos, goal, pathFinderOptions);
+            if (!path.incomplete) {
+                return enemyStructure;
+            }
+        }
+
+        // If nothing was found by this point, get a wall to attack
+        return this.getIdealWallTarget(leadCreep);
+    }
+
+    /**
+     *
+     * @param leadCreep The creep we are basing the target off of
+     */
+    public static getIdealWallTarget(leadCreep: Creep): StructureWall | StructureRampart | undefined {
+        const rampart: StructureRampart = leadCreep.pos.findClosestByPath(FIND_HOSTILE_STRUCTURES, {
+            filter: (struct: Structure) => struct.structureType === STRUCTURE_RAMPART
+        }) as StructureRampart;
+
+        const wall: StructureWall = leadCreep.pos.findClosestByPath(FIND_STRUCTURES, {
+            filter: (struct: Structure) => struct.structureType === STRUCTURE_WALL
+        }) as StructureWall;
+
+        if (!wall && !rampart) {
+            return undefined;
+        }
+        if (wall && rampart) {
+            return wall.pos.getRangeTo(leadCreep.pos) < rampart.pos.getRangeTo(leadCreep.pos) ? wall : rampart;
+        }
+        return wall ? wall : rampart;
+    }
+
+    public static getHealTarget(instance: ISquadManager): Creep | undefined {
+        const creeps: Creep[] = MemoryApi_Military.getLivingCreepsInSquadByInstance(instance);
+        if (!_.some(creeps, (creep) => creep.hits < creep.hitsMax)) return undefined;
+        for (const creep of creeps) {
+            if (creep.hits < creep.hitsMax) return creep;
+        }
+        return undefined;
+    }
 }
