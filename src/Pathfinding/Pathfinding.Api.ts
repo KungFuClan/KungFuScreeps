@@ -21,6 +21,10 @@ export class PathfindingApi {
         if (!Memory.empire) {
             Memory.empire = {
                 militaryOperations: {},
+                market: {
+                    priceData: {},
+                    requests: {}
+                }
             };
         }
 
@@ -49,13 +53,11 @@ export class PathfindingApi {
         } else if (!room.controller.my && room.controller.owner) {
             roomStatus = ROOM_STATUS_HOSTILE;
         } else if (!room.controller.my && room.controller.reservation !== undefined) {
-
             if (room.controller.reservation.username === "Invader") {
                 roomStatus = ROOM_STATUS_INVADER_REMOTE;
             } else {
                 roomStatus = ROOM_STATUS_HOSTILE_REMOTE;
             }
-
         } else {
             roomStatus = ROOM_STATUS_NEUTRAL;
         }
@@ -168,7 +170,6 @@ export class PathfindingApi {
      * @param costMatrx The costMatrix object to set the values on
      */
     public static UseRoomForCostMatrix(roomName: string, costMatrix?: CostMatrix, creep?: Creep): boolean {
-
         // Always allow pathing in the creeps current room and target room
         if (creep?.room.name === roomName || creep?.memory.targetRoom === roomName) {
             return true;
@@ -206,7 +207,6 @@ export class PathfindingApi {
      * Creates a room where all sides are considered unwalkable
      */
     public static BlockRoomForCostMatrix(roomName: string, costMatrix: CostMatrix): void {
-
         for (let i = 0; i < 50; i++) {
             costMatrix.set(i, 0, 255);
             costMatrix.set(i, 49, 255);

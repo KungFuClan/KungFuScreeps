@@ -1084,12 +1084,17 @@ interface MarketData {
     };
 
     /**
-     * The current requests
+     * The current requests, indexed as ROOMNAME_RESOURCETYPE
      */
-    requests: MarketRequest[];
+    requests: { [index: string]: MarketRequest };
 }
 
 interface MarketRequest {
+    /**
+     * The room making the request
+     */
+    roomName: string;
+
     /**
      * The type of resource
      */
@@ -1104,6 +1109,11 @@ interface MarketRequest {
      * The number of ticks before we force completion of the order
      */
     maxWaitRemaining: number;
+
+    /**
+     * The type of transaction
+     */
+    requestType: "receive" | "send";
 
     /**
      * The current status of the request
