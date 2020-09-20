@@ -59,12 +59,12 @@ export class MarketManager {
         for (let resource of trackedResources) {
             // TODO Handle subscription tokens
             if (resource === SUBSCRIPTION_TOKEN) {
-                return;
+                continue;
             }
 
             // Don't regenerate an existing request
             if (Memory.empire.market.requests[`${room.name}_${resource}`] !== undefined) {
-                return;
+                continue;
             }
 
             let resourceAmount = termStore.getUsedCapacity(resource);
