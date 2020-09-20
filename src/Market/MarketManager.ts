@@ -14,7 +14,9 @@ export class MarketManager {
         O: 10001,
         X: 5001,
         H: 10001,
-        K: 10001
+        K: 10001,
+
+        GO: 0
     };
 
     public static MAX_ResourceLimits: { [key in MarketResourceConstant]?: number } = {
@@ -22,7 +24,9 @@ export class MarketManager {
         O: 20000,
         X: 10000,
         H: 20000,
-        K: 20000
+        K: 20000,
+
+        GO: 0
     };
     /**
      * Run the Market Manager for the empire

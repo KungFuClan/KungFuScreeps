@@ -71,7 +71,8 @@ export class MarketHelper {
      */
     public static getSellPrice(resource: ResourceConstant | MarketResourceConstant): number {
         // TODO Improve this algorithm, currently we get average for the day + 10%
-        let targetAverage = Game.market.getHistory(resource as ResourceConstant)[13].avgPrice * 1.1;
+        let resourceHistory = Game.market.getHistory(resource as ResourceConstant);
+        let targetAverage = resourceHistory[resourceHistory.length - 1].avgPrice * 1.1;
 
         let bestBuyPrice = _.max(
             Game.market.getAllOrders(order => order.resourceType === resource && order.type === "buy"),
