@@ -5,26 +5,25 @@ import { MemoryApi_Empire, UserException } from "Utils/Imports/internals";
 import { Mem } from "Utils/MemHack";
 import { MarketHelper } from "./MarketHelper";
 
-// ! Only the resources listed in these constants will be processed in requests
-const MIN_ResourceLimits: { [key in MarketResourceConstant]?: number } = {
-    L: 10001,
-    O: 10001,
-    X: 5001,
-    H: 10001,
-    K: 10001
-};
-
-const MAX_ResourceLimits: { [key in MarketResourceConstant]?: number } = {
-    L: 20000,
-    O: 20000,
-    X: 10000,
-    H: 20000,
-    K: 20000
-};
-
 const defaultWaitTime = 500;
 
 export class MarketManager {
+    // ! Only the resources listed in these constants will be processed in requests
+    public static MIN_ResourceLimits: { [key in MarketResourceConstant]?: number } = {
+        L: 10001,
+        O: 10001,
+        X: 5001,
+        H: 10001,
+        K: 10001
+    };
+
+    public static MAX_ResourceLimits: { [key in MarketResourceConstant]?: number } = {
+        L: 20000,
+        O: 20000,
+        X: 10000,
+        H: 20000,
+        K: 20000
+    };
     /**
      * Run the Market Manager for the empire
      */
@@ -53,7 +52,9 @@ export class MarketManager {
 
         let termStore = room.terminal?.store;
 
-        let trackedResources: MarketResourceConstant[] = Object.keys(MIN_ResourceLimits) as MarketResourceConstant[];
+        let trackedResources: MarketResourceConstant[] = Object.keys(
+            this.MIN_ResourceLimits
+        ) as MarketResourceConstant[];
 
         for (let resource of trackedResources) {
             // TODO Handle subscription tokens
@@ -71,11 +72,11 @@ export class MarketManager {
             let request: MarketRequest | undefined;
 
             // Handle less than minimum resource amount
-            if (resourceAmount < MIN_ResourceLimits[resource]!) {
+            if (resourceAmount < this.MIN_ResourceLimits[resource]!) {
                 request = {
                     roomName: room.name,
                     resourceType: resource,
-                    amount: MAX_ResourceLimits[resource]! - resourceAmount,
+                    amount: this.MAX_ResourceLimits[resource]! - resourceAmount,
                     maxWaitRemaining: defaultWaitTime,
                     requestType: "receive",
                     status: "pendingTransfer"
@@ -83,11 +84,11 @@ export class MarketManager {
             }
 
             // Handle more than maximum resource amount
-            if (resourceAmount > MAX_ResourceLimits[resource]!) {
+            if (resourceAmount > this.MAX_ResourceLimits[resource]!) {
                 request = {
                     roomName: room.name,
                     resourceType: resource,
-                    amount: resourceAmount - MAX_ResourceLimits[resource]!,
+                    amount: resourceAmount - this.MAX_ResourceLimits[resource]!,
                     maxWaitRemaining: defaultWaitTime,
                     requestType: "send",
                     status: "pendingTransfer"
@@ -110,6 +111,10 @@ export class MarketManager {
             const request = marketRequests[requestIndex];
             // Decrement timer - allowed negative
             request.maxWaitRemaining--;
+
+            // Update the amount on transfer requests before we go through the status check cyle
+            // This catches rooms that have recently acquired resources independently, so that they do not receive extra.
+            MarketHelper.updateTransferRequestAmount(request);
 
             if (request.status === "complete" || request.status === "incomplete") {
                 MarketHelper.deleteRequest(request);
@@ -143,7 +148,6 @@ export class MarketManager {
      * @param request
      */
     public static sellExtraMinerals(request: MarketRequest): boolean {
-        // TODO Improve this algorithm, currently we get average for the day + 10%
         let targetPrice = MarketHelper.getSellPrice(request.resourceType);
 
         let result = Game.market.createOrder({
@@ -168,7 +172,7 @@ export class MarketManager {
      */
     public static fillFromOwnedTerminals(request: MarketRequest): boolean {
         // Find all send requests that match the resourceType using a custom method below
-        const sendingRequests = this.getSendingRequests(request.resourceType);
+        const sendingRequests = MarketHelper.getSendingRequests(request.resourceType);
 
         if (sendingRequests.length === 0) {
             return false;
@@ -208,21 +212,5 @@ export class MarketManager {
         }
 
         return result === OK;
-    }
-
-    /**
-     * Get requests that are sending the resource
-     * @param resource The type of resource to find requests for
-     */
-    public static getSendingRequests(resource: MarketResourceConstant): MarketRequest[] {
-        const marketRequests = _.filter(
-            Memory.empire.market.requests,
-            (request: MarketRequest) =>
-                request.requestType === "send" &&
-                request.resourceType === resource &&
-                request.status === "pendingTransfer"
-        );
-
-        return marketRequests;
     }
 }

@@ -1,5 +1,6 @@
 import _ from "lodash";
 import { UserException, ERROR_WARN } from "Utils/Imports/internals";
+import { MarketManager } from "./MarketManager";
 
 export class MarketHelper {
     /**
@@ -70,5 +71,45 @@ export class MarketHelper {
         ).price;
 
         return Math.max(targetAverage, bestBuyPrice);
+    }
+
+    /**
+     * Get requests that are sending the resource
+     * @param resource The type of resource to find requests for
+     */
+    public static getSendingRequests(resource: MarketResourceConstant): MarketRequest[] {
+        const marketRequests = _.filter(
+            Memory.empire.market.requests,
+            (request: MarketRequest) =>
+                request.requestType === "send" &&
+                request.resourceType === resource &&
+                request.status === "pendingTransfer"
+        );
+
+        return marketRequests;
+    }
+
+    /**
+     * Update the amount of resources needed for a transfer request
+     * @param request
+     */
+    public static updateTransferRequestAmount(request: MarketRequest): void {
+        if (request.status !== "pendingTransfer") return;
+
+        const terminal = Game.rooms[request.roomName].terminal;
+
+        if (!terminal) return;
+
+        const currentResourceAmount = terminal.store.getUsedCapacity(request.resourceType as ResourceConstant);
+
+        if (request.requestType === "receive") {
+            request.amount = MarketManager.MAX_ResourceLimits[request.resourceType]! - currentResourceAmount;
+        } else if (request.requestType === "send") {
+            request.amount = currentResourceAmount - MarketManager.MAX_ResourceLimits[request.resourceType]!;
+        }
+
+        if (request.amount < 0) {
+            request.status = "complete";
+        }
     }
 }
