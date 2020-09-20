@@ -6,10 +6,12 @@ export class MapVisualManager {
      * Run the map visual manager
      */
     public static runMapVisualManager(): void {
+        // ! Change these back so visuals generate, temporary
+
         // How often to regenerate map visuals
-        const visualPersistTime = 100;
+        const visualPersistTime = 0;
         // How often to render the map visuals
-        const visualRenderTime = 1;
+        const visualRenderTime = 0;
 
         if (Game.time % visualPersistTime === 0) {
             this.highlightSeenRooms(1000);

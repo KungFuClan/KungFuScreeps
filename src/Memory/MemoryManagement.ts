@@ -45,8 +45,13 @@ export class MemoryManager {
             Memory.creeps = {};
         }
 
-        if (!Memory.empire?.militaryOperations) {
+        if (!Memory.empire) {
             Memory.empire = {
+                market: {
+                    priceData: {},
+                    requests: {}
+                },
+
                 militaryOperations: {}
             };
         }

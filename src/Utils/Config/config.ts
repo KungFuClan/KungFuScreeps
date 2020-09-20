@@ -211,7 +211,7 @@ export const MAX_WORKERS_UPGRADER_STATE: number = 4;
  *
  * Number of work parts for a mini power upgrader that this number decides
  */
-export const STORAGE_LEVEL_MINI_UPGRADERS: number = 50000;
+export const STORAGE_LEVEL_MINI_UPGRADERS: number = 200000;
 export const MINI_UPGRADER_WORK_PARTS: number = 5;
 
 /**
