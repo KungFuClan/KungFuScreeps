@@ -45,12 +45,20 @@ export class MarketHelper {
             );
         }
 
+        let newestOrder = _.max(orders, order => order.created).created;
+
+        // Don't decide anything if the newest order is less than 5 ticks old, since the market lags behind
+        if (Game.time - newestOrder <= 5) {
+            return;
+        }
+
         let amountLeftInOrder = orders.reduce((total: number, order: Order) => {
             return total + order.amount;
         }, 0);
 
         if (amountLeftInOrder === 0) {
             request.status = "complete";
+
             for (let order of orders) {
                 Game.market.cancelOrder(order.id);
             }
