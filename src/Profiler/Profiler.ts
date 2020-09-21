@@ -142,6 +142,9 @@ export function profile(
 }
 
 function isEnabled(): boolean {
+    if (!Memory.profiler) {
+        Memory.profiler = { data: {}, total: 0 };
+    }
     return Memory.profiler.start !== undefined;
 }
 
