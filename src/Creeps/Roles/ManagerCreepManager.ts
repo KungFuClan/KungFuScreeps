@@ -44,7 +44,7 @@ export class ManagerCreepManager implements ICivCreepRoleManager {
     private getEnergyJob(creep: Creep, room: Room): BaseJob | undefined {
         const creepOptions: CreepOptionsCiv = creep.memory.options as CreepOptionsCiv;
         // Check for energy in the terminal
-        if (creepOptions.getFromTerminal) {
+        if (creepOptions.getFromTerminal && this.isNonStorageJob(creep, room)) {
             // All backupStructures with enough energy to fill creep.carry, and not taken
             const backupStructures = MemoryApi_Jobs.getBackupStructuresJobs(
                 room,
