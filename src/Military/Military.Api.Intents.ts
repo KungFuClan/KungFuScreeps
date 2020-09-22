@@ -387,6 +387,7 @@ export class MilitaryIntents_Api {
         }
 
         const creeps: Creep[] = MemoryApi_Military.getLivingCreepsInSquadByInstance(instance);
+        if (_.some(creeps, (creep) => creep.fatigue > 0)) return true;
         _.forEach(creeps, (creep: Creep) => {
             const intent: Move_MiliIntent = {
                 action: ACTION_MOVE,
