@@ -1,11 +1,3 @@
-// keep
-// This will handle automatic construction site placement for the room
-// Will have its own manager, however the manager will be called via room manager
-// Open to feedback on how to tackle this, just want to introduce the idea
-// Planning on handling dependent rooms and owned rooms seperately
-// This will allow us to seperate the construction for each structure type into different functions
-// Think of how room visuals is set up in different boxes... like that
-
 export class AutoConstruction {
     /**
      * Create an array that contains true or false if a tile is buildable
@@ -33,53 +25,6 @@ export class AutoConstruction {
             }
         }
         return buildableArray;
-    }
-
-    /**
-     * Returns the top left tile of a buildable location, given the params
-     * @param height The height of the module (y range)
-     * @param width The width of the module (x range)
-     * @returns RoomPosition The top left position of where the module can be placed
-     */
-    public static getOptimalLocation(roomName: string, height: number, width: number) {
-        // Todo: Source this from memory rather than create it each time
-        const buildableArray = this.getBuildableTiles(roomName);
-
-        let currentPos: number[] | undefined;
-        let currentHeight = 0;
-        let currentWidth = 0;
-
-        // TODO Reprogram this to check corners first, then check internals. Can avoid a lot of extra work this way
-        // [1,1] - [48,48]; Skip exits
-        for (let x = 1; x < 49; x++) {
-            for (let y = 1; y < 49; y++) {
-                // If tile is buildable either add to currHeight/width; set currentPos if needed
-                if (buildableArray[x][y] === true) {
-                    if (currentPos === undefined) {
-                        currentPos = [x, y];
-                    }
-                    currentHeight++;
-                    currentWidth++;
-                } else {
-                    // Reset currentPos if height/width is not enough once we hit an unbuildable tile
-                    if (currentHeight < height || currentWidth < width) {
-                        currentPos = undefined;
-                        currentHeight = 0;
-                        currentWidth = 0;
-                    }
-                }
-
-                // Break out of height loop if we have enough space
-                if (currentHeight >= height) {
-                    break;
-                }
-            }
-
-            // Break out of width loop if we have enough space
-            if (currentWidth >= width && currentHeight >= width) {
-                break;
-            }
-        }
     }
 
     /**
