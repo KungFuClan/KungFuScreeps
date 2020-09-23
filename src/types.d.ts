@@ -354,7 +354,12 @@ interface RoomCostMatrices {
     towerDamageMatrix?: StoredCostMatrix;
     structureMatrix?: StoredCostMatrix;
     terrainMatrix?: StoredCostMatrix;
-    quadSquadMatrix?: StoredCostMatrix;
+    quadSquadMatrix?: {
+        1?: StoredCostMatrix; // TOP
+        3?: StoredCostMatrix; // RIGHT
+        5?: StoredCostMatrix; // BOTTOM
+        7?: StoredCostMatrix; // LEFT
+    };
 }
 interface StoredCostMatrix {
     serializedCostMatrix: string;

@@ -20,7 +20,6 @@ import {
     SpawnHelper,
     SpawnApi,
     UserException,
-
     MemoryApi_Room
 } from "Utils/Imports/internals";
 
@@ -67,14 +66,13 @@ export class MedicBodyOptsHelper implements ICreepBodyOptsHelper {
                 body = { heal: 8, move: 6 };
                 break;
 
-            case TIER_7:    // 8 Heal, 8 Move - Total Cost: 2400
+            case TIER_7: // 8 Heal, 8 Move - Total Cost: 2400
                 body = { heal: 15, move: 15 };
                 break;
 
-            case TIER_8:    // 15 Heal, 15 Move - Total Cost: 4500
+            case TIER_8: // 15 Heal, 15 Move - Total Cost: 4500
                 body = { heal: 15, move: 15 };
                 break;
-
         }
 
         // ! Important DONT FORGET TO CHANGE
@@ -136,7 +134,16 @@ export class MedicBodyOptsHelper implements ICreepBodyOptsHelper {
      */
     public getSpawnDirection(centerSpawn: StructureSpawn, room: Room): DirectionConstant[] {
         const roomCenter: RoomPosition = MemoryApi_Room.getBunkerCenter(room, false);
-        const directions: DirectionConstant[] = [TOP, TOP_RIGHT, RIGHT, BOTTOM_RIGHT, BOTTOM, BOTTOM_LEFT, LEFT, TOP_LEFT];
+        const directions: DirectionConstant[] = [
+            TOP,
+            TOP_RIGHT,
+            RIGHT,
+            BOTTOM_RIGHT,
+            BOTTOM,
+            BOTTOM_LEFT,
+            LEFT,
+            TOP_LEFT
+        ];
         const managerDirection: DirectionConstant = centerSpawn.pos.getDirectionTo(roomCenter!.x, roomCenter!.y);
         directions.splice(directions.indexOf(managerDirection), 1);
         return directions;

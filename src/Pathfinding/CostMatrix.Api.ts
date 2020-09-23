@@ -38,11 +38,10 @@ export class CostMatrixApi {
      * @param roomName Room to get the cost matrix for
      */
     public static getQuadSquadMatrix(roomName: string, direction: TOP | RIGHT | BOTTOM | LEFT): CostMatrix {
-
         const roomCostMatrices: RoomCostMatrices = this.getOrInitializeCostMatrices(roomName);
 
-        if (this.isCostMatrixValid(roomCostMatrices.quadSquadMatrix)) {
-            return this.deserializeStoredCostMatrix(roomCostMatrices.quadSquadMatrix!);
+        if (roomCostMatrices.quadSquadMatrix && this.isCostMatrixValid(roomCostMatrices.quadSquadMatrix[direction])) {
+            return this.deserializeStoredCostMatrix(roomCostMatrices.quadSquadMatrix[direction]!);
         }
 
         const terrain: RoomTerrain = new Room.Terrain(roomName);
@@ -52,11 +51,26 @@ export class CostMatrixApi {
         let dy: number;
 
         switch (direction) {
-            case TOP: dx = -1; dy = -1; break;
-            case RIGHT: dx = +1; dy = -1; break;
-            case BOTTOM: dx = +1; dy = +1; break;
-            case LEFT: dx = -1; dy = +1; break;
-            default: dx = 0; dy = 0; break;
+            case TOP:
+                dx = -1;
+                dy = -1;
+                break;
+            case RIGHT:
+                dx = +1;
+                dy = -1;
+                break;
+            case BOTTOM:
+                dx = +1;
+                dy = +1;
+                break;
+            case LEFT:
+                dx = -1;
+                dy = +1;
+                break;
+            default:
+                dx = 0;
+                dy = 0;
+                break;
         }
 
         for (let x = 0; x < 50; x++) {
@@ -80,7 +94,13 @@ export class CostMatrixApi {
         if (Game.rooms[roomName] !== undefined) {
             // if we have vision, get structures
             let structures = Game.rooms[roomName].find(FIND_STRUCTURES);
-            structures = _.filter(structures, (struct) => struct.structureType !== STRUCTURE_ROAD && struct.structureType !== STRUCTURE_CONTAINER && !(struct.structureType === STRUCTURE_RAMPART && <OwnedStructure><unknown>struct.my))
+            structures = _.filter(
+                structures,
+                struct =>
+                    struct.structureType !== STRUCTURE_ROAD &&
+                    struct.structureType !== STRUCTURE_CONTAINER &&
+                    !(struct.structureType === STRUCTURE_RAMPART && <OwnedStructure>(<unknown>struct.my))
+            );
 
             _.forEach(structures, (struct: Structure) => {
                 quadSquadMatrix.set(struct.pos.x, struct.pos.y, 255);
@@ -93,7 +113,14 @@ export class CostMatrixApi {
             });
         }
 
-        this.costMatrices[roomName].terrainMatrix = this.serializeCostMatrix(quadSquadMatrix, roomName, true, Game.time + 2000);
+        if (!this.costMatrices[roomName].quadSquadMatrix) this.costMatrices[roomName].quadSquadMatrix = {};
+
+        this.costMatrices[roomName].quadSquadMatrix![direction] = this.serializeCostMatrix(
+            quadSquadMatrix,
+            roomName,
+            true,
+            Game.time + 2000
+        );
         return quadSquadMatrix;
     }
     /**
