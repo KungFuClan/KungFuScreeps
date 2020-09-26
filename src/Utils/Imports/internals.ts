@@ -24,6 +24,7 @@ export * from "Room/Room.State.Api";
 export * from "Room/Room.Structure.Api";
 export * from "Spawn/Spawn.Api";
 export * from "Memory/Memory.Military.Api";
+export * from "AutoConstruction/AutoConstruction.Api";
 // ----------------------------
 // Export All Helpers
 export * from "AutoConstruction/AutoConstructionHelper";
@@ -37,6 +38,7 @@ export * from "Memory/MemoryHelper";
 export * from "Memory/Memory.Room.Helper";
 export * from "Military/militaryData.Helper";
 export * from "Military/Military.Intents.Helper";
+export * from "AutoConstruction/AutoConstructionHelper";
 // -----------------------------
 // Body/Option Helper Implementations
 export * from "Creeps/RoleHelpers/MinerBodyOptsHelper";
@@ -88,6 +90,7 @@ export * from "Memory/MemoryManagement";
 export * from "Room/RoomManager";
 export * from "Spawn/SpawnManager";
 export * from "Military/MilitaryManager";
+export * from 'AutoConstruction/AutoConstructionManager';
 // ---------------------------------
 // Import Room Visuals
 export * from "RoomVisuals/RoomVisual.Api";

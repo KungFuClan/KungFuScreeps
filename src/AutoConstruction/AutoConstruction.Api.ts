@@ -1,4 +1,4 @@
-export class AutoConstruction {
+export class AutoConstruction_Api {
     /**
      * Create an array that contains true or false if a tile is buildable
      * @param roomName The name of the room to get buildable tiles

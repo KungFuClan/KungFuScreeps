@@ -1,2 +1,2 @@
 // Helper for automatic construction for rooms
-export class AutoConstructionHelper { }
+export class AutoConstruction_Helper { }

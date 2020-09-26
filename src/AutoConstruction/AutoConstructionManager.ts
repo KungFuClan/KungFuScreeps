@@ -1,4 +1,4 @@
-import { MemoryApi_Empire } from "Utils/Imports/internals";
+import { MemoryApi_Empire, MemoryApi_Room } from "Utils/Imports/internals";
 
 export class AutoConstructionManager {
 
@@ -18,9 +18,10 @@ export class AutoConstructionManager {
      * @param room The room we are running it for
      */
     private static runSingleAutoConstructionManager(room: Room): void {
+        if (!room.controller) return;
+        const bunkerCenter: RoomPosition = MemoryApi_Room.getBunkerCenter(room);
+        const rcl: number = room.controller.level;
 
-        // get the bunker center
-        // get the current rcl
         // check if we're missing any buildings for the current rcl
         // return these buildings as an array that we're missing
         // object denoting it (ie source container, upgrader link, etc)

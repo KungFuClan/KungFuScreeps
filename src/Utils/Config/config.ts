@@ -154,6 +154,7 @@ export const EVENT_MANAGER_BUCKET_LIMIT = 4000;
 export const ROOM_OVERLAY_BUCKET_LIMIT = 4000;
 export const MAP_OVERLAY_BUCKET_LIMIT = 4000;
 export const MARKET_MANAGER_BUCKET_LIMIT = 4000;
+export const AUTOCONST_MANAGER_BUCKET_LIMIT = 6000;
 
 /**
  * Market Constnats
