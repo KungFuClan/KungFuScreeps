@@ -35,4 +35,77 @@ export class AutoConstruction_Api {
         // Game Given Constant - Number of sites
         return MAX_CONSTRUCTION_SITES - Object.keys(Game.constructionSites).length;
     }
+
+    /**
+     * Check and place construction sites for the main center of the bunker
+     * @param room the room we are checking for
+     * @param bunkerCenter the center of the bunker for our main room
+     * @param rcl the current rcl of the room
+     * @param currentConstructionCount the current number of active construction sites
+     */
+    public static checkBunkerCenterBuildings(room: Room, bunkerCenter: RoomPosition, rcl: number, currentConstructionCount: number): void {
+
+    }
+
+    /**
+     * Check and place construction sites for the buildings around the controller
+     * @param room the room we are checking for
+     * @param controller the controller for the main room
+     * @param rcl the current rcl of the room
+     * @param currentConstructionCount the current number of active construction sites
+     */
+    public static checkControllerBuildings(room: Room, controller: StructureController, rcl: number, currentConstructionCount: number): void {
+
+    }
+
+    /**
+     * Check and place construction sites for the extensions in the room
+     * @param room the room we are checking for
+     * @param bunkerCenter the center of the bunker for our main room
+     * @param rcl the current rcl of the room
+     * @param currentConstructionCount the current number of active construction sites
+     */
+    public static checkExtensions(room: Room, bunkerCenter: RoomPosition, rcl: number, currentConstructionCount: number): void {
+
+    }
+
+    /**
+     * Check and place construction sites for the roads in the room
+     * @param room the room we are checking for
+     * @param bunkerCenter the center of the bunker for our main room
+     * @param rcl the current rcl of the room
+     * @param currentConstructionCount the current number of active construction sites
+     */
+    public static checkRoads(room: Room, bunkerCenter: RoomPosition, rcl: number, currentConstructionCount: number): void {
+
+    }
+
+    /**
+     * Check and place construction sites for the buildings around the sources
+     * @param room the room we are checking for
+     * @param sources the sources for the room we are checking for
+     * @param rcl the current rcl of the room
+     * @param currentConstructionCount the current number of active construction sites
+     */
+    public static checkSourceBuildings(room: Room, sources: Source[], rcl: number, currentConstructionCount: number): void {
+
+    }
+
+    /**
+     * Check and place construction sites for the buildings around the remote room sources
+     * @param room the room we are checking for
+     * @param currentConstructionCount the current number of active construction sites
+     */
+    public static checkRemoteRoomSourceBuildings(room: Room, currentConstructionCount: number): void {
+
+    }
+
+    /**
+     * Check and place construction sites for the roads leading towards the remote rooms (if applicable)
+     * @param room the room we are checking for
+     * @param currentConstructionCount the current number of active construction sites
+     */
+    public static checkRemoteRoomRoads(room: Room, currentConstructionCount: number): void {
+
+    }
 }
