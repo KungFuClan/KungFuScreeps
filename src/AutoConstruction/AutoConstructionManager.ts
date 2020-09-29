@@ -30,10 +30,12 @@ export class AutoConstructionManager {
         // Run the checks for all buildings we will need to consider
         AutoConstruction_Api.checkBunkerCenterBuildings(room, bunkerCenter, rcl, currentConstructionCount);
         AutoConstruction_Api.checkControllerBuildings(room, controller, rcl, currentConstructionCount);
-        AutoConstruction_Api.checkExtensions(room, bunkerCenter, rcl, currentConstructionCount);
-        AutoConstruction_Api.checkRoads(room, bunkerCenter, rcl, currentConstructionCount);
         AutoConstruction_Api.checkSourceBuildings(room, sources, rcl, currentConstructionCount);
-        AutoConstruction_Api.checkRemoteRoomSourceBuildings(room, currentConstructionCount);
-        AutoConstruction_Api.checkRemoteRoomRoads(room, currentConstructionCount);
+
+        // Not yet implemented for MVP
+        // AutoConstruction_Api.checkExtensions(room, bunkerCenter, rcl, currentConstructionCount);
+        // AutoConstruction_Api.checkGeneralRoads(room, bunkerCenter, rcl, currentConstructionCount);
+        // AutoConstruction_Api.checkRemoteRoomSourceBuildings(room, currentConstructionCount);
+        // AutoConstruction_Api.checkRemoteRoomRoads(room, currentConstructionCount);
     }
 }

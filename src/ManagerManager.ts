@@ -75,21 +75,6 @@ export class ManagerManager {
             }
         }
 
-        // Display room visuals if we have a fat enough bucket and config option allows it
-        if (Game.cpu.bucket > ROOM_OVERLAY_BUCKET_LIMIT && ROOM_VISUALS_ON) {
-            try {
-                RoomVisualManager.runRoomVisualManager();
-            } catch (e) {
-                UtilHelper.printError(e);
-            }
-        } else {
-            try {
-                RoomVisualManager.runRoomVisualManagerSlim();
-            } catch (e) {
-                UtilHelper.printError(e);
-            }
-        }
-
         if (Game.cpu.bucket > EMPIRE_MANAGER_BUCKET_LIMIT) {
             try {
                 EmpireManager.runEmpireManager();
@@ -114,9 +99,24 @@ export class ManagerManager {
             }
         }
 
-        if (Game.cpu.bucket > AUTOCONST_MANAGER_BUCKET_LIMIT) {
+        if (Game.cpu.bucket > AUTOCONST_MANAGER_BUCKET_LIMIT && RoomHelper_Structure.executeEveryTicks(1)) {
             try {
                 AutoConstructionManager.runAutoConstructionManager();
+            } catch (e) {
+                UtilHelper.printError(e);
+            }
+        }
+
+        // Display room visuals if we have a fat enough bucket and config option allows it
+        if (Game.cpu.bucket > ROOM_OVERLAY_BUCKET_LIMIT && ROOM_VISUALS_ON) {
+            try {
+                RoomVisualManager.runRoomVisualManager();
+            } catch (e) {
+                UtilHelper.printError(e);
+            }
+        } else {
+            try {
+                RoomVisualManager.runRoomVisualManagerSlim();
             } catch (e) {
                 UtilHelper.printError(e);
             }

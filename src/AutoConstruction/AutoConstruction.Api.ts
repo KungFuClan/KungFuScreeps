@@ -75,7 +75,7 @@ export class AutoConstruction_Api {
      * @param rcl the current rcl of the room
      * @param currentConstructionCount the current number of active construction sites
      */
-    public static checkRoads(room: Room, bunkerCenter: RoomPosition, rcl: number, currentConstructionCount: number): void {
+    public static checkGeneralRoads(room: Room, bunkerCenter: RoomPosition, rcl: number, currentConstructionCount: number): void {
 
     }
 
