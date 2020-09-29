@@ -1,6 +1,7 @@
 import { link } from "fs";
 import _ from "lodash";
 import { MemoryApi_Room } from "Memory/Memory.Room.Api";
+import { RoomHelper_Structure } from "Utils/Imports/internals";
 
 // Helper for automatic construction for rooms
 export class AutoConstruction_Helper {
@@ -41,68 +42,35 @@ export class AutoConstruction_Helper {
             { dx: 1, dy: -1 },
             { dx: 1, dy: 1 },
             { dx: -1, dy: -1 }
-        ]
+        ];
+        let numOfSpawns: number = 1;
 
         switch (rcl) {
+            // Only need 1 spawn up to rcl 7
             case 1:
             case 2:
             case 3:
             case 4:
             case 5:
             case 6:
-                // Make sure we have a spawn, if not build one
-                spawns = MemoryApi_Room.getStructureOfType(room.name, STRUCTURE_SPAWN, undefined, true) as StructureSpawn[];
-                if (spawns.length >= 1) return;
-                for (let i = 0; i < 1; ++i) {
-                    // Skip the iteration if there is already a structure or construction site there
-                    if (
-                        _.some(room.lookAt(bunkerCenter.x + spawnLoc[i].dx, bunkerCenter.y + spawnLoc[i].dy), (obj => {
-                            obj.type === LOOK_CONSTRUCTION_SITES || obj.type === LOOK_STRUCTURES
-                        }))
-                    ) {
-                        continue;
-                    }
-
-                    if (currentConstructionCount >= MAX_CONSTRUCTION_SITES) return;
-                    room.createConstructionSite(bunkerCenter.x + spawnLoc[i].dx, bunkerCenter.y + spawnLoc[i].dy, STRUCTURE_SPAWN);
-                }
-                return;
-
+                numOfSpawns = 1;
             case 7:
-                // Make sure we have 2 spawns, if not build another spawn
-                spawns = MemoryApi_Room.getStructureOfType(room.name, STRUCTURE_SPAWN, undefined, true) as StructureSpawn[];
-                if (spawns.length >= 2) return;
-                for (let i = 0; i < 2; ++i) {
-                    // Skip the iteration if there is already a structure or construction site there
-                    if (
-                        _.some(room.lookAt(bunkerCenter.x + spawnLoc[i].dx, bunkerCenter.y + spawnLoc[i].dy), (obj => {
-                            obj.type === LOOK_CONSTRUCTION_SITES || obj.type === LOOK_STRUCTURES
-                        }))
-                    ) {
-                        continue;
-                    }
-
-                    room.createConstructionSite(bunkerCenter.x + spawnLoc[i].dx, bunkerCenter.y + spawnLoc[i].dy, STRUCTURE_SPAWN);
-                }
-                return;
-
+                numOfSpawns = 2;
+                break;
             case 8:
-                // Make sure we have 3 spawns, if not build another spawn
-                spawns = MemoryApi_Room.getStructureOfType(room.name, STRUCTURE_SPAWN, undefined, true) as StructureSpawn[];
-                if (spawns.length >= 3) return;
-                for (let i = 0; i < 3; ++i) {
-                    // Skip the iteration if there is already a structure or construction site there
-                    if (
-                        _.some(room.lookAt(bunkerCenter.x + spawnLoc[i].dx, bunkerCenter.y + spawnLoc[i].dy), (obj => {
-                            obj.type === LOOK_CONSTRUCTION_SITES || obj.type === LOOK_STRUCTURES
-                        }))
-                    ) {
-                        continue;
-                    }
+                numOfSpawns = 3;
+                break;
+        }
 
-                    room.createConstructionSite(bunkerCenter.x + spawnLoc[i].dx, bunkerCenter.y + spawnLoc[i].dy, STRUCTURE_SPAWN);
-                }
-                return;
+        // Make sure we have a spawn, if not build one
+        spawns = MemoryApi_Room.getStructureOfType(room.name, STRUCTURE_SPAWN, undefined, true) as StructureSpawn[];
+        if (spawns.length >= numOfSpawns) return;
+        for (let i = 0; i < numOfSpawns; ++i) {
+            // Skip the iteration if there is already a structure or construction site there
+            const positionToCheck: RoomPosition = new RoomPosition(bunkerCenter.x + spawnLoc[i].dx, bunkerCenter.y + spawnLoc[i].dy, room.name);
+            if (RoomHelper_Structure.structureOrSiteExistsAtRoomPosition(room, positionToCheck)) continue;
+            if (currentConstructionCount >= MAX_CONSTRUCTION_SITES) return;
+            room.createConstructionSite(bunkerCenter.x + spawnLoc[i].dx, bunkerCenter.y + spawnLoc[i].dy, STRUCTURE_SPAWN);
         }
     }
 

@@ -380,4 +380,16 @@ export class RoomHelper_Structure {
         }
         return storageLevels;
     }
+
+    /**
+     * Check if a room position has a construction site or structure on it
+     * @param room The room we are checking the position inside
+     * @param positionToCheck The position we are checking on
+     * @returns boolean representing if a structure or construction site exists
+     */
+    public static structureOrSiteExistsAtRoomPosition(room: Room, positionToCheck: RoomPosition): boolean {
+        return _.some(room.lookAt(positionToCheck), (obj => {
+            obj.type === LOOK_CONSTRUCTION_SITES || obj.type === LOOK_STRUCTURES
+        }));
+    }
 }
