@@ -1,3 +1,5 @@
+import { AutoConstruction_Helper } from "./AutoConstructionHelper";
+
 export class AutoConstruction_Api {
     /**
      * Create an array that contains true or false if a tile is buildable
@@ -28,15 +30,6 @@ export class AutoConstruction_Api {
     }
 
     /**
-     * Returns the number of available constructionSites out of the current cap
-     * @returns number
-     */
-    public static remainingConstSites(): number {
-        // Game Given Constant - Number of sites
-        return MAX_CONSTRUCTION_SITES - Object.keys(Game.constructionSites).length;
-    }
-
-    /**
      * Check and place construction sites for the main center of the bunker
      * @param room the room we are checking for
      * @param bunkerCenter the center of the bunker for our main room
@@ -44,7 +37,13 @@ export class AutoConstruction_Api {
      * @param currentConstructionCount the current number of active construction sites
      */
     public static checkBunkerCenterBuildings(room: Room, bunkerCenter: RoomPosition, rcl: number, currentConstructionCount: number): void {
-
+        AutoConstruction_Helper.checkTowers(room, bunkerCenter, rcl, currentConstructionCount);
+        AutoConstruction_Helper.checkSpawns(room, bunkerCenter, rcl, currentConstructionCount);
+        AutoConstruction_Helper.checkBunkerCenterLink(room, bunkerCenter, rcl, currentConstructionCount);
+        AutoConstruction_Helper.checkStorage(room, bunkerCenter, rcl, currentConstructionCount);
+        AutoConstruction_Helper.checkTerminal(room, bunkerCenter, rcl, currentConstructionCount);
+        AutoConstruction_Helper.checkBunkerCenterRamparts(room, bunkerCenter, rcl, currentConstructionCount);
+        AutoConstruction_Helper.checkBunkerCenterRoads(room, bunkerCenter, rcl, currentConstructionCount);
     }
 
     /**
