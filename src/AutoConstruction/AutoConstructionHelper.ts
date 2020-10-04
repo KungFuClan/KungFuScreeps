@@ -1,3 +1,4 @@
+import { dirxml } from "console";
 import { link } from "fs";
 import _ from "lodash";
 import { MemoryApi_Room } from "Memory/Memory.Room.Api";
@@ -230,18 +231,26 @@ export class AutoConstruction_Helper {
      * @param currentConstructionCount the current number of active construction sites empire wide
      */
     public static checkBunkerCenterRoads(room: Room, bunkerCenter: RoomPosition, rcl: number, currentConstructionCount: number): void {
-        switch (rcl) {
-            // Don't worry about roads until rcl 4 (when we have storage)
-            case 1:
-            case 2:
-            case 3:
-                return;
-            case 4:
-            case 5:
-            case 6:
-            case 7:
-            case 8:
-                break;
+        const roadLoc = [
+            { dx: 0, dy: -3 },
+            { dx: 0, dy: 3 },
+            { dx: 3, dy: 0 },
+            { dx: -3, dy: 0 },
+            { dx: 2, dy: -1 },
+            { dx: 2, dy: 1 },
+            { dx: -2, dy: -1 },
+            { dx: -2, dy: 1 },
+            { dx: 1, dy: -2 },
+            { dx: 1, dy: 2 },
+            { dx: -1, dy: -2 },
+            { dx: -1, dy: 2 }
+        ];
+
+        for (const location of roadLoc) {
+            const positionToCheck: RoomPosition = new RoomPosition(bunkerCenter.x + location.dx, bunkerCenter.y + location.dy, room.name);
+            if (!RoomHelper_Structure.structureOrSiteExistsAtRoomPosition(room, positionToCheck)) {
+                room.createConstructionSite(positionToCheck.x, positionToCheck.y, STRUCTURE_ROAD);
+            }
         }
     }
 }
