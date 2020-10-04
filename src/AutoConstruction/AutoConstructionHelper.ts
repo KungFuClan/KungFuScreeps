@@ -14,18 +14,46 @@ export class AutoConstruction_Helper {
      * @param currentConstructionCount the current number of active construction sites empire wide
      */
     public static checkTowers(room: Room, bunkerCenter: RoomPosition, rcl: number, currentConstructionCount: number): void {
+        const towerLoc = [
+            { dx: 0, dy: -1 },
+            { dx: 0, dy: -2 },
+            { dx: 0, dy: 1 },
+            { dx: 0, dy: 2 },
+            { dx: -2, dy: 0 },
+            { dx: 2, dy: 0 }
+        ];
+        let numOfTowers: number = 1;
+
         switch (rcl) {
-            // No towers for first 2 rcl
+            // No towers until rcl 3
             case 1:
             case 2:
-                return;
+                break;
             case 3:
             case 4:
+                numOfTowers = 1;
+                break;
             case 5:
             case 6:
-            case 7:
-            case 8:
+                numOfTowers = 2;
                 break;
+            case 7:
+                numOfTowers = 3;
+                break;
+            case 8:
+                numOfTowers = 6;
+                break;
+        }
+
+        // Make sure we have a tower, if not build one
+        const towers = MemoryApi_Room.getStructureOfType(room.name, STRUCTURE_TOWER, undefined, true) as StructureTower[];
+        if (towers.length >= numOfTowers) return;
+        for (let i = 0; i < numOfTowers; ++i) {
+            // Skip the iteration if there is already a structure or construction site there
+            const positionToCheck: RoomPosition = new RoomPosition(bunkerCenter.x + towerLoc[i].dx, bunkerCenter.y + towerLoc[i].dy, room.name);
+            if (RoomHelper_Structure.structureOrSiteExistsAtRoomPosition(room, positionToCheck)) continue;
+            if (currentConstructionCount >= MAX_CONSTRUCTION_SITES) return;
+            room.createConstructionSite(bunkerCenter.x + towerLoc[i].dx, bunkerCenter.y + towerLoc[i].dy, STRUCTURE_TOWER);
         }
     }
 
@@ -37,7 +65,6 @@ export class AutoConstruction_Helper {
      * @param currentConstructionCount the current number of active construction sites empire wide
      */
     public static checkSpawns(room: Room, bunkerCenter: RoomPosition, rcl: number, currentConstructionCount: number): void {
-        let spawns: StructureSpawn[] = [];
         const spawnLoc = [
             { dx: 1, dy: -1 },
             { dx: 1, dy: 1 },
@@ -54,6 +81,7 @@ export class AutoConstruction_Helper {
             case 5:
             case 6:
                 numOfSpawns = 1;
+                break;
             case 7:
                 numOfSpawns = 2;
                 break;
@@ -63,7 +91,7 @@ export class AutoConstruction_Helper {
         }
 
         // Make sure we have a spawn, if not build one
-        spawns = MemoryApi_Room.getStructureOfType(room.name, STRUCTURE_SPAWN, undefined, true) as StructureSpawn[];
+        const spawns = MemoryApi_Room.getStructureOfType(room.name, STRUCTURE_SPAWN, undefined, true) as StructureSpawn[];
         if (spawns.length >= numOfSpawns) return;
         for (let i = 0; i < numOfSpawns; ++i) {
             // Skip the iteration if there is already a structure or construction site there
