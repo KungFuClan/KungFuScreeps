@@ -19,7 +19,8 @@ import {
     MILITARY_MANAGER_BUCKET_LIMIT,
     MilitaryManager,
     MAP_OVERLAY_BUCKET_LIMIT,
-    MARKET_MANAGER_BUCKET_LIMIT, AUTOCONST_MANAGER_BUCKET_LIMIT
+    MARKET_MANAGER_BUCKET_LIMIT,
+    AUTOCONST_MANAGER_BUCKET_LIMIT
 } from "Utils/Imports/internals";
 import { MapVisualManager } from "MapVisuals/MapVisualManager";
 import { MarketManager } from "Market/MarketManager";
@@ -31,7 +32,7 @@ export class ManagerManager {
             ConsoleCommands.init();
         }
 
-        if (Game.cpu.bucket >= 10000) {
+        if (Game.cpu.generatePixel !== undefined && Game.cpu.bucket >= 10000) {
             Game.cpu.generatePixel();
         }
 
