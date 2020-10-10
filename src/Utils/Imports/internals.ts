@@ -88,6 +88,7 @@ export * from "Memory/MemoryManagement";
 export * from "Room/RoomManager";
 export * from "Spawn/SpawnManager";
 export * from "Military/MilitaryManager";
+export * from "AutoConstruction/AutoConstructionManager";
 // ---------------------------------
 // Import Room Visuals
 export * from "RoomVisuals/RoomVisual.Api";

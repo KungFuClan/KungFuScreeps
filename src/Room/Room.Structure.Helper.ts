@@ -12,7 +12,7 @@ import {
     militaryDataHelper,
     ERROR_ERROR
 } from "Utils/Imports/internals";
-import _ from "lodash";
+import _, { object } from "lodash";
 
 export class RoomHelper_Structure {
     /**
@@ -379,5 +379,22 @@ export class RoomHelper_Structure {
             storageLevels += terminal.store[RESOURCE_ENERGY];
         }
         return storageLevels;
+    }
+
+    /**
+     * Check if a room position has a construction site or structure on it
+     * @param room The room we are checking the position inside
+     * @param positionToCheck The position we are checking on
+     * @returns boolean representing if a structure or construction site exists
+     */
+    public static structureOrSiteExistsAtRoomPosition(room: Room, positionToCheck: RoomPosition): boolean {
+        const sitesAtPos = _.filter(room.lookAt(positionToCheck), (obj => {
+            obj.type === LOOK_CONSTRUCTION_SITES || obj.type === LOOK_STRUCTURES
+        }));
+
+        if (sitesAtPos.length === 0) return false;
+        return _.some(sitesAtPos, (site) => {
+            return site.structure?.structureType !== STRUCTURE_RAMPART;
+        });
     }
 }

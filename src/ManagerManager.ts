@@ -19,10 +19,12 @@ import {
     MILITARY_MANAGER_BUCKET_LIMIT,
     MilitaryManager,
     MAP_OVERLAY_BUCKET_LIMIT,
-    MARKET_MANAGER_BUCKET_LIMIT
+    MARKET_MANAGER_BUCKET_LIMIT,
+    AUTOCONST_MANAGER_BUCKET_LIMIT
 } from "Utils/Imports/internals";
 import { MapVisualManager } from "MapVisuals/MapVisualManager";
 import { MarketManager } from "Market/MarketManager";
+import { AutoConstructionManager } from "AutoConstruction/AutoConstructionManager";
 
 export class ManagerManager {
     public static runManagerManager(): void {
@@ -30,11 +32,10 @@ export class ManagerManager {
             ConsoleCommands.init();
         }
 
-        if (Game.cpu.bucket >= 10000) {
+        if (Game.cpu.generatePixel !== undefined && Game.cpu.bucket >= 10000) {
             Game.cpu.generatePixel();
         }
 
-        // clean up memory
         if (Game.cpu.bucket > MEMORY_MANAGER_BUCKET_LIMIT) {
             try {
                 MemoryManager.runMemoryManager();
@@ -43,7 +44,6 @@ export class ManagerManager {
             }
         }
 
-        // run rooms
         if (Game.cpu.bucket > ROOM_MANAGER_BUCKET_LIMIT) {
             try {
                 RoomManager.runRoomManager();
@@ -52,7 +52,6 @@ export class ManagerManager {
             }
         }
 
-        // run spawning
         if (Game.cpu.bucket > SPAWN_MANAGER_BUCKET_LIMIT && RoomHelper_Structure.executeEveryTicks(3)) {
             try {
                 SpawnManager.runSpawnManager();
@@ -61,7 +60,6 @@ export class ManagerManager {
             }
         }
 
-        // run creeps
         if (Game.cpu.bucket > CREEP_MANAGER_BUCKET_LIMIT) {
             try {
                 CreepManager.runCreepManager();
@@ -73,6 +71,38 @@ export class ManagerManager {
         if (Game.cpu.bucket > MAP_OVERLAY_BUCKET_LIMIT && ROOM_VISUALS_ON) {
             try {
                 MapVisualManager.runMapVisualManager();
+            } catch (e) {
+                UtilHelper.printError(e);
+            }
+        }
+
+        if (Game.cpu.bucket > EMPIRE_MANAGER_BUCKET_LIMIT) {
+            try {
+                EmpireManager.runEmpireManager();
+            } catch (e) {
+                UtilHelper.printError(e);
+            }
+        }
+
+        if (Game.cpu.bucket > MARKET_MANAGER_BUCKET_LIMIT) {
+            try {
+                MarketManager.runMarketManager();
+            } catch (e) {
+                UtilHelper.printError(e);
+            }
+        }
+
+        if (Game.cpu.bucket > MILITARY_MANAGER_BUCKET_LIMIT) {
+            try {
+                MilitaryManager.runOperations();
+            } catch (e) {
+                UtilHelper.printError(e);
+            }
+        }
+
+        if (Game.cpu.bucket > AUTOCONST_MANAGER_BUCKET_LIMIT && RoomHelper_Structure.executeEveryTicks(1)) {
+            try {
+                AutoConstructionManager.runAutoConstructionManager();
             } catch (e) {
                 UtilHelper.printError(e);
             }
@@ -92,32 +122,5 @@ export class ManagerManager {
                 UtilHelper.printError(e);
             }
         }
-
-        // run the empire
-        if (Game.cpu.bucket > EMPIRE_MANAGER_BUCKET_LIMIT) {
-            try {
-                EmpireManager.runEmpireManager();
-            } catch (e) {
-                UtilHelper.printError(e);
-            }
-        }
-
-        if (Game.cpu.bucket > MARKET_MANAGER_BUCKET_LIMIT) {
-            try {
-                MarketManager.runMarketManager();
-            } catch (e) {
-                UtilHelper.printError(e);
-            }
-        }
-
-        // run the military
-        if (Game.cpu.bucket > MILITARY_MANAGER_BUCKET_LIMIT) {
-            try {
-                MilitaryManager.runOperations();
-            } catch (e) {
-                UtilHelper.printError(e);
-            }
-        }
-        // -------- end managers --------
     }
 }
