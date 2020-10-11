@@ -27,8 +27,7 @@ export class MarketHelper {
         if (request.status !== "pendingMarket") {
             throw new UserException(
                 "MarketRequest Error",
-                "Attempted to checkOrderStatus on a request that is not in pendingMarket status - " +
-                    +this.getRequestName(request),
+                `Attempted to checkOrderStatus on a request that is not in pendingMarket status - ${+this.getRequestName(request)}`,
                 ERROR_WARN
             );
         }
@@ -38,14 +37,17 @@ export class MarketHelper {
         });
 
         if (orders.length === 0) {
-            throw new UserException(
+            let error = new UserException(
                 "MarketRequest Error",
-                "Could not find the order for the MarketRequest - " + this.getRequestName(request),
+                `Could not find the order for the MarketRequest - ${this.getRequestName(request)}\nDeleting Request.`,
                 ERROR_WARN
-            );
+                );
+
+            this.deleteRequest(request);
+            throw error;
         }
 
-        let newestOrder = _.max(orders, order => order.created).created;
+        let newestOrder = _.max(orders, (order) => order.created).created;
 
         // Don't decide anything if the newest order is less than 5 ticks old, since the market lags behind
         if (Game.time - newestOrder <= 5) {
@@ -58,8 +60,16 @@ export class MarketHelper {
 
         if (amountLeftInOrder === 0) {
             request.status = "complete";
-
             for (let order of orders) {
+                Game.market.cancelOrder(order.id);
+            }
+        }
+
+        // -20K means the order has been waiting for roughly a day at ~3 second ticks, so we cancel and replace the order to improve the price
+        if(request.maxWaitRemaining <= -20000) {
+            request.status = "incomplete";
+            for (let order of orders) {
+                // TODO Look into changing the price here instead of canceling, since we do have to re-pay the market fee when we do this.
                 Game.market.cancelOrder(order.id);
             }
         }
