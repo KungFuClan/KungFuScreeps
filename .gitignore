@@ -4,6 +4,9 @@
 # npm lock file (v5.0.0+)
 /package-lock.json
 
+# rollup config file
+rollup.config.js
+
 # Ignore basic folders
 /.rpt2_cache
 /tsc-out

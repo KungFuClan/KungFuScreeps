@@ -28,6 +28,11 @@ import { AutoConstructionManager } from "AutoConstruction/AutoConstructionManage
 
 export class ManagerManager {
     public static runManagerManager(): void {
+
+        // * Debug Variables
+        const debug_disableVisuals = true;
+        const debug_disableMarket = true;
+
         if (RoomHelper_Structure.executeEveryTicks(1000)) {
             ConsoleCommands.init();
         }
@@ -68,7 +73,7 @@ export class ManagerManager {
             }
         }
 
-        if (Game.cpu.bucket > MAP_OVERLAY_BUCKET_LIMIT && ROOM_VISUALS_ON) {
+        if (!debug_disableVisuals && Game.cpu.bucket > MAP_OVERLAY_BUCKET_LIMIT && ROOM_VISUALS_ON) {
             try {
                 MapVisualManager.runMapVisualManager();
             } catch (e) {
@@ -84,7 +89,7 @@ export class ManagerManager {
             }
         }
 
-        if (Game.cpu.bucket > MARKET_MANAGER_BUCKET_LIMIT) {
+        if (!debug_disableMarket && Game.cpu.bucket > MARKET_MANAGER_BUCKET_LIMIT) {
             try {
                 MarketManager.runMarketManager();
             } catch (e) {
@@ -109,7 +114,7 @@ export class ManagerManager {
         }
 
         // Display room visuals if we have a fat enough bucket and config option allows it
-        if (Game.cpu.bucket > ROOM_OVERLAY_BUCKET_LIMIT && ROOM_VISUALS_ON) {
+        if (!debug_disableVisuals && Game.cpu.bucket > ROOM_OVERLAY_BUCKET_LIMIT && ROOM_VISUALS_ON) {
             try {
                 RoomVisualManager.runRoomVisualManager();
             } catch (e) {

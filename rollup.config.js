@@ -21,9 +21,13 @@ export default {
     format: "cjs",
     sourcemap: true
   },
-
+  output: {
+    file: "C:/Users/Brock/AppData/Local/Screeps/scripts/server2_screepspl_us___21025/default/main.js",
+    format: "cjs",
+    sourcemap: true
+  },
   plugins: [
-    clear({ targets: ["dist"] }),
+    clear({ targets: ["dist", "C:/Users/Brock/AppData/Local/Screeps/scripts/server2_screepspl_us___21025/default"]}),
     resolve(),
     commonjs(),
     typescript({tsconfig: "./tsconfig.json"}),

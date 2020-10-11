@@ -171,11 +171,15 @@ export class StandardSquadManager implements ISquadManager {
                 hostiles: true,
                 hostileStructures: true
             };
+
             const creeps: Creep[] = MemoryApi_Military.getLivingCreepsInSquadByInstance(instance);
             const roomData: MilitaryDataAll = militaryDataHelper.getRoomData(creeps, {}, dataNeeded, instance);
 
             if (status !== SQUAD_STATUS_RALLY) {
-                if (!instance.attackTarget || MilitaryMovement_Helper.needSwitchAttackTarget(instance, roomData, instance.attackTarget)) {
+                if (MilitaryMovement_Helper.needSwitchAttackTarget(instance, roomData, instance.attackTarget)) {
+
+                    // TODO We currently will not target anything not in target room - this could be a desired behavior
+
                     const attackTarget: Structure | Creep | undefined = MilitaryCombat_Api.getSeigeAttackTarget(instance, roomData);
                     instance.attackTarget = attackTarget ? attackTarget.id : undefined;
                 }

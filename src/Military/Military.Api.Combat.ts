@@ -12,6 +12,7 @@ import {
 } from "Utils/Imports/internals";
 import { stringify } from "querystring";
 import _ from "lodash";
+import { CostMatrixApi } from "Pathfinding/CostMatrix.Api";
 
 export class MilitaryCombat_Api {
     /**
@@ -322,25 +323,13 @@ export class MilitaryCombat_Api {
         const pathFinderOptions: PathFinderOpts = {
             roomCallback: (roomName): boolean | CostMatrix => {
                 const room: Room = Game.rooms[roomName];
-                const costs = new PathFinder.CostMatrix();
-                if (!room) {
-                    return false;
-                }
 
-                // Set walls and ramparts as unwalkable
-                room.find(FIND_STRUCTURES).forEach(function (struct: Structure<StructureConstant>) {
-                    if (struct.structureType === STRUCTURE_WALL || struct.structureType === STRUCTURE_RAMPART) {
-                        // Set walls and ramparts as unwalkable
-                        costs.set(struct.pos.x, struct.pos.y, 0xff);
-                    }
-                } as any);
+                // TODO Get Squad orientation here?
+                let testMatrix = CostMatrixApi.getQuadSquadMatrix(roomName, 7);
+                // TODO Remove this
+                CostMatrixApi.visualizeCostMatrix(testMatrix, roomName, 10, 100);
 
-                // Set creeps as unwalkable
-                room.find(FIND_CREEPS).forEach(function (currentCreep: Creep) {
-                    costs.set(currentCreep.pos.x, currentCreep.pos.y, 0xff);
-                });
-
-                return costs;
+                return testMatrix;
             }
         };
 

@@ -356,7 +356,7 @@ export class MilitaryMovement_Helper {
     public static needSwitchAttackTarget(instance: ISquadManager, roomData: MilitaryDataAll, attackTarget: Id<Creep | Structure> | undefined): boolean {
         if (!instance.attackTarget) return true;
         const attackTargetObject = Game.getObjectById(instance.attackTarget);
-        if (!attackTargetObject) return true;
+        if (attackTargetObject === null) return true;
         return false;
     }
 

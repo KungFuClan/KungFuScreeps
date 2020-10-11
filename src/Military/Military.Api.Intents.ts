@@ -10,7 +10,7 @@ import {
     ERROR_ERROR,
     SQUAD_STATUS_RALLY,
     militaryDataHelper,
-    RoomHelper_Structure, ACTION_ATTACK, MilitaryIntents_Helper
+    RoomHelper_Structure, ACTION_ATTACK, MilitaryIntents_Helper, PathfindingApi
 } from "Utils/Imports/internals";
 import { MilitaryMovement_Helper } from "./Military.Movement.Helper";
 import _ from "lodash";
@@ -386,12 +386,14 @@ export class MilitaryIntents_Api {
             return false;
         }
 
+        let moveDirection: DirectionConstant = MilitaryMovement_Helper.getQuadSquadPathingPoint(instance).findPathTo(new RoomPosition(25, 25, instance.targetRoom))[0].direction;
+
         const creeps: Creep[] = MemoryApi_Military.getLivingCreepsInSquadByInstance(instance);
         if (_.some(creeps, (creep) => creep.fatigue > 0)) return true;
         _.forEach(creeps, (creep: Creep) => {
             const intent: Move_MiliIntent = {
                 action: ACTION_MOVE,
-                target: instance.orientation!,
+                target: moveDirection,
                 targetType: "direction"
             };
             MemoryApi_Military.pushIntentToCreepStack(instance, creep.name, intent);
