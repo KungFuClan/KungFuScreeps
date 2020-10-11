@@ -1,8 +1,5 @@
 import _ from "lodash";
-import { MemoryApi_Room } from "Memory/Memory.Room.Api";
-import { send } from "process";
-import { MemoryApi_Empire, UserException } from "Utils/Imports/internals";
-import { Mem } from "Utils/MemHack";
+import { ERROR_WARN, MemoryApi_Empire, UserException, UtilHelper } from "Utils/Imports/internals";
 import { MarketHelper } from "./MarketHelper";
 
 const defaultWaitTime = 500;
@@ -165,6 +162,12 @@ export class MarketManager {
         if (result === OK) {
             request.status = "pendingMarket";
             return true;
+        } else {
+            UtilHelper.printError(new UserException(
+                "Failed to create market order",
+                `${request.roomName} : ${request.resourceType} : ${request.amount} : ${request.requestType} : ${request.status}\nReturnCode: ${result}`,
+                ERROR_WARN
+            ));
         }
 
         return false;
