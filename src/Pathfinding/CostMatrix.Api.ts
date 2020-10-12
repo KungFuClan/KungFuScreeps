@@ -34,7 +34,6 @@ export class CostMatrixApi {
 
     /**
      * Returns a cost matrix adjusted to make walkable for a quad squad
-     * TODO Fix caching to cache the directions as well, currently it will cache one CM regardless of direction
      * @param roomName Room to get the cost matrix for
      */
     public static getQuadSquadMatrix(roomName: string, direction: TOP | RIGHT | BOTTOM | LEFT): CostMatrix {

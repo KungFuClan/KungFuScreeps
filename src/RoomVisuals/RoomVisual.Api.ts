@@ -634,7 +634,7 @@ export class RoomVisualApi {
 
         // Quit early if no creeps
         if (hostileCreeps.length === 0) {
-            return;
+            // return;
         }
 
         // Take out creeps with heal parts
@@ -654,7 +654,7 @@ export class RoomVisualApi {
         const towers = MemoryApi_Room.getStructureOfType(
             room.name,
             STRUCTURE_TOWER,
-            (tower: StructureTower) => tower.energy > 0
+            (tower: StructureTower) => tower.store.getUsedCapacity(RESOURCE_ENERGY) > 0
         ) as StructureTower[];
 
         const creepHealData = RoomHelper_Structure.getCreepsAvailableHealing(healCreeps, attackCreeps);
@@ -669,17 +669,19 @@ export class RoomVisualApi {
 
             const netDamage = damage - data.healAmount;
 
+            console.log(`dist: ${distance}, dmg: ${damage}, heal: ${data.healAmount}, net: ${netDamage}`)
+
             // If greater than the min damage and we shot last tick, or greater than max damage regardless of shooting last tick
             if (
                 (netDamage >= TOWER_MIN_DAMAGE_THRESHOLD && room.memory.shotLastTick === true) ||
                 netDamage >= TOWER_MAX_DAMAGE_THRESHOLD
             ) {
-                roomVisual.text((damage - data.healAmount).toString(), data.creep.pos.x, data.creep.pos.y, {
+                roomVisual.text((netDamage).toString(), data.creep.pos.x, data.creep.pos.y, {
                     font: 0.75,
                     color: "#00ff00"
                 });
             } else {
-                roomVisual.text((damage - data.healAmount).toString(), data.creep.pos.x, data.creep.pos.y, {
+                roomVisual.text((netDamage).toString(), data.creep.pos.x, data.creep.pos.y, {
                     font: 0.75,
                     color: "#ff0000"
                 });

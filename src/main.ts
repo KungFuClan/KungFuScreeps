@@ -8,7 +8,7 @@
 */
 
 // Define prototypes
-import { ErrorMapper, ManagerManager } from "Utils/Imports/internals";
+import { ErrorMapper, ManagerManager, RoomVisualApi } from "Utils/Imports/internals";
 import { Mem } from "Utils/MemHack";
 
 // import * as Profiler from "./Profiler";
@@ -17,4 +17,5 @@ import { Mem } from "Utils/MemHack";
 export const loop = ErrorMapper.wrapLoop(() => {
     Mem.loadCachedMemory();
     ManagerManager.runManagerManager();
+    RoomVisualApi.debug_towerDamageOverlay_perCreep(Game.rooms["W8S8"])
 });

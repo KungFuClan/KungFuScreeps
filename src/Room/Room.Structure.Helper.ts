@@ -333,7 +333,10 @@ export class RoomHelper_Structure {
      * @param target An object with a pos property
      */
     public static getAverageDistanceToTarget(fromPoints: _HasRoomPosition[], target: _HasRoomPosition) {
-        const totalDistance = _.sum(fromPoints, (point: _HasRoomPosition) => point.pos.getRangeTo(target.pos));
+        let totalDistance = 0;
+        for(let point of fromPoints) {
+            totalDistance += point.pos.getRangeTo(target.pos);
+        }
         return totalDistance / fromPoints.length;
     }
 
