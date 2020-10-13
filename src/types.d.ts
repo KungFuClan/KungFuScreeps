@@ -1596,3 +1596,11 @@ type CLAIM_DEFAULT = "claimDefault";
 type CLAIM_ESCORT = "claimEscort";
 
 type ClaimRoomTypeConstant = CLAIM_DEFAULT | CLAIM_ESCORT;
+
+interface CostMatrix {
+    _bits: number[];
+}
+
+interface RoomTerrain {
+    getRawBuffer: () => number[];
+}

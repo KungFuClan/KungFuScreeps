@@ -84,7 +84,7 @@ export class ManagerManager {
             }
         }
 
-        if (Game.cpu.bucket > MARKET_MANAGER_BUCKET_LIMIT) {
+        if (Game.shard.name !== "screepsplus2" && Game.cpu.bucket > MARKET_MANAGER_BUCKET_LIMIT) {
             try {
                 MarketManager.runMarketManager();
             } catch (e) {
