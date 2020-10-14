@@ -305,14 +305,14 @@ export class RoomVisualApi {
      * @param y the y coord for the visual
      */
     public static createClaimFlagVisual(room: Room, x: number, y: number): number {
-        const dependentRemoteRooms: Array<ClaimRoomMemory | undefined> = MemoryApi_Room.getClaimRooms(room);
+        const dependentClaimRooms: Array<ClaimRoomMemory | undefined> = MemoryApi_Room.getClaimRooms(room);
 
         // Draw the text
         const lines: string[] = [];
         lines.push("");
         lines.push("Claim Rooms ");
         lines.push("");
-        for (const dr of dependentRemoteRooms) {
+        for (const dr of dependentClaimRooms) {
             if (!dr) {
                 continue;
             }

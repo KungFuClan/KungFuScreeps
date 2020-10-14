@@ -42,7 +42,7 @@ export class ProcessDefaultClaimRoom implements IFlagProcesser {
         // Get the host room and set the flags memory
         const flagTypeConst: FlagTypeConstant | undefined = EmpireHelper.getFlagType(flag);
         const roomName: string = flag.pos.roomName;
-        Memory.flags[flag.name].complete = false;
+        Memory.flags[flag.name].complete = true;
         Memory.flags[flag.name].processed = true;
         Memory.flags[flag.name].timePlaced = Game.time;
         Memory.flags[flag.name].flagType = flagTypeConst;
@@ -75,6 +75,12 @@ export class ProcessDefaultClaimRoom implements IFlagProcesser {
      * @param flag the flag that triggered the claim remove event
      */
     private handleRemoveClaimFlagPlaced(flag: Flag): void {
-
+        // Get the host room and set the flags memory
+        const flagTypeConst: FlagTypeConstant | undefined = EmpireHelper.getFlagType(flag);
+        Memory.flags[flag.name].complete = true;
+        Memory.flags[flag.name].processed = true;
+        Memory.flags[flag.name].timePlaced = Game.time;
+        Memory.flags[flag.name].flagType = flagTypeConst;
+        Memory.flags[flag.name].flagName = flag.name;
     }
 }
