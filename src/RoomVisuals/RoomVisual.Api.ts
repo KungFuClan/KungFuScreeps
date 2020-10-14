@@ -306,7 +306,6 @@ export class RoomVisualApi {
      */
     public static createClaimFlagVisual(room: Room, x: number, y: number): number {
         const dependentClaimRooms: Array<ClaimRoomMemory | undefined> = MemoryApi_Room.getClaimRooms(room);
-        console.log("Claim rooms: " + dependentClaimRooms);
 
         // Draw the text
         const lines: string[] = [];
