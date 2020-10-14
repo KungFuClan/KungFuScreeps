@@ -682,7 +682,7 @@ export class MemoryApi_Room {
         }
 
         let claimRooms: ClaimRoomMemory[] = [];
-        for (let i in room.memory.remoteRooms) {
+        for (let i in room.memory.claimRooms) {
             const cc: ClaimRoomMemory = room.memory.claimRooms![i];
             if (cc) claimRooms.push(cc);
         }
