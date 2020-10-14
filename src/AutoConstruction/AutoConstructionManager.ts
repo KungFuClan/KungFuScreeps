@@ -21,6 +21,8 @@ export class AutoConstructionManager {
         if (!room.controller) return;
         const currentConstructionCount = Object.keys(Game.constructionSites).length;
         if (currentConstructionCount >= MAX_CONSTRUCTION_SITES) return;
+        const spawns = room.find(FIND_MY_SPAWNS);
+        if (spawns.length < 1) return;
         const bunkerCenter: RoomPosition = MemoryApi_Room.getBunkerCenter(room);
         const controller: StructureController = room.controller;
         const rcl: number = room.controller.level;
