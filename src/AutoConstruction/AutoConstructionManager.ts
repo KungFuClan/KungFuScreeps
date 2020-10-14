@@ -33,7 +33,7 @@ export class AutoConstructionManager {
         AutoConstruction_Api.checkControllerBuildings(room, controller, rcl, currentConstructionCount);
         AutoConstruction_Api.checkSourceBuildings(room, sources, rcl, currentConstructionCount);
 
-        AutoConstruction_Api.displayMatrix(AutoConstruction_Api.getDistanceTransform(room, 0, true), false, true);
+        // AutoConstruction_Api.displayMatrix(AutoConstruction_Api.getDistanceTransform(room, 0, true), false, true);
 
         // TODO Remove - Temp line
         // let cpu = Game.cpu.getUsed();

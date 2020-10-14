@@ -208,6 +208,21 @@ export class AutoConstruction_Helper {
      * @param currentConstructionCount the current number of active construction sites empire wide
      */
     public static checkBunkerCenterRamparts(room: Room, bunkerCenter: RoomPosition, rcl: number, currentConstructionCount: number): void {
+        const rampartLoc = [
+            { dx: 0, dy: 0 },
+            { dx: 0, dy: 1 },
+            { dx: 0, dy: -1 },
+            { dx: 0, dy: 2 },
+            { dx: 0, dy: -2 },
+            { dx: -1, dy: 0 },
+            { dx: -1, dy: -1 },
+            { dx: -1, dy: 1 },
+            { dx: 1, dy: -1 },
+            { dx: 1, dy: 1 },
+            { dx: 1, dy: 0 },
+            { dx: -2, dy: 0 },
+            { dx: 2, dy: 0 },
+        ];
         switch (rcl) {
             // Don't worry about ramparts until rcl 4 (once we grab a storage)
             case 1:
@@ -219,6 +234,12 @@ export class AutoConstruction_Helper {
             case 6:
             case 7:
             case 8:
+                for (const location of rampartLoc) {
+                    const positionToCheck: RoomPosition = new RoomPosition(bunkerCenter.x + location.dx, bunkerCenter.y + location.dy, room.name);
+                    if (!RoomHelper_Structure.structureOrSiteExistsAtRoomPosition(room, positionToCheck)) {
+                        room.createConstructionSite(positionToCheck.x, positionToCheck.y, STRUCTURE_RAMPART);
+                    }
+                }
                 break;
         }
     }
